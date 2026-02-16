@@ -9,6 +9,19 @@ import osmnx as ox
 MSU_IIT_CENTER = (8.2280, 124.2452)  # (lat, lon)
 DEFAULT_CACHE_PATH = Path("data") / "msu_iit_drive.graphml"
 
+# Paper-grounded hazard class -> numeric score mapping.
+FLOOD_CLASS_TO_SCORE = {
+    "low": 0.2,       # 0-0.5m
+    "moderate": 0.6,  # 0.5-1.5m
+    "high": 1.0,      # >1.5m
+}
+LANDSLIDE_CLASS_TO_SCORE = {
+    "very_low": 0.1,
+    "low": 0.5,
+    "moderate": 0.8,
+    "high": 1.0,
+}
+
 
 def get_raw_osm_graph(
     cache_path=DEFAULT_CACHE_PATH,
@@ -46,16 +59,38 @@ def get_raw_osm_graph(
     return G_raw
 
 
-def sample_edge_hazard_scores(low_hazard_edge_prob=0.8):
-    # Most roads are safer; a minority are high-risk segments.
-    if np.random.rand() < low_hazard_edge_prob:
-        flood_score = np.random.uniform(0.0, 0.2)
-        landslide_score = np.random.uniform(0.0, 0.2)
-    else:
-        flood_score = np.random.uniform(0.35, 1.0)
-        landslide_score = np.random.uniform(0.35, 1.0)
+def _sample_class(score_map, class_probs):
+    classes = list(score_map.keys())
+    probs = np.array([class_probs[c] for c in classes], dtype=float)
+    probs = probs / probs.sum()
+    chosen = np.random.choice(classes, p=probs)
+    return chosen, float(score_map[chosen])
 
-    return float(flood_score), float(landslide_score)
+
+def sample_edge_hazard_scores(low_hazard_edge_prob=0.8):
+    """Sample discrete hazard classes and mapped numeric scores per edge.
+
+    `low_hazard_edge_prob` keeps backward compatibility with previous behavior:
+    it biases sampling toward the lowest hazard class.
+    """
+    low_p = float(np.clip(low_hazard_edge_prob, 0.0, 1.0))
+    rem_p = 1.0 - low_p
+
+    flood_probs = {
+        "low": low_p,
+        "moderate": rem_p * 0.6,
+        "high": rem_p * 0.4,
+    }
+    landslide_probs = {
+        "very_low": low_p,
+        "low": rem_p * 0.5,
+        "moderate": rem_p * 0.3,
+        "high": rem_p * 0.2,
+    }
+
+    flood_class, flood_score = _sample_class(FLOOD_CLASS_TO_SCORE, flood_probs)
+    landslide_class, landslide_score = _sample_class(LANDSLIDE_CLASS_TO_SCORE, landslide_probs)
+    return flood_score, landslide_score, flood_class, landslide_class
 
 
 def to_training_graph(raw_graph, num_nodes=60, min_nodes=30, max_nodes=100, low_hazard_edge_prob=0.8):
@@ -92,7 +127,9 @@ def to_training_graph(raw_graph, num_nodes=60, min_nodes=30, max_nodes=100, low_
         length_m = float(data.get("length", 1.0))
         # Approx. travel time in minutes with nominal 30 km/h urban speed.
         base_time = (length_m / 8.33) / 60.0
-        flood_score, landslide_score = sample_edge_hazard_scores(low_hazard_edge_prob=low_hazard_edge_prob)
+        flood_score, landslide_score, flood_class, landslide_class = sample_edge_hazard_scores(
+            low_hazard_edge_prob=low_hazard_edge_prob
+        )
         G.add_edge(
             u,
             v,
@@ -100,6 +137,8 @@ def to_training_graph(raw_graph, num_nodes=60, min_nodes=30, max_nodes=100, low_
             base_time=max(base_time, 0.01),
             flood_score=flood_score,
             landslide_score=landslide_score,
+            flood_class=flood_class,
+            landslide_class=landslide_class,
         )
 
     return G
