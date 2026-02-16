@@ -5,6 +5,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import matplotlib.pyplot as plt
+from pathlib import Path
 from collections import deque
 
 from graph_utils import get_raw_osm_graph, to_training_graph
@@ -275,10 +276,11 @@ def evaluate_policy(model, env, num_episodes=100, epsilon=0.0):
 
 # Training loop
 def train(
-    num_episodes=1000,
+    num_episodes=1500,
     log_every=20,
     target_update_every=20,
-    eval_episodes=100,
+    eval_episodes=300,
+    eval_every=20,
     graph_num_nodes=15,
     graph_min_nodes=12,
     graph_max_nodes=20,
@@ -297,7 +299,7 @@ def train(
     target = DQN(state_dim, action_dim)
     target.load_state_dict(online.state_dict())
 
-    optimizer = optim.Adam(online.parameters(), lr=1e-3)
+    optimizer = optim.Adam(online.parameters(), lr=3e-4)
     buffer = ReplayBuffer()
 
     gamma = 0.99
@@ -313,6 +315,13 @@ def train(
 
     reward_history = []
     success_history = []
+    best_eval_success = -1.0
+    best_eval_reward = -1e9
+    best_episode = 0
+    checkpoints_dir = Path("checkpoints")
+    checkpoints_dir.mkdir(parents=True, exist_ok=True)
+    best_model_path = checkpoints_dir / "best_model.pt"
+    last_model_path = checkpoints_dir / "last_model.pt"
 
     for episode in range(num_episodes):
         state = env.reset()
@@ -366,25 +375,84 @@ def train(
             window_success = success_history[-log_every:]
             avg_reward = float(np.mean(window_rewards))
             success_rate = float(np.mean(window_success))
-            print(
-                f"Episode {episode + 1}, "
-                f"LastReward: {total_reward:.2f}, "
-                f"AvgReward({log_every}): {avg_reward:.2f}, "
-                f"SuccessRate({log_every}): {success_rate:.2%}, "
-                f"Epsilon: {epsilon:.3f}"
+            # print(
+            #     f"Episode {episode + 1}, "
+            #     f"LastReward: {total_reward:.2f}, "
+            #     f"AvgReward({log_every}): {avg_reward:.2f}, "
+            #     f"SuccessRate({log_every}): {success_rate:.2%}, "
+            #     f"Epsilon: {epsilon:.3f}"
+            # )
+
+        if (episode + 1) % eval_every == 0:
+            eval_mean_reward_greedy, eval_success_rate_greedy = evaluate_policy(
+                online, env, num_episodes=eval_episodes, epsilon=0.0
             )
+            eval_mean_reward_noisy, eval_success_rate_noisy = evaluate_policy(
+                online, env, num_episodes=eval_episodes, epsilon=0.05
+            )
+            print(
+                f"[Eval @ Episode {episode + 1}] "
+                f"eps=0.0 -> MeanReward: {eval_mean_reward_greedy:.2f}, SuccessRate: {eval_success_rate_greedy:.2%} | "
+                f"eps=0.05 -> MeanReward: {eval_mean_reward_noisy:.2f}, SuccessRate: {eval_success_rate_noisy:.2%}"
+            )
+
+            if (
+                eval_success_rate_greedy > best_eval_success
+                or (
+                    eval_success_rate_greedy == best_eval_success
+                    and eval_mean_reward_greedy > best_eval_reward
+                )
+            ):
+                best_eval_success = eval_success_rate_greedy
+                best_eval_reward = eval_mean_reward_greedy
+                best_episode = episode + 1
+                torch.save(
+                    {
+                        "episode": best_episode,
+                        "model_state_dict": online.state_dict(),
+                        "optimizer_state_dict": optimizer.state_dict(),
+                        "eval_success_rate_eps0": best_eval_success,
+                        "eval_mean_reward_eps0": best_eval_reward,
+                        "graph_num_nodes": env.num_nodes,
+                        "seed": SEED,
+                    },
+                    best_model_path,
+                )
+                # print(
+                #     f"Saved best checkpoint: {best_model_path} "
+                #     f"(episode {best_episode}, success={best_eval_success:.2%}, reward={best_eval_reward:.2f})"
+                # )
+
+    torch.save(
+        {
+            "episode": num_episodes,
+            "model_state_dict": online.state_dict(),
+            "optimizer_state_dict": optimizer.state_dict(),
+            "graph_num_nodes": env.num_nodes,
+            "seed": SEED,
+        },
+        last_model_path,
+    )
+    print(f"Saved last checkpoint: {last_model_path}")
 
     eval_mean_reward, eval_success_rate = evaluate_policy(
         online, env, num_episodes=eval_episodes, epsilon=0.0
     )
+    eval_mean_reward_eps005, eval_success_rate_eps005 = evaluate_policy(
+        online, env, num_episodes=eval_episodes, epsilon=0.05
+    )
     print(
         f"Evaluation over {eval_episodes} episodes | "
-        f"MeanReward: {eval_mean_reward:.2f}, "
-        f"SuccessRate: {eval_success_rate:.2%}"
+        f"eps=0.0 MeanReward: {eval_mean_reward:.2f}, SuccessRate: {eval_success_rate:.2%} | "
+        f"eps=0.05 MeanReward: {eval_mean_reward_eps005:.2f}, SuccessRate: {eval_success_rate_eps005:.2%}"
+    )
+    print(
+        f"Best checkpoint summary | Episode: {best_episode}, "
+        f"eps=0.0 MeanReward: {best_eval_reward:.2f}, SuccessRate: {best_eval_success:.2%}"
     )
 
 
 # Run training
 if __name__ == "__main__":    
-    train()
-    # visualize_graph(create_base_graph(num_nodes=30, min_nodes=30, max_nodes=40), title="Base Graph (No Hazards)")
+    # train()
+    visualize_graph(create_base_graph(num_nodes=30, min_nodes=30, max_nodes=40), title="Base Graph (No Hazards)")
