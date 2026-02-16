@@ -46,7 +46,19 @@ def get_raw_osm_graph(
     return G_raw
 
 
-def to_training_graph(raw_graph, num_nodes=60, min_nodes=30, max_nodes=100):
+def sample_edge_hazard_scores(low_hazard_edge_prob=0.8):
+    # Most roads are safer; a minority are high-risk segments.
+    if np.random.rand() < low_hazard_edge_prob:
+        flood_score = np.random.uniform(0.0, 0.2)
+        landslide_score = np.random.uniform(0.0, 0.2)
+    else:
+        flood_score = np.random.uniform(0.35, 1.0)
+        landslide_score = np.random.uniform(0.35, 1.0)
+
+    return float(flood_score), float(landslide_score)
+
+
+def to_training_graph(raw_graph, num_nodes=60, min_nodes=30, max_nodes=100, low_hazard_edge_prob=0.8):
     if hasattr(ox, "convert") and hasattr(ox.convert, "to_undirected"):
         G_work = ox.convert.to_undirected(raw_graph)
     else:
@@ -80,13 +92,14 @@ def to_training_graph(raw_graph, num_nodes=60, min_nodes=30, max_nodes=100):
         length_m = float(data.get("length", 1.0))
         # Approx. travel time in minutes with nominal 30 km/h urban speed.
         base_time = (length_m / 8.33) / 60.0
+        flood_score, landslide_score = sample_edge_hazard_scores(low_hazard_edge_prob=low_hazard_edge_prob)
         G.add_edge(
             u,
             v,
             length=length_m,
             base_time=max(base_time, 0.01),
-            flood_score=np.random.rand(),
-            landslide_score=np.random.rand(),
+            flood_score=flood_score,
+            landslide_score=landslide_score,
         )
 
     return G
