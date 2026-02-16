@@ -4,48 +4,67 @@ import networkx as nx
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import matplotlib.pyplot as plt
 from collections import deque
 
-# =====================
-# Reproducibility
-# =====================
+from graph_utils import get_raw_osm_graph, to_training_graph
 
-SEED = 42
+# Reproducibility
+SEED = 40
 random.seed(SEED)
 np.random.seed(SEED)
 torch.manual_seed(SEED)
 
 
-# Mock Graph (With Hazard Scores)
-def create_base_graph(num_nodes=10, k_neighbors=3):
-    G = nx.Graph()
+# OSM-Based Graph (Iligan City, around MSU-IIT)
+def create_base_graph(num_nodes=60, min_nodes=30, max_nodes=100, force_download=False):
+    raw_graph = get_raw_osm_graph(min_nodes=min_nodes, force_download=force_download)
+    return to_training_graph(raw_graph, num_nodes=num_nodes, min_nodes=min_nodes, max_nodes=max_nodes)
 
-    # Create node positions
-    positions = {i: np.random.rand(2) for i in range(num_nodes)}
+def visualize_graph(G, title="Graph Visualization", highlight_start=None, highlight_deliveries=None):
+    pos = nx.get_node_attributes(G, "pos")
 
-    for i in range(num_nodes):
-        G.add_node(i, pos=positions[i])
+    plt.figure(figsize=(6, 6))
 
-    # Connect to nearest neighbors
-    for i in range(num_nodes):
-        distances = []
-        for j in range(num_nodes):
-            if i != j:
-                dist = np.linalg.norm(positions[i] - positions[j])
-                distances.append((j, dist))
-        distances.sort(key=lambda x: x[1])
+    # Draw Nodes
+    node_colors = []
 
-        for j, dist in distances[:k_neighbors]:
-            if not G.has_edge(i, j):
-                G.add_edge(
-                    i, j,
-                    length=dist,
-                    base_time=dist,
-                    flood_score=np.random.rand(),
-                    landslide_score=np.random.rand()
-                )
+    for node in G.nodes():
+        if highlight_start is not None and node == highlight_start:
+            node_colors.append("green")
+        elif highlight_deliveries is not None and node in highlight_deliveries:
+            node_colors.append("red")
+        else:
+            node_colors.append("skyblue")
 
-    return G
+    nx.draw_networkx_nodes(G, pos, node_color=node_colors, node_size=500)
+
+    # Draw Edges
+    edge_colors = []
+    widths = []
+
+    for u, v, data in G.edges(data=True):
+        hazard_intensity = data["flood_score"] + data["landslide_score"]
+
+        # Normalize for color scaling
+        hazard_clamped = min(hazard_intensity / 2.0, 1.0)
+
+        if data.get("blocked", False):
+            edge_colors.append("black")
+            widths.append(3)
+        else:
+            # Blue (low hazard) → Red (high hazard)
+            edge_colors.append((hazard_clamped, 0, 1 - hazard_clamped))
+            widths.append(1 + hazard_clamped * 2)
+
+    nx.draw_networkx_edges(G, pos, edge_color=edge_colors, width=widths)
+
+    # Draw Labels
+    nx.draw_networkx_labels(G, pos)
+
+    plt.title(title)
+    plt.axis("off")
+    plt.show()
 
 
 # Hazard Activation Model
@@ -77,8 +96,8 @@ class HazardRoutingEnv:
     def __init__(self, base_graph, num_deliveries=2):
         self.base_graph = base_graph
         self.num_nodes = base_graph.number_of_nodes()
-        self.num_deliveries = num_deliveries
-        self.max_steps = 50
+        self.num_deliveries = min(num_deliveries, self.num_nodes - 1)
+        self.max_steps = max(50, self.num_nodes * 2)
 
     def reset(self):
         rain_key = random.choice(list(RAIN_LEVELS.keys()))
@@ -210,11 +229,11 @@ class ReplayBuffer:
 
 # Training loop
 def train():
-    base_graph = create_base_graph(num_nodes=10)
+    base_graph = create_base_graph(num_nodes=60, min_nodes=30, max_nodes=100)
     env = HazardRoutingEnv(base_graph)
 
-    state_dim = 2 * 10 + 1
-    action_dim = 10
+    state_dim = 2 * env.num_nodes + 1
+    action_dim = env.num_nodes
 
     online = DQN(state_dim, action_dim)
     target = DQN(state_dim, action_dim)
@@ -236,9 +255,19 @@ def train():
 
         while not done:
             mask = env.get_action_mask()
+            valid_actions = torch.where(mask == 1)[0]
+
+            if valid_actions.numel() == 0:
+                # No traversable roads from current node under active hazards.
+                reward = -50.0
+                next_state = env._get_state()
+                done = True
+                buffer.store((state, env.current_node, reward, next_state, done))
+                state = next_state
+                total_reward += reward
+                continue
 
             if random.random() < epsilon:
-                valid_actions = torch.where(mask == 1)[0]
                 action = random.choice(valid_actions).item()
             else:
                 with torch.no_grad():
@@ -278,4 +307,10 @@ def train():
 
 # Run training
 if __name__ == "__main__":
-    train()
+    base_graph = create_base_graph(num_nodes=60, min_nodes=30, max_nodes=100)
+
+    print("Visualizing Base Graph (Hazard Scores Only)")
+    visualize_graph(base_graph, title="Base Graph (No Activation)")
+
+    
+    # train()
