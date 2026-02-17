@@ -1,16 +1,15 @@
 """
 Hazard-aware RL routing prototype on a compact OSM road graph.
 
-Main components:
-1) Base graph construction from cached OSM data.
-2) Episode hazard activation (rainfall RI1..RI5, currently sampling RI1..RI3).
-3) Routing environment with masked actions and shaped reward.
-4) DQN training/evaluation with replay buffer and target network.
+This script is config-driven. Edit `experiment_config.json` to run ablations
+without touching code.
 """
 
+import json
 import math
 import random
 from collections import deque
+from copy import deepcopy
 from pathlib import Path
 
 import networkx as nx
@@ -19,35 +18,13 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-from graph_utils import get_raw_osm_graph, to_training_graph
-
-# =========================
-# Reproducibility
-# =========================
-SEED = 40
-random.seed(SEED)
-np.random.seed(SEED)
-torch.manual_seed(SEED)
+from utils.graph_utils import get_raw_osm_graph, to_training_graph
 
 
 # =========================
-# Graph Construction
+# Defaults
 # =========================
-def create_base_graph(num_nodes=30, min_nodes=30, max_nodes=40, force_download=False):
-    """Create the static graph used for all episode hazard realizations."""
-    raw_graph = get_raw_osm_graph(min_nodes=min_nodes, force_download=force_download)
-    return to_training_graph(
-        raw_graph,
-        num_nodes=num_nodes,
-        min_nodes=min_nodes,
-        max_nodes=max_nodes,
-    )
-
-
-# =========================
-# Hazard Activation
-# =========================
-RAIN_LEVELS = {
+DEFAULT_RAIN_LEVELS = {
     "RI1": {
         "speed_mult": 0.94,
         "flood_block_threshold": 1.0,
@@ -84,23 +61,164 @@ RAIN_LEVELS = {
         "landslide_block_prob": 1.00,
     },
 }
+
+DEFAULT_CONFIG = {
+    "seed": 40,
+    "graph": {
+        "num_nodes": 15,
+        "min_nodes": 12,
+        "max_nodes": 20,
+        "force_download": False,
+    },
+    "environment": {
+        "num_deliveries": 2,
+        "min_max_steps": 50,
+        "max_steps_multiplier": 2.0,
+        "episode_time_scale": 6.0,
+    },
+    "hazard": {
+        "rain_levels": DEFAULT_RAIN_LEVELS,
+        "active_rain_keys": ["RI1", "RI2", "RI3"],
+        "flood_time_weight": 0.5,
+        "landslide_time_weight": 0.5,
+        "high_risk_flood_threshold": 0.6,
+        "high_risk_landslide_threshold": 0.5,
+        "max_neighbor_slots": 4,
+        "neighbor_feature_dim": 5,
+    },
+    "reward": {
+        "delivery": 50.0,
+        "mission_success": 100.0,
+        "k_progress": 0.1,
+        "hazard_lambda": 10.0,
+        "w_flood": 0.6,
+        "w_landslide": 0.4,
+        "eta_time": 0.2,
+        "penalty_timeout": -100.0,
+        "penalty_blockage": -100.0,
+        "penalty_incomplete_per_delivery": -20.0,
+    },
+    "model": {
+        "hidden_sizes": [64, 64],
+    },
+    "replay": {
+        "capacity": 10000,
+    },
+    "training": {
+        "num_episodes": 1500,
+        "gamma": 0.99,
+        "lr": 3e-4,
+        "batch_size": 32,
+        "epsilon_start": 1.0,
+        "epsilon_min": 0.05,
+        "epsilon_decay": 0.995,
+        "target_update_every_steps": 500,
+        "log_every": 20,
+        "eval_every": 20,
+    },
+    "evaluation": {
+        "episodes": 300,
+        "epsilon_greedy": 0.0,
+        "epsilon_noisy": 0.05,
+    },
+    "paths": {
+        "checkpoints_dir": "checkpoints",
+    },
+}
+
+CONFIG_PATH_DEFAULT = "experiment_config.json"
+
+
+# Runtime globals configured from config file.
+SEED = DEFAULT_CONFIG["seed"]
+RAIN_LEVELS = deepcopy(DEFAULT_CONFIG["hazard"]["rain_levels"])
 RAIN_KEYS = list(RAIN_LEVELS.keys())
-# Feasibility mode: only sample lighter scenarios for now.
-ACTIVE_RAIN_KEYS = ["RI1", "RI2", "RI3"]
-
-# travel_time = base_time * (1/speed_mult) * (1 + f*Hf + l*Hl)
-FLOOD_TIME_WEIGHT = 0.5
-LANDSLIDE_TIME_WEIGHT = 0.5
-
-HIGH_RISK_FLOOD_THRESHOLD = 0.6
-HIGH_RISK_LANDSLIDE_THRESHOLD = 0.5
-
-MAX_NEIGHBOR_SLOTS = 4
-NEIGHBOR_FEATURE_DIM = 5
+ACTIVE_RAIN_KEYS = list(DEFAULT_CONFIG["hazard"]["active_rain_keys"])
+FLOOD_TIME_WEIGHT = float(DEFAULT_CONFIG["hazard"]["flood_time_weight"])
+LANDSLIDE_TIME_WEIGHT = float(DEFAULT_CONFIG["hazard"]["landslide_time_weight"])
+HIGH_RISK_FLOOD_THRESHOLD = float(DEFAULT_CONFIG["hazard"]["high_risk_flood_threshold"])
+HIGH_RISK_LANDSLIDE_THRESHOLD = float(DEFAULT_CONFIG["hazard"]["high_risk_landslide_threshold"])
+MAX_NEIGHBOR_SLOTS = int(DEFAULT_CONFIG["hazard"]["max_neighbor_slots"])
+NEIGHBOR_FEATURE_DIM = int(DEFAULT_CONFIG["hazard"]["neighbor_feature_dim"])
 
 
+def set_seed(seed):
+    global SEED
+    SEED = int(seed)
+    random.seed(SEED)
+    np.random.seed(SEED)
+    torch.manual_seed(SEED)
+
+
+def deep_update(base, override):
+    """Recursively merge `override` into `base`."""
+    for k, v in override.items():
+        if isinstance(v, dict) and isinstance(base.get(k), dict):
+            deep_update(base[k], v)
+        else:
+            base[k] = v
+    return base
+
+
+def load_config(config_path=CONFIG_PATH_DEFAULT):
+    """Load config from JSON; create default file if missing."""
+    cfg = deepcopy(DEFAULT_CONFIG)
+    path = Path(config_path)
+
+    if not path.exists():
+        path.write_text(json.dumps(cfg, indent=2), encoding="utf-8")
+        print(f"Created default config at: {path}")
+        return cfg
+
+    with path.open("r", encoding="utf-8") as f:
+        user_cfg = json.load(f)
+    return deep_update(cfg, user_cfg)
+
+
+def apply_runtime_config(cfg):
+    """Apply config values that are used via module-level globals."""
+    global RAIN_LEVELS
+    global RAIN_KEYS
+    global ACTIVE_RAIN_KEYS
+    global FLOOD_TIME_WEIGHT
+    global LANDSLIDE_TIME_WEIGHT
+    global HIGH_RISK_FLOOD_THRESHOLD
+    global HIGH_RISK_LANDSLIDE_THRESHOLD
+    global MAX_NEIGHBOR_SLOTS
+    global NEIGHBOR_FEATURE_DIM
+
+    hazard_cfg = cfg["hazard"]
+    RAIN_LEVELS = deepcopy(hazard_cfg["rain_levels"])
+    RAIN_KEYS = list(RAIN_LEVELS.keys())
+
+    active = [k for k in hazard_cfg.get("active_rain_keys", RAIN_KEYS) if k in RAIN_LEVELS]
+    ACTIVE_RAIN_KEYS = active if active else list(RAIN_KEYS)
+
+    FLOOD_TIME_WEIGHT = float(hazard_cfg["flood_time_weight"])
+    LANDSLIDE_TIME_WEIGHT = float(hazard_cfg["landslide_time_weight"])
+    HIGH_RISK_FLOOD_THRESHOLD = float(hazard_cfg["high_risk_flood_threshold"])
+    HIGH_RISK_LANDSLIDE_THRESHOLD = float(hazard_cfg["high_risk_landslide_threshold"])
+    MAX_NEIGHBOR_SLOTS = int(hazard_cfg["max_neighbor_slots"])
+    NEIGHBOR_FEATURE_DIM = int(hazard_cfg["neighbor_feature_dim"])
+
+
+# =========================
+# Graph Construction
+# =========================
+def create_base_graph(num_nodes=30, min_nodes=30, max_nodes=40, force_download=False):
+    raw_graph = get_raw_osm_graph(min_nodes=min_nodes, force_download=force_download)
+    return to_training_graph(
+        raw_graph,
+        num_nodes=num_nodes,
+        min_nodes=min_nodes,
+        max_nodes=max_nodes,
+    )
+
+
+# =========================
+# Hazard Activation
+# =========================
 def _haversine_distance_m(pos_a, pos_b):
-    """Great-circle distance in meters between [lon, lat] points."""
     lon1, lat1 = float(pos_a[0]), float(pos_a[1])
     lon2, lat2 = float(pos_b[0]), float(pos_b[1])
     r = 6_371_000.0
@@ -113,7 +231,6 @@ def _haversine_distance_m(pos_a, pos_b):
 
 
 def _bearing_radians(pos_a, pos_b):
-    """Initial bearing from pos_a to pos_b in radians in [-pi, pi]."""
     lon1, lat1 = math.radians(float(pos_a[0])), math.radians(float(pos_a[1]))
     lon2, lat2 = math.radians(float(pos_b[0])), math.radians(float(pos_b[1]))
     d_lam = lon2 - lon1
@@ -123,14 +240,12 @@ def _bearing_radians(pos_a, pos_b):
 
 
 def _sample_block(hazard_value, threshold, prob):
-    """Sample whether one mechanism blocks an edge."""
     if threshold is None or hazard_value < threshold:
         return False
     return np.random.rand() < prob
 
 
 def activate_hazards(G_base, rain_key):
-    """Activate edge states for a single episode."""
     rain = RAIN_LEVELS[rain_key]
     G = G_base.copy()
 
@@ -170,13 +285,19 @@ def activate_hazards(G_base, rain_key):
 # Environment
 # =========================
 class HazardRoutingEnv:
-    """Routing environment with fixed-per-episode hazard realization."""
+    def __init__(self, base_graph, num_deliveries=2, env_cfg=None, reward_cfg=None):
+        env_cfg = env_cfg or {}
+        reward_cfg = reward_cfg or {}
 
-    def __init__(self, base_graph, num_deliveries=2):
         self.base_graph = base_graph
         self.num_nodes = base_graph.number_of_nodes()
-        self.num_deliveries = min(num_deliveries, self.num_nodes - 1)
-        self.max_steps = max(50, self.num_nodes * 2)
+        self.num_deliveries = min(int(num_deliveries), self.num_nodes - 1)
+
+        min_max_steps = int(env_cfg.get("min_max_steps", 50))
+        step_multiplier = float(env_cfg.get("max_steps_multiplier", 2.0))
+        self.max_steps = max(min_max_steps, int(self.num_nodes * step_multiplier))
+        self.episode_time_scale = float(env_cfg.get("episode_time_scale", 6.0))
+
         self.rain_dim = len(RAIN_KEYS)
         self.max_neighbor_slots = MAX_NEIGHBOR_SLOTS
         self.neighbor_feature_dim = NEIGHBOR_FEATURE_DIM
@@ -191,22 +312,21 @@ class HazardRoutingEnv:
         self.max_edge_length = max(float(max_edge_length), 1e-6)
         self.max_base_time = max(float(max_base_time), 1e-6)
 
-        # Paper-aligned reward coefficients.
-        self.reward_delivery = 50.0
-        self.reward_mission_success = 100.0
-        self.k_progress = 0.1
-        self.hazard_lambda = 10.0
-        self.w_flood = 0.6
-        self.w_landslide = 0.4
-        self.eta_time = 0.2
-        self.penalty_timeout = -100.0
-        self.penalty_blockage = -100.0
-        self.penalty_incomplete_per_delivery = -20.0
+        # Reward coefficients
+        self.reward_delivery = float(reward_cfg.get("delivery", 50.0))
+        self.reward_mission_success = float(reward_cfg.get("mission_success", 100.0))
+        self.k_progress = float(reward_cfg.get("k_progress", 0.1))
+        self.hazard_lambda = float(reward_cfg.get("hazard_lambda", 10.0))
+        self.w_flood = float(reward_cfg.get("w_flood", 0.6))
+        self.w_landslide = float(reward_cfg.get("w_landslide", 0.4))
+        self.eta_time = float(reward_cfg.get("eta_time", 0.2))
+        self.penalty_timeout = float(reward_cfg.get("penalty_timeout", -100.0))
+        self.penalty_blockage = float(reward_cfg.get("penalty_blockage", -100.0))
+        self.penalty_incomplete_per_delivery = float(reward_cfg.get("penalty_incomplete_per_delivery", -20.0))
 
-        self.max_elapsed_time = max(1e-6, self.max_steps * self.max_base_time * 6.0)
+        self.max_elapsed_time = max(1e-6, self.max_steps * self.max_base_time * self.episode_time_scale)
         self.max_episode_time = self.max_elapsed_time
 
-        # Precomputed geometric context.
         self.node_pos = {n: np.array(base_graph.nodes[n]["pos"], dtype=float) for n in base_graph.nodes()}
         self.shortest_len = dict(nx.all_pairs_dijkstra_path_length(base_graph, weight="length"))
         self.max_shortest_len = max(
@@ -215,7 +335,6 @@ class HazardRoutingEnv:
         )
         self.max_shortest_len = max(float(self.max_shortest_len), 1e-6)
 
-        # 2N one-hot + 3 progress + 4 spatial + (4*5) neighbor + rain one-hot.
         self.state_dim = (
             2 * self.num_nodes
             + 3
@@ -264,10 +383,8 @@ class HazardRoutingEnv:
         return delivery_vec
 
     def _build_target_features(self, unvisited):
-        n_remaining = len(unvisited)
-        n_completed = len(self.completed)
-        n_remaining_norm = n_remaining / max(self.num_deliveries, 1)
-        n_completed_norm = n_completed / max(self.num_deliveries, 1)
+        n_remaining_norm = len(unvisited) / max(self.num_deliveries, 1)
+        n_completed_norm = len(self.completed) / max(self.num_deliveries, 1)
         elapsed_norm = min(self.total_time / self.max_episode_time, 1.0)
 
         cur_pos = self.node_pos[self.current_node]
@@ -303,6 +420,7 @@ class HazardRoutingEnv:
             list(self.G.neighbors(self.current_node)),
             key=lambda nbr: self.G[self.current_node][nbr].get("length", 0.0),
         )
+
         for nbr in neighbors[: self.max_neighbor_slots]:
             edge = self.G[self.current_node][nbr]
             flood_score = edge.get("flood_score", 0.0)
@@ -337,7 +455,6 @@ class HazardRoutingEnv:
 
     def step(self, action):
         self.steps += 1
-
         mask = self.get_action_mask()
         if mask[action] == 0:
             reward = self.failure_penalty("blockage")
@@ -393,15 +510,16 @@ class HazardRoutingEnv:
 # Model + Replay
 # =========================
 class DQN(nn.Module):
-    def __init__(self, state_dim, action_dim):
+    def __init__(self, state_dim, action_dim, hidden_sizes=(64, 64)):
         super().__init__()
-        self.net = nn.Sequential(
-            nn.Linear(state_dim, 64),
-            nn.ReLU(),
-            nn.Linear(64, 64),
-            nn.ReLU(),
-            nn.Linear(64, action_dim),
-        )
+        layers = []
+        prev = state_dim
+        for h in hidden_sizes:
+            layers.append(nn.Linear(prev, int(h)))
+            layers.append(nn.ReLU())
+            prev = int(h)
+        layers.append(nn.Linear(prev, action_dim))
+        self.net = nn.Sequential(*layers)
 
     def forward(self, x):
         return self.net(x)
@@ -409,7 +527,7 @@ class DQN(nn.Module):
 
 class ReplayBuffer:
     def __init__(self, capacity=10000):
-        self.buffer = deque(maxlen=capacity)
+        self.buffer = deque(maxlen=int(capacity))
 
     def store(self, transition):
         self.buffer.append(transition)
@@ -434,10 +552,8 @@ def select_action(model, state, mask, epsilon):
     valid_actions = torch.where(mask == 1)[0]
     if valid_actions.numel() == 0:
         return None
-
     if random.random() < epsilon:
         return random.choice(valid_actions).item()
-
     with torch.no_grad():
         q_values = model(state).clone()
         q_values[mask == 0] = -1e9
@@ -476,53 +592,75 @@ def evaluate_policy(model, env, num_episodes=100, epsilon=0.0):
 # =========================
 # Training
 # =========================
-def train(
-    num_episodes=1500,
-    log_every=20,
-    target_update_every_steps=500,
-    eval_episodes=300,
-    eval_every=20,
-    graph_num_nodes=15,
-    graph_min_nodes=12,
-    graph_max_nodes=20,
-):
-    base_graph = create_base_graph(
-        num_nodes=graph_num_nodes,
-        min_nodes=graph_min_nodes,
-        max_nodes=graph_max_nodes,
-    )
-    env = HazardRoutingEnv(base_graph)
+def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
+    cfg = load_config(config_path)
+    if config_overrides:
+        cfg = deep_update(cfg, config_overrides)
 
-    online = DQN(env.state_dim, env.num_nodes)
-    target = DQN(env.state_dim, env.num_nodes)
+    set_seed(cfg["seed"])
+    apply_runtime_config(cfg)
+
+    graph_cfg = cfg["graph"]
+    env_cfg = cfg["environment"]
+    reward_cfg = cfg["reward"]
+    model_cfg = cfg["model"]
+    replay_cfg = cfg["replay"]
+    train_cfg = cfg["training"]
+    eval_cfg = cfg["evaluation"]
+    paths_cfg = cfg["paths"]
+
+    base_graph = create_base_graph(
+        num_nodes=int(graph_cfg["num_nodes"]),
+        min_nodes=int(graph_cfg["min_nodes"]),
+        max_nodes=int(graph_cfg["max_nodes"]),
+        force_download=bool(graph_cfg.get("force_download", False)),
+    )
+    env = HazardRoutingEnv(
+        base_graph,
+        num_deliveries=int(env_cfg["num_deliveries"]),
+        env_cfg=env_cfg,
+        reward_cfg=reward_cfg,
+    )
+
+    online = DQN(env.state_dim, env.num_nodes, hidden_sizes=tuple(model_cfg["hidden_sizes"]))
+    target = DQN(env.state_dim, env.num_nodes, hidden_sizes=tuple(model_cfg["hidden_sizes"]))
     target.load_state_dict(online.state_dict())
 
-    optimizer = optim.Adam(online.parameters(), lr=3e-4)
-    buffer = ReplayBuffer()
+    optimizer = optim.Adam(online.parameters(), lr=float(train_cfg["lr"]))
+    buffer = ReplayBuffer(capacity=int(replay_cfg["capacity"]))
 
-    gamma = 0.99
-    epsilon = 1.0
-    epsilon_min = 0.05
-    epsilon_decay = 0.995
-    batch_size = 32
+    num_episodes = int(train_cfg["num_episodes"])
+    gamma = float(train_cfg["gamma"])
+    epsilon = float(train_cfg["epsilon_start"])
+    epsilon_min = float(train_cfg["epsilon_min"])
+    epsilon_decay = float(train_cfg["epsilon_decay"])
+    batch_size = int(train_cfg["batch_size"])
+    target_update_every_steps = int(train_cfg["target_update_every_steps"])
+    log_every = int(train_cfg["log_every"])
+    eval_every = int(train_cfg["eval_every"])
+
+    eval_episodes = int(eval_cfg["episodes"])
+    eval_eps0 = float(eval_cfg["epsilon_greedy"])
+    eval_eps_noise = float(eval_cfg["epsilon_noisy"])
+
     train_steps = 0
-
-    print(
-        f"Graph stats | Nodes: {env.num_nodes}, Edges: {base_graph.number_of_edges()}, "
-        f"AvgBaseTime: {env.avg_base_time:.4f}, AvgHazard: {env.avg_edge_hazard:.4f}, "
-        f"StateDim: {env.state_dim}, Tmax(min): {env.max_elapsed_time:.2f}"
-    )
-
     reward_history = []
     success_history = []
     best_eval_success = -1.0
     best_eval_reward = -1e9
     best_episode = 0
 
-    checkpoints_dir = Path("checkpoints")
+    checkpoints_dir = Path(paths_cfg["checkpoints_dir"])
     checkpoints_dir.mkdir(parents=True, exist_ok=True)
     best_model_path = checkpoints_dir / "best_model.pt"
     last_model_path = checkpoints_dir / "last_model.pt"
+
+    print(
+        f"Graph stats | Nodes: {env.num_nodes}, Edges: {base_graph.number_of_edges()}, "
+        f"AvgBaseTime: {env.avg_base_time:.4f}, AvgHazard: {env.avg_edge_hazard:.4f}, "
+        f"StateDim: {env.state_dim}, Tmax(min): {env.max_elapsed_time:.2f}, "
+        f"Deliveries: {env.num_deliveries}"
+    )
 
     for episode in range(num_episodes):
         state = env.reset()
@@ -582,14 +720,16 @@ def train(
             )
 
         if (episode + 1) % eval_every == 0:
-            eval_reward_eps0, eval_success_eps0 = evaluate_policy(online, env, num_episodes=eval_episodes, epsilon=0.0)
-            eval_reward_eps005, eval_success_eps005 = evaluate_policy(
-                online, env, num_episodes=eval_episodes, epsilon=0.05
+            eval_reward_eps0, eval_success_eps0 = evaluate_policy(
+                online, env, num_episodes=eval_episodes, epsilon=eval_eps0
+            )
+            eval_reward_epsn, eval_success_epsn = evaluate_policy(
+                online, env, num_episodes=eval_episodes, epsilon=eval_eps_noise
             )
             print(
                 f"[Eval @ Episode {episode + 1}] "
-                f"eps=0.0 -> MeanReward: {eval_reward_eps0:.2f}, SuccessRate: {eval_success_eps0:.2%} | "
-                f"eps=0.05 -> MeanReward: {eval_reward_eps005:.2f}, SuccessRate: {eval_success_eps005:.2%}"
+                f"eps={eval_eps0:.2f} -> MeanReward: {eval_reward_eps0:.2f}, SuccessRate: {eval_success_eps0:.2%} | "
+                f"eps={eval_eps_noise:.2f} -> MeanReward: {eval_reward_epsn:.2f}, SuccessRate: {eval_success_epsn:.2%}"
             )
 
             if (eval_success_eps0 > best_eval_success) or (
@@ -603,10 +743,12 @@ def train(
                         "episode": best_episode,
                         "model_state_dict": online.state_dict(),
                         "optimizer_state_dict": optimizer.state_dict(),
-                        "eval_success_rate_eps0": best_eval_success,
-                        "eval_mean_reward_eps0": best_eval_reward,
+                        "eval_success_rate_primary": best_eval_success,
+                        "eval_mean_reward_primary": best_eval_reward,
                         "graph_num_nodes": env.num_nodes,
+                        "num_deliveries": env.num_deliveries,
                         "seed": SEED,
+                        "config_path": str(config_path),
                     },
                     best_model_path,
                 )
@@ -621,22 +763,26 @@ def train(
             "model_state_dict": online.state_dict(),
             "optimizer_state_dict": optimizer.state_dict(),
             "graph_num_nodes": env.num_nodes,
+            "num_deliveries": env.num_deliveries,
             "seed": SEED,
+            "config_path": str(config_path),
         },
         last_model_path,
     )
     print(f"Saved last checkpoint: {last_model_path}")
 
-    final_reward_eps0, final_success_eps0 = evaluate_policy(online, env, num_episodes=eval_episodes, epsilon=0.0)
-    final_reward_eps005, final_success_eps005 = evaluate_policy(online, env, num_episodes=eval_episodes, epsilon=0.05)
+    final_reward_eps0, final_success_eps0 = evaluate_policy(online, env, num_episodes=eval_episodes, epsilon=eval_eps0)
+    final_reward_epsn, final_success_epsn = evaluate_policy(
+        online, env, num_episodes=eval_episodes, epsilon=eval_eps_noise
+    )
     print(
         f"Evaluation over {eval_episodes} episodes | "
-        f"eps=0.0 MeanReward: {final_reward_eps0:.2f}, SuccessRate: {final_success_eps0:.2%} | "
-        f"eps=0.05 MeanReward: {final_reward_eps005:.2f}, SuccessRate: {final_success_eps005:.2%}"
+        f"eps={eval_eps0:.2f} MeanReward: {final_reward_eps0:.2f}, SuccessRate: {final_success_eps0:.2%} | "
+        f"eps={eval_eps_noise:.2f} MeanReward: {final_reward_epsn:.2f}, SuccessRate: {final_success_epsn:.2%}"
     )
     print(
         f"Best checkpoint summary | Episode: {best_episode}, "
-        f"eps=0.0 MeanReward: {best_eval_reward:.2f}, SuccessRate: {best_eval_success:.2%}"
+        f"PrimaryEval MeanReward: {best_eval_reward:.2f}, SuccessRate: {best_eval_success:.2%}"
     )
 
 
