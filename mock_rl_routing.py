@@ -100,6 +100,8 @@ RAIN_LEVELS = {
     },
 }
 RAIN_KEYS = list(RAIN_LEVELS.keys())
+# Temporary feasibility mode: sample only lighter-to-heavy rain (exclude RI4/RI5).
+ACTIVE_RAIN_KEYS = ["RI1", "RI2", "RI3"]
 
 # hazard(Hf, Hl) = 1 + f*Hf + l*Hl
 FLOOD_TIME_WEIGHT = 0.5
@@ -270,7 +272,7 @@ class HazardRoutingEnv:
 
     def reset(self):
         """Start a new episode and return initial state."""
-        rain_key = random.choice(RAIN_KEYS)
+        rain_key = random.choice(ACTIVE_RAIN_KEYS)
         self.G = activate_hazards(self.base_graph, rain_key)
         rain_idx = RAIN_KEYS.index(rain_key)
         self.rain_onehot = np.zeros(self.rain_dim, dtype=float)
