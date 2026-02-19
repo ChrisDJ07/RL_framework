@@ -101,6 +101,6 @@
     "epsilon_noisy": 0.05
   },
   "paths": {
-    "checkpoints_dir": "checkpoints"
+    "checkpoints_dir": "checkpoints/no_spatial"
   }
 }
