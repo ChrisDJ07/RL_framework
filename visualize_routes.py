@@ -65,7 +65,18 @@ def load_env_and_model(
             env_cfg=env_cfg,
             reward_cfg=reward_cfg,
         )
-        model = module.DQN(env.state_dim, env.num_nodes, hidden_sizes=tuple(model_cfg["hidden_sizes"]))
+        action_dim = int(getattr(env, "action_dim", env.num_nodes))
+        try:
+            model = module.DQN(
+                env.state_dim,
+                action_dim,
+                num_nodes=env.num_nodes,
+                num_delivery_slots=env.num_deliveries,
+                hidden_sizes=tuple(model_cfg["hidden_sizes"]),
+                node_embedding_dim=int(model_cfg.get("node_embedding_dim", 16)),
+            )
+        except TypeError:
+            model = module.DQN(env.state_dim, action_dim, hidden_sizes=tuple(model_cfg["hidden_sizes"]))
         try:
             model.load_state_dict(checkpoint["model_state_dict"])
             model.eval()
@@ -105,8 +116,9 @@ def run_episode(env, model, module, epsilon=0.0):
 
         prev = env.current_node
         next_state, reward, done, info = env.step(action)
-        path_edges.append((prev, action))
-        path_nodes.append(action)
+        next_node = env.current_node
+        path_edges.append((prev, next_node))
+        path_nodes.append(next_node)
         total_reward += reward
         state = next_state
         reason = info.get("termination_reason")

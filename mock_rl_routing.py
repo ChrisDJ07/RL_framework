@@ -106,6 +106,7 @@ DEFAULT_CONFIG = {
     },
     "model": {
         "hidden_sizes": [64, 64],
+        "node_embedding_dim": 16,
     },
     "replay": {
         "capacity": 10000,
@@ -363,12 +364,13 @@ class HazardRoutingEnv:
         self.max_shortest_len = max(float(self.max_shortest_len), 1e-6)
 
         self.state_dim = (
-            2 * self.num_nodes
-            + 3
+            3
             + 4
             + self.max_neighbor_slots * self.neighbor_feature_dim
             + self.rain_dim
         )
+        self.action_dim = self.max_neighbor_slots
+        self._action_slots = []
 
     def _nearest_unvisited_shortest(self, node, unvisited_nodes):
         if not unvisited_nodes:
@@ -402,12 +404,14 @@ class HazardRoutingEnv:
         self.steps = 0
         return self._get_state()
 
-    def _build_delivery_vec(self):
-        delivery_vec = np.zeros(self.num_nodes)
-        for d in self.delivery_nodes:
-            if d not in self.completed:
-                delivery_vec[d] = 1.0
-        return delivery_vec
+    def _build_unvisited_delivery_state(self):
+        unvisited = [d for d in self.delivery_nodes if d not in self.completed]
+        unvisited_idx = np.zeros(self.num_deliveries, dtype=np.int64)
+        unvisited_mask = np.zeros(self.num_deliveries, dtype=np.float32)
+        for i, node_id in enumerate(unvisited[: self.num_deliveries]):
+            unvisited_idx[i] = int(node_id)
+            unvisited_mask[i] = 1.0
+        return unvisited, unvisited_idx, unvisited_mask
 
     def _build_target_features(self, unvisited):
         n_remaining_norm = len(unvisited) / max(self.num_deliveries, 1)
@@ -441,14 +445,16 @@ class HazardRoutingEnv:
             dtype=float,
         )
 
-    def _build_neighbor_features(self):
-        features = []
+    def _get_action_slots(self):
         neighbors = sorted(
             list(self.G.neighbors(self.current_node)),
             key=lambda nbr: self.G[self.current_node][nbr].get("length", 0.0),
         )
+        return neighbors[: self.max_neighbor_slots]
 
-        for nbr in neighbors[: self.max_neighbor_slots]:
+    def _build_neighbor_features(self, action_slots):
+        features = []
+        for nbr in action_slots:
             edge = self.G[self.current_node][nbr]
             flood_score = edge.get("flood_score", 0.0)
             landslide_score = edge.get("landslide_score", 0.0)
@@ -464,44 +470,49 @@ class HazardRoutingEnv:
         return np.array(features, dtype=float)
 
     def _get_state(self):
-        node_onehot = np.zeros(self.num_nodes)
-        node_onehot[self.current_node] = 1.0
-        delivery_vec = self._build_delivery_vec()
-        unvisited = [d for d in self.delivery_nodes if d not in self.completed]
+        unvisited, unvisited_idx, unvisited_mask = self._build_unvisited_delivery_state()
         target_feats = self._build_target_features(unvisited)
-        neighbor_feats = self._build_neighbor_features()
-        state = np.concatenate([node_onehot, delivery_vec, target_feats, neighbor_feats, self.rain_onehot])
-        return torch.tensor(state, dtype=torch.float32)
+        action_slots = self._get_action_slots()
+        neighbor_feats = self._build_neighbor_features(action_slots)
+        state_vec = np.concatenate([target_feats, neighbor_feats, self.rain_onehot])
+        return {
+            "state_vec": torch.tensor(state_vec, dtype=torch.float32),
+            "current_idx": torch.tensor(int(self.current_node), dtype=torch.long),
+            "unvisited_idx": torch.tensor(unvisited_idx, dtype=torch.long),
+            "unvisited_mask": torch.tensor(unvisited_mask, dtype=torch.float32),
+        }
 
     def get_action_mask(self):
-        mask = np.zeros(self.num_nodes)
-        for nbr in self.G.neighbors(self.current_node):
+        self._action_slots = self._get_action_slots()
+        mask = np.zeros(self.action_dim, dtype=np.float32)
+        for slot_idx, nbr in enumerate(self._action_slots):
             if not self.G[self.current_node][nbr].get("blocked", False):
-                mask[nbr] = 1.0
+                mask[slot_idx] = 1.0
         return torch.tensor(mask, dtype=torch.float32)
 
     def step(self, action):
         self.steps += 1
         mask = self.get_action_mask()
-        if mask[action] == 0:
+        if action is None or action < 0 or action >= self.action_dim or mask[action] == 0:
             reward = self.failure_penalty("blockage")
             return self._get_state(), reward, True, {"termination_reason": "invalid_action"}
 
         unvisited_before = [d for d in self.delivery_nodes if d not in self.completed]
         d_before = self._nearest_unvisited_shortest(self.current_node, unvisited_before)
 
-        edge = self.G[self.current_node][action]
+        next_node = self._action_slots[action]
+        edge = self.G[self.current_node][next_node]
         travel_time = edge["travel_time"]
         hf = edge["flood_score"]
         hl = edge["landslide_score"]
 
         self.total_time += travel_time
         self.total_hazard += (hf + hl)
-        self.current_node = action
+        self.current_node = next_node
 
         delivery_reward = 0.0
-        if action in self.delivery_nodes and action not in self.completed:
-            self.completed.add(action)
+        if next_node in self.delivery_nodes and next_node not in self.completed:
+            self.completed.add(next_node)
             delivery_reward = self.reward_delivery
 
         unvisited_after = [d for d in self.delivery_nodes if d not in self.completed]
@@ -538,10 +549,13 @@ class HazardRoutingEnv:
 # Model + Replay
 # =========================
 class DQN(nn.Module):
-    def __init__(self, state_dim, action_dim, hidden_sizes=(64, 64)):
+    def __init__(self, state_dim, action_dim, num_nodes, num_delivery_slots, hidden_sizes=(64, 64), node_embedding_dim=16):
         super().__init__()
+        self.node_embedding = nn.Embedding(int(num_nodes), int(node_embedding_dim))
+        self.num_delivery_slots = int(num_delivery_slots)
+        embed_input_dim = int(node_embedding_dim) * 2  # current node + pooled unvisited delivery embedding
         layers = []
-        prev = state_dim
+        prev = state_dim + embed_input_dim
         for h in hidden_sizes:
             layers.append(nn.Linear(prev, int(h)))
             layers.append(nn.ReLU())
@@ -549,8 +563,13 @@ class DQN(nn.Module):
         layers.append(nn.Linear(prev, action_dim))
         self.net = nn.Sequential(*layers)
 
-    def forward(self, x):
-        return self.net(x)
+    def forward(self, state_vec, current_idx, unvisited_idx, unvisited_mask):
+        cur_emb = self.node_embedding(current_idx)
+        unvisited_emb = self.node_embedding(unvisited_idx)
+        mask = unvisited_mask.unsqueeze(-1)
+        pooled_unvisited = (unvisited_emb * mask).sum(dim=1) / mask.sum(dim=1).clamp(min=1.0)
+        model_in = torch.cat([state_vec, cur_emb, pooled_unvisited], dim=1)
+        return self.net(model_in)
 
 
 class ReplayBuffer:
@@ -562,12 +581,31 @@ class ReplayBuffer:
 
     def sample(self, batch_size):
         batch = random.sample(self.buffer, batch_size)
-        states, actions, rewards, next_states, dones, next_masks = zip(*batch)
+        (
+            state_vecs,
+            current_idxs,
+            unvisited_idxs,
+            unvisited_masks,
+            actions,
+            rewards,
+            next_state_vecs,
+            next_current_idxs,
+            next_unvisited_idxs,
+            next_unvisited_masks,
+            dones,
+            next_masks,
+        ) = zip(*batch)
         return (
-            torch.stack(states),
-            torch.tensor(actions),
+            torch.stack(state_vecs),
+            torch.tensor(current_idxs, dtype=torch.long),
+            torch.stack(unvisited_idxs),
+            torch.stack(unvisited_masks),
+            torch.tensor(actions, dtype=torch.long),
             torch.tensor(rewards, dtype=torch.float32),
-            torch.stack(next_states),
+            torch.stack(next_state_vecs),
+            torch.tensor(next_current_idxs, dtype=torch.long),
+            torch.stack(next_unvisited_idxs),
+            torch.stack(next_unvisited_masks),
             torch.tensor(dones, dtype=torch.float32),
             torch.stack(next_masks),
         )
@@ -583,7 +621,12 @@ def select_action(model, state, mask, epsilon):
     if random.random() < epsilon:
         return random.choice(valid_actions).item()
     with torch.no_grad():
-        q_values = model(state).clone()
+        q_values = model(
+            state["state_vec"].unsqueeze(0),
+            state["current_idx"].unsqueeze(0),
+            state["unvisited_idx"].unsqueeze(0),
+            state["unvisited_mask"].unsqueeze(0),
+        ).squeeze(0).clone()
         q_values[mask == 0] = -1e9
         return torch.argmax(q_values).item()
 
@@ -671,8 +714,22 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
         )
         base_graph_node_link = nx.node_link_data(base_graph)
 
-        online = DQN(env.state_dim, env.num_nodes, hidden_sizes=tuple(model_cfg["hidden_sizes"]))
-        target = DQN(env.state_dim, env.num_nodes, hidden_sizes=tuple(model_cfg["hidden_sizes"]))
+        online = DQN(
+            env.state_dim,
+            env.action_dim,
+            num_nodes=env.num_nodes,
+            num_delivery_slots=env.num_deliveries,
+            hidden_sizes=tuple(model_cfg["hidden_sizes"]),
+            node_embedding_dim=int(model_cfg.get("node_embedding_dim", 16)),
+        )
+        target = DQN(
+            env.state_dim,
+            env.action_dim,
+            num_nodes=env.num_nodes,
+            num_delivery_slots=env.num_deliveries,
+            hidden_sizes=tuple(model_cfg["hidden_sizes"]),
+            node_embedding_dim=int(model_cfg.get("node_embedding_dim", 16)),
+        )
         target.load_state_dict(online.state_dict())
 
         optimizer = optim.Adam(online.parameters(), lr=float(train_cfg["lr"]))
@@ -707,7 +764,7 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
         log(
             f"Graph stats | Nodes: {env.num_nodes}, Edges: {base_graph.number_of_edges()}, "
             f"AvgBaseTime: {env.avg_base_time:.4f}, AvgHazard: {env.avg_edge_hazard:.4f}, "
-            f"StateDim: {env.state_dim}, Tmax(min): {env.max_elapsed_time:.2f}, "
+            f"StateDim: {env.state_dim}, ActionDim: {env.action_dim}, Tmax(min): {env.max_elapsed_time:.2f}, "
             f"Deliveries: {env.num_deliveries}"
         )
 
@@ -724,23 +781,61 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
                     break
 
                 next_state, reward, done, _ = env.step(action)
-                next_mask = env.get_action_mask() if not done else torch.zeros(env.num_nodes, dtype=torch.float32)
+                next_mask = env.get_action_mask() if not done else torch.zeros(env.action_dim, dtype=torch.float32)
 
-                buffer.store((state, action, reward, next_state, done, next_mask))
+                buffer.store(
+                    (
+                        state["state_vec"],
+                        state["current_idx"],
+                        state["unvisited_idx"],
+                        state["unvisited_mask"],
+                        action,
+                        reward,
+                        next_state["state_vec"],
+                        next_state["current_idx"],
+                        next_state["unvisited_idx"],
+                        next_state["unvisited_mask"],
+                        done,
+                        next_mask,
+                    )
+                )
                 state = next_state
                 total_reward += reward
 
                 if len(buffer) >= batch_size:
-                    states, actions, rewards, next_states, dones, next_masks = buffer.sample(batch_size)
+                    (
+                        state_vecs,
+                        current_idxs,
+                        unvisited_idxs,
+                        unvisited_masks,
+                        actions,
+                        rewards,
+                        next_state_vecs,
+                        next_current_idxs,
+                        next_unvisited_idxs,
+                        next_unvisited_masks,
+                        dones,
+                        next_masks,
+                    ) = buffer.sample(batch_size)
 
-                    q_values = online(states)
+                    q_values = online(state_vecs, current_idxs, unvisited_idxs, unvisited_masks)
                     q_selected = q_values.gather(1, actions.unsqueeze(1)).squeeze()
 
                     with torch.no_grad():
-                        next_online_q = online(next_states)
+                        next_online_q = online(
+                            next_state_vecs,
+                            next_current_idxs,
+                            next_unvisited_idxs,
+                            next_unvisited_masks,
+                        )
                         next_online_q[next_masks == 0] = -1e9
                         next_actions = next_online_q.argmax(dim=1)
-                        next_q = target(next_states).gather(1, next_actions.unsqueeze(1)).squeeze()
+                        next_q = target(
+                            next_state_vecs,
+                            next_current_idxs,
+                            next_unvisited_idxs,
+                            next_unvisited_masks,
+                        ).gather(1, next_actions.unsqueeze(1)).squeeze()
                         has_valid_next = (next_masks.sum(dim=1) > 0).float()
                         target_q = rewards + gamma * next_q * (1 - dones) * has_valid_next
 
@@ -795,8 +890,10 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
                             "eval_success_rate_primary": best_eval_success,
                             "eval_mean_reward_primary": best_eval_reward,
                             "graph_num_nodes": env.num_nodes,
+                            "action_dim": env.action_dim,
                             "num_deliveries": env.num_deliveries,
                             "seed": SEED,
+                            "model_variant": "spatial_neighbor_head",
                             "config_path": str(config_path),
                             "base_graph_node_link": base_graph_node_link,
                         },
@@ -813,8 +910,10 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
                 "model_state_dict": online.state_dict(),
                 "optimizer_state_dict": optimizer.state_dict(),
                 "graph_num_nodes": env.num_nodes,
+                "action_dim": env.action_dim,
                 "num_deliveries": env.num_deliveries,
                 "seed": SEED,
+                "model_variant": "spatial_neighbor_head",
                 "config_path": str(config_path),
                 "base_graph_node_link": base_graph_node_link,
             },

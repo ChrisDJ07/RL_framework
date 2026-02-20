@@ -82,13 +82,14 @@
     "hidden_sizes": [
       64,
       64
-    ]
+    ],
+    "node_embedding_dim": 16
   },
   "replay": {
     "capacity": 10000
   },
   "training": {
-    "num_episodes": 2000,
+    "num_episodes": 4000,
     "gamma": 0.99,
     "lr": 0.003,
     "batch_size": 32,
