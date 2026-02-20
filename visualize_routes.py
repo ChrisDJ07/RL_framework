@@ -1,4 +1,5 @@
 import math
+import importlib
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -10,44 +11,78 @@ from matplotlib.lines import Line2D
 import mock_rl_routing as mrr
 
 
-def load_env_and_model(config_path="experiment_config.json", checkpoint_path="checkpoints/best_model.pt"):
-    cfg = mrr.load_config(config_path)
-    mrr.set_seed(cfg["seed"])
-    mrr.apply_runtime_config(cfg)
-
-    graph_cfg = cfg["graph"]
-    env_cfg = cfg["environment"]
-    reward_cfg = cfg["reward"]
-    model_cfg = cfg["model"]
-
-    base_graph = mrr.create_base_graph(
-        num_nodes=int(graph_cfg["num_nodes"]),
-        min_nodes=int(graph_cfg["min_nodes"]),
-        max_nodes=int(graph_cfg["max_nodes"]),
-        force_download=bool(graph_cfg.get("force_download", False)),
-    )
-    env = mrr.HazardRoutingEnv(
-        base_graph,
-        num_deliveries=int(env_cfg["num_deliveries"]),
-        env_cfg=env_cfg,
-        reward_cfg=reward_cfg,
-    )
-
-    model = mrr.DQN(env.state_dim, env.num_nodes, hidden_sizes=tuple(model_cfg["hidden_sizes"]))
-
+def load_env_and_model(
+    config_path="experiment_config.json",
+    checkpoint_path="checkpoints/best_model.pt",
+    seed=None,
+    use_config_seed=True,
+):
     ckpt_file = Path(checkpoint_path)
     if not ckpt_file.exists():
         raise FileNotFoundError(f"Checkpoint not found: {ckpt_file}")
+    checkpoint = torch.load(ckpt_file, map_location="cpu", weights_only=False)
 
-    checkpoint = torch.load(ckpt_file, map_location="cpu")
-    model.load_state_dict(checkpoint["model_state_dict"])
-    model.eval()
-    return env, model
+    candidate_modules = ["mock_rl_routing", "mock_rl_routing_no_spatial"]
+    last_error = None
+
+    for module_name in candidate_modules:
+        module = importlib.import_module(module_name)
+        cfg = module.load_config(config_path)
+        resolved_seed = seed
+        if resolved_seed is None and use_config_seed:
+            resolved_seed = cfg["seed"]
+        if resolved_seed is not None:
+            module.set_seed(resolved_seed)
+
+        module.apply_runtime_config(cfg)
+
+        graph_cfg = cfg["graph"]
+        env_cfg = cfg["environment"]
+        reward_cfg = cfg["reward"]
+        model_cfg = cfg["model"]
+
+        if "base_graph_node_link" in checkpoint:
+            base_graph = nx.node_link_graph(checkpoint["base_graph_node_link"])
+            print(f"Visualizer: loaded base graph snapshot from checkpoint ({module_name}).")
+        else:
+            base_graph = module.create_base_graph(
+                num_nodes=int(graph_cfg["num_nodes"]),
+                min_nodes=int(graph_cfg["min_nodes"]),
+                max_nodes=int(graph_cfg["max_nodes"]),
+                force_download=bool(graph_cfg.get("force_download", False)),
+                prebuilt_graphml_path=str(graph_cfg.get("prebuilt_graphml_path", "") or ""),
+                use_existing_hazards=bool(graph_cfg.get("use_existing_hazards", False)),
+                flood_attr=str(graph_cfg.get("flood_attr", "flood_hazard")),
+                landslide_attr=str(graph_cfg.get("landslide_attr", "landslide_hazard")),
+                travel_time_attr=str(graph_cfg.get("travel_time_attr", "travel_time_min")),
+            )
+            print(f"Visualizer: checkpoint has no graph snapshot, rebuilt graph from config ({module_name}).")
+
+        env = module.HazardRoutingEnv(
+            base_graph,
+            num_deliveries=int(env_cfg["num_deliveries"]),
+            env_cfg=env_cfg,
+            reward_cfg=reward_cfg,
+        )
+        model = module.DQN(env.state_dim, env.num_nodes, hidden_sizes=tuple(model_cfg["hidden_sizes"]))
+        try:
+            model.load_state_dict(checkpoint["model_state_dict"])
+            model.eval()
+            print(f"Visualizer: loaded checkpoint with module {module_name}.")
+            return env, model, module
+        except RuntimeError as e:
+            last_error = e
+            continue
+
+    raise RuntimeError(
+        "Could not load checkpoint with either model variant "
+        "(mock_rl_routing or mock_rl_routing_no_spatial)."
+    ) from last_error
 
 
-def run_episode(env, model, epsilon=0.0):
+def run_episode(env, model, module, epsilon=0.0):
     state = env.reset()
-    rain_key = mrr.RAIN_KEYS[int(np.argmax(env.rain_onehot))]
+    rain_key = module.RAIN_KEYS[int(np.argmax(env.rain_onehot))]
 
     start_node = env.current_node
     delivery_nodes = set(env.delivery_nodes)
@@ -60,7 +95,7 @@ def run_episode(env, model, epsilon=0.0):
 
     while not done:
         mask = env.get_action_mask()
-        action = mrr.select_action(model, state, mask, epsilon)
+        action = module.select_action(model, state, mask, epsilon)
 
         if action is None:
             total_reward += env.failure_penalty("blockage")
@@ -203,9 +238,16 @@ def visualize_episodes(
     epsilon=0.0,
     cols=5,
     save_path="checkpoints/route_visualization.png",
+    seed=None,
+    use_config_seed=False,
 ):
-    env, model = load_env_and_model(config_path=config_path, checkpoint_path=checkpoint_path)
-    results = [run_episode(env, model, epsilon=epsilon) for _ in range(num_episodes)]
+    env, model, module = load_env_and_model(
+        config_path=config_path,
+        checkpoint_path=checkpoint_path,
+        seed=seed,
+        use_config_seed=use_config_seed,
+    )
+    results = [run_episode(env, model, module, epsilon=epsilon) for _ in range(num_episodes)]
 
     rows = math.ceil(num_episodes / cols)
     fig, axes = plt.subplots(rows, cols, figsize=(cols * 5.2, rows * 4.2))
@@ -227,7 +269,8 @@ def visualize_episodes(
     ]
     fig.legend(handles=legend_handles, loc="lower center", ncol=6, frameon=False, fontsize=9)
     fig.suptitle(
-        f"Routing Visualizer | Episodes={num_episodes} | Policy epsilon={epsilon:.2f} | Checkpoint={Path(checkpoint_path).name}",
+        f"Routing Visualizer | Episodes={num_episodes} | Policy epsilon={epsilon:.2f} | "
+        f"Seed={'config' if use_config_seed and seed is None else seed} | Checkpoint={Path(checkpoint_path).name}",
         fontsize=12,
         y=0.995,
     )
@@ -244,8 +287,11 @@ if __name__ == "__main__":
     visualize_episodes(
         config_path="experiment_config.json",
         checkpoint_path="checkpoints/best_model.pt",
+        # checkpoint_path="checkpoints/no_spatial/best_model.pt",
         num_episodes=12,
-        epsilon=0.0,
+        epsilon=0.05,
         cols=4,
         save_path="checkpoints/route_visualization.png",
+        seed=None,
+        use_config_seed=True,
     )

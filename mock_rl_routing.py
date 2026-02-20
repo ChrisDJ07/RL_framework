@@ -128,6 +128,8 @@ DEFAULT_CONFIG = {
     },
     "paths": {
         "checkpoints_dir": "checkpoints",
+        "runs_dir": "runs",
+        "run_log_file": "last_run.txt",
     },
 }
 
@@ -632,186 +634,209 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
     eval_cfg = cfg["evaluation"]
     paths_cfg = cfg["paths"]
 
-    base_graph = create_base_graph(
-        num_nodes=int(graph_cfg["num_nodes"]),
-        min_nodes=int(graph_cfg["min_nodes"]),
-        max_nodes=int(graph_cfg["max_nodes"]),
-        force_download=bool(graph_cfg.get("force_download", False)),
-        prebuilt_graphml_path=str(graph_cfg.get("prebuilt_graphml_path", "") or ""),
-        use_existing_hazards=bool(graph_cfg.get("use_existing_hazards", False)),
-        flood_attr=str(graph_cfg.get("flood_attr", "flood_hazard")),
-        landslide_attr=str(graph_cfg.get("landslide_attr", "landslide_hazard")),
-        travel_time_attr=str(graph_cfg.get("travel_time_attr", "travel_time_min")),
-    )
-    env = HazardRoutingEnv(
-        base_graph,
-        num_deliveries=int(env_cfg["num_deliveries"]),
-        env_cfg=env_cfg,
-        reward_cfg=reward_cfg,
-    )
+    runs_dir = Path(paths_cfg.get("runs_dir", "runs"))
+    run_log_file = str(paths_cfg.get("run_log_file", "last_run.txt"))
+    run_log_path = Path(run_log_file)
+    if not run_log_path.is_absolute() and run_log_path.parent == Path("."):
+        run_log_path = runs_dir / run_log_path
+    run_log_path.parent.mkdir(parents=True, exist_ok=True)
 
-    online = DQN(env.state_dim, env.num_nodes, hidden_sizes=tuple(model_cfg["hidden_sizes"]))
-    target = DQN(env.state_dim, env.num_nodes, hidden_sizes=tuple(model_cfg["hidden_sizes"]))
-    target.load_state_dict(online.state_dict())
+    run_log_fp = run_log_path.open("w", encoding="utf-8")
 
-    optimizer = optim.Adam(online.parameters(), lr=float(train_cfg["lr"]))
-    buffer = ReplayBuffer(capacity=int(replay_cfg["capacity"]))
+    def log(msg):
+        print(msg)
+        run_log_fp.write(f"{msg}\n")
+        run_log_fp.flush()
 
-    num_episodes = int(train_cfg["num_episodes"])
-    gamma = float(train_cfg["gamma"])
-    epsilon = float(train_cfg["epsilon_start"])
-    epsilon_min = float(train_cfg["epsilon_min"])
-    epsilon_decay = float(train_cfg["epsilon_decay"])
-    batch_size = int(train_cfg["batch_size"])
-    target_update_every_steps = int(train_cfg["target_update_every_steps"])
-    log_every = int(train_cfg["log_every"])
-    eval_every = int(train_cfg["eval_every"])
+    try:
+        base_graph = create_base_graph(
+            num_nodes=int(graph_cfg["num_nodes"]),
+            min_nodes=int(graph_cfg["min_nodes"]),
+            max_nodes=int(graph_cfg["max_nodes"]),
+            force_download=bool(graph_cfg.get("force_download", False)),
+            prebuilt_graphml_path=str(graph_cfg.get("prebuilt_graphml_path", "") or ""),
+            use_existing_hazards=bool(graph_cfg.get("use_existing_hazards", False)),
+            flood_attr=str(graph_cfg.get("flood_attr", "flood_hazard")),
+            landslide_attr=str(graph_cfg.get("landslide_attr", "landslide_hazard")),
+            travel_time_attr=str(graph_cfg.get("travel_time_attr", "travel_time_min")),
+        )
+        env = HazardRoutingEnv(
+            base_graph,
+            num_deliveries=int(env_cfg["num_deliveries"]),
+            env_cfg=env_cfg,
+            reward_cfg=reward_cfg,
+        )
+        base_graph_node_link = nx.node_link_data(base_graph)
 
-    eval_episodes = int(eval_cfg["episodes"])
-    eval_eps0 = float(eval_cfg["epsilon_greedy"])
-    eval_eps_noise = float(eval_cfg["epsilon_noisy"])
+        online = DQN(env.state_dim, env.num_nodes, hidden_sizes=tuple(model_cfg["hidden_sizes"]))
+        target = DQN(env.state_dim, env.num_nodes, hidden_sizes=tuple(model_cfg["hidden_sizes"]))
+        target.load_state_dict(online.state_dict())
 
-    train_steps = 0
-    reward_history = []
-    success_history = []
-    best_eval_success = -1.0
-    best_eval_reward = -1e9
-    best_episode = 0
+        optimizer = optim.Adam(online.parameters(), lr=float(train_cfg["lr"]))
+        buffer = ReplayBuffer(capacity=int(replay_cfg["capacity"]))
 
-    checkpoints_dir = Path(paths_cfg["checkpoints_dir"])
-    checkpoints_dir.mkdir(parents=True, exist_ok=True)
-    best_model_path = checkpoints_dir / "best_model.pt"
-    last_model_path = checkpoints_dir / "last_model.pt"
+        num_episodes = int(train_cfg["num_episodes"])
+        gamma = float(train_cfg["gamma"])
+        epsilon = float(train_cfg["epsilon_start"])
+        epsilon_min = float(train_cfg["epsilon_min"])
+        epsilon_decay = float(train_cfg["epsilon_decay"])
+        batch_size = int(train_cfg["batch_size"])
+        target_update_every_steps = int(train_cfg["target_update_every_steps"])
+        log_every = int(train_cfg["log_every"])
+        eval_every = int(train_cfg["eval_every"])
 
-    print(
-        f"Graph stats | Nodes: {env.num_nodes}, Edges: {base_graph.number_of_edges()}, "
-        f"AvgBaseTime: {env.avg_base_time:.4f}, AvgHazard: {env.avg_edge_hazard:.4f}, "
-        f"StateDim: {env.state_dim}, Tmax(min): {env.max_elapsed_time:.2f}, "
-        f"Deliveries: {env.num_deliveries}"
-    )
+        eval_episodes = int(eval_cfg["episodes"])
+        eval_eps0 = float(eval_cfg["epsilon_greedy"])
+        eval_eps_noise = float(eval_cfg["epsilon_noisy"])
 
-    for episode in range(num_episodes):
-        state = env.reset()
-        done = False
-        total_reward = 0.0
+        train_steps = 0
+        reward_history = []
+        success_history = []
+        best_eval_success = -1.0
+        best_eval_reward = -1e9
+        best_episode = 0
 
-        while not done:
-            mask = env.get_action_mask()
-            action = select_action(online, state, mask, epsilon)
-            if action is None:
-                total_reward += env.failure_penalty("blockage")
-                break
+        checkpoints_dir = Path(paths_cfg["checkpoints_dir"])
+        checkpoints_dir.mkdir(parents=True, exist_ok=True)
+        best_model_path = checkpoints_dir / "best_model.pt"
+        last_model_path = checkpoints_dir / "last_model.pt"
 
-            next_state, reward, done, _ = env.step(action)
-            next_mask = env.get_action_mask() if not done else torch.zeros(env.num_nodes, dtype=torch.float32)
+        log(
+            f"Graph stats | Nodes: {env.num_nodes}, Edges: {base_graph.number_of_edges()}, "
+            f"AvgBaseTime: {env.avg_base_time:.4f}, AvgHazard: {env.avg_edge_hazard:.4f}, "
+            f"StateDim: {env.state_dim}, Tmax(min): {env.max_elapsed_time:.2f}, "
+            f"Deliveries: {env.num_deliveries}"
+        )
 
-            buffer.store((state, action, reward, next_state, done, next_mask))
-            state = next_state
-            total_reward += reward
+        for episode in range(num_episodes):
+            state = env.reset()
+            done = False
+            total_reward = 0.0
 
-            if len(buffer) >= batch_size:
-                states, actions, rewards, next_states, dones, next_masks = buffer.sample(batch_size)
+            while not done:
+                mask = env.get_action_mask()
+                action = select_action(online, state, mask, epsilon)
+                if action is None:
+                    total_reward += env.failure_penalty("blockage")
+                    break
 
-                q_values = online(states)
-                q_selected = q_values.gather(1, actions.unsqueeze(1)).squeeze()
+                next_state, reward, done, _ = env.step(action)
+                next_mask = env.get_action_mask() if not done else torch.zeros(env.num_nodes, dtype=torch.float32)
 
-                with torch.no_grad():
-                    next_online_q = online(next_states)
-                    next_online_q[next_masks == 0] = -1e9
-                    next_actions = next_online_q.argmax(dim=1)
-                    next_q = target(next_states).gather(1, next_actions.unsqueeze(1)).squeeze()
-                    has_valid_next = (next_masks.sum(dim=1) > 0).float()
-                    target_q = rewards + gamma * next_q * (1 - dones) * has_valid_next
+                buffer.store((state, action, reward, next_state, done, next_mask))
+                state = next_state
+                total_reward += reward
 
-                loss = nn.MSELoss()(q_selected, target_q)
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
+                if len(buffer) >= batch_size:
+                    states, actions, rewards, next_states, dones, next_masks = buffer.sample(batch_size)
 
-                train_steps += 1
-                if train_steps % target_update_every_steps == 0:
-                    target.load_state_dict(online.state_dict())
+                    q_values = online(states)
+                    q_selected = q_values.gather(1, actions.unsqueeze(1)).squeeze()
 
-        reward_history.append(total_reward)
-        success_history.append(1 if len(env.completed) == len(env.delivery_nodes) else 0)
-        epsilon = max(epsilon_min, epsilon * epsilon_decay)
+                    with torch.no_grad():
+                        next_online_q = online(next_states)
+                        next_online_q[next_masks == 0] = -1e9
+                        next_actions = next_online_q.argmax(dim=1)
+                        next_q = target(next_states).gather(1, next_actions.unsqueeze(1)).squeeze()
+                        has_valid_next = (next_masks.sum(dim=1) > 0).float()
+                        target_q = rewards + gamma * next_q * (1 - dones) * has_valid_next
 
-        if (episode + 1) % log_every == 0:
-            avg_reward = float(np.mean(reward_history[-log_every:]))
-            success_rate = float(np.mean(success_history[-log_every:]))
-            print(
-                f"Episode {episode + 1}, "
-                f"LastReward: {total_reward:.2f}, "
-                f"AvgReward({log_every}): {avg_reward:.2f}, "
-                f"SuccessRate({log_every}): {success_rate:.2%}, "
-                f"Epsilon: {epsilon:.3f}"
-            )
+                    loss = nn.MSELoss()(q_selected, target_q)
+                    optimizer.zero_grad()
+                    loss.backward()
+                    optimizer.step()
 
-        if (episode + 1) % eval_every == 0:
-            eval_reward_eps0, eval_success_eps0 = evaluate_policy(
-                online, env, num_episodes=eval_episodes, epsilon=eval_eps0
-            )
-            eval_reward_epsn, eval_success_epsn = evaluate_policy(
-                online, env, num_episodes=eval_episodes, epsilon=eval_eps_noise
-            )
-            print(
-                f"[Eval @ Episode {episode + 1}] "
-                f"eps={eval_eps0:.2f} -> MeanReward: {eval_reward_eps0:.2f}, SuccessRate: {eval_success_eps0:.2%} | "
-                f"eps={eval_eps_noise:.2f} -> MeanReward: {eval_reward_epsn:.2f}, SuccessRate: {eval_success_epsn:.2%}"
-            )
+                    train_steps += 1
+                    if train_steps % target_update_every_steps == 0:
+                        target.load_state_dict(online.state_dict())
 
-            if (eval_success_eps0 > best_eval_success) or (
-                eval_success_eps0 == best_eval_success and eval_reward_eps0 > best_eval_reward
-            ):
-                best_eval_success = eval_success_eps0
-                best_eval_reward = eval_reward_eps0
-                best_episode = episode + 1
-                torch.save(
-                    {
-                        "episode": best_episode,
-                        "model_state_dict": online.state_dict(),
-                        "optimizer_state_dict": optimizer.state_dict(),
-                        "eval_success_rate_primary": best_eval_success,
-                        "eval_mean_reward_primary": best_eval_reward,
-                        "graph_num_nodes": env.num_nodes,
-                        "num_deliveries": env.num_deliveries,
-                        "seed": SEED,
-                        "config_path": str(config_path),
-                    },
-                    best_model_path,
-                )
-                print(
-                    f"Saved best checkpoint: {best_model_path} "
-                    f"(episode {best_episode}, success={best_eval_success:.2%}, reward={best_eval_reward:.2f})"
+            reward_history.append(total_reward)
+            success_history.append(1 if len(env.completed) == len(env.delivery_nodes) else 0)
+            epsilon = max(epsilon_min, epsilon * epsilon_decay)
+
+            if (episode + 1) % log_every == 0:
+                avg_reward = float(np.mean(reward_history[-log_every:]))
+                success_rate = float(np.mean(success_history[-log_every:]))
+                log(
+                    f"Episode {episode + 1}, "
+                    f"LastReward: {total_reward:.2f}, "
+                    f"AvgReward({log_every}): {avg_reward:.2f}, "
+                    f"SuccessRate({log_every}): {success_rate:.2%}, "
+                    f"Epsilon: {epsilon:.3f}"
                 )
 
-    torch.save(
-        {
-            "episode": num_episodes,
-            "model_state_dict": online.state_dict(),
-            "optimizer_state_dict": optimizer.state_dict(),
-            "graph_num_nodes": env.num_nodes,
-            "num_deliveries": env.num_deliveries,
-            "seed": SEED,
-            "config_path": str(config_path),
-        },
-        last_model_path,
-    )
-    print(f"Saved last checkpoint: {last_model_path}")
+            if (episode + 1) % eval_every == 0:
+                eval_reward_eps0, eval_success_eps0 = evaluate_policy(
+                    online, env, num_episodes=eval_episodes, epsilon=eval_eps0
+                )
+                eval_reward_epsn, eval_success_epsn = evaluate_policy(
+                    online, env, num_episodes=eval_episodes, epsilon=eval_eps_noise
+                )
+                log(
+                    f"[Eval @ Episode {episode + 1}] "
+                    f"eps={eval_eps0:.2f} -> MeanReward: {eval_reward_eps0:.2f}, SuccessRate: {eval_success_eps0:.2%} | "
+                    f"eps={eval_eps_noise:.2f} -> MeanReward: {eval_reward_epsn:.2f}, SuccessRate: {eval_success_epsn:.2%}"
+                )
 
-    final_reward_eps0, final_success_eps0 = evaluate_policy(online, env, num_episodes=eval_episodes, epsilon=eval_eps0)
-    final_reward_epsn, final_success_epsn = evaluate_policy(
-        online, env, num_episodes=eval_episodes, epsilon=eval_eps_noise
-    )
-    print(
-        f"Evaluation over {eval_episodes} episodes | "
-        f"eps={eval_eps0:.2f} MeanReward: {final_reward_eps0:.2f}, SuccessRate: {final_success_eps0:.2%} | "
-        f"eps={eval_eps_noise:.2f} MeanReward: {final_reward_epsn:.2f}, SuccessRate: {final_success_epsn:.2%}"
-    )
-    print(
-        f"Best checkpoint summary | Episode: {best_episode}, "
-        f"PrimaryEval MeanReward: {best_eval_reward:.2f}, SuccessRate: {best_eval_success:.2%}"
-    )
+                if (eval_success_eps0 > best_eval_success) or (
+                    eval_success_eps0 == best_eval_success and eval_reward_eps0 > best_eval_reward
+                ):
+                    best_eval_success = eval_success_eps0
+                    best_eval_reward = eval_reward_eps0
+                    best_episode = episode + 1
+                    torch.save(
+                        {
+                            "episode": best_episode,
+                            "model_state_dict": online.state_dict(),
+                            "optimizer_state_dict": optimizer.state_dict(),
+                            "eval_success_rate_primary": best_eval_success,
+                            "eval_mean_reward_primary": best_eval_reward,
+                            "graph_num_nodes": env.num_nodes,
+                            "num_deliveries": env.num_deliveries,
+                            "seed": SEED,
+                            "config_path": str(config_path),
+                            "base_graph_node_link": base_graph_node_link,
+                        },
+                        best_model_path,
+                    )
+                    log(
+                        f"Saved best checkpoint: {best_model_path} "
+                        f"(episode {best_episode}, success={best_eval_success:.2%}, reward={best_eval_reward:.2f})"
+                    )
+
+        torch.save(
+            {
+                "episode": num_episodes,
+                "model_state_dict": online.state_dict(),
+                "optimizer_state_dict": optimizer.state_dict(),
+                "graph_num_nodes": env.num_nodes,
+                "num_deliveries": env.num_deliveries,
+                "seed": SEED,
+                "config_path": str(config_path),
+                "base_graph_node_link": base_graph_node_link,
+            },
+            last_model_path,
+        )
+        log(f"Saved last checkpoint: {last_model_path}")
+
+        final_reward_eps0, final_success_eps0 = evaluate_policy(
+            online, env, num_episodes=eval_episodes, epsilon=eval_eps0
+        )
+        final_reward_epsn, final_success_epsn = evaluate_policy(
+            online, env, num_episodes=eval_episodes, epsilon=eval_eps_noise
+        )
+        log(
+            f"Evaluation over {eval_episodes} episodes | "
+            f"eps={eval_eps0:.2f} MeanReward: {final_reward_eps0:.2f}, SuccessRate: {final_success_eps0:.2%} | "
+            f"eps={eval_eps_noise:.2f} MeanReward: {final_reward_epsn:.2f}, SuccessRate: {final_success_epsn:.2%}"
+        )
+        log(
+            f"Best checkpoint summary | Episode: {best_episode}, "
+            f"PrimaryEval MeanReward: {best_eval_reward:.2f}, SuccessRate: {best_eval_success:.2%}"
+        )
+        log(f"Run log saved to: {run_log_path}")
+    finally:
+        run_log_fp.close()
 
 
 if __name__ == "__main__":

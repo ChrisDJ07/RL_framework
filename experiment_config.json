@@ -1,9 +1,9 @@
 {
   "seed": 40,
   "graph": {
-    "num_nodes": 15,
-    "min_nodes": 12,
-    "max_nodes": 20,
+    "num_nodes": 25,
+    "min_nodes": 25,
+    "max_nodes": 25,
     "force_download": false,
     "prebuilt_graphml_path": "data/la_trinidad_hazard_graph.graphml",
     "use_existing_hazards": true,
@@ -12,7 +12,7 @@
     "travel_time_attr": "travel_time_min"
   },
   "environment": {
-    "num_deliveries": 3,
+    "num_deliveries": 2,
     "min_max_steps": 50,
     "max_steps_multiplier": 2.0,
     "episode_time_scale": 6.0
@@ -22,7 +22,7 @@
       "RI1": {
         "speed_mult": 0.94,
         "flood_block_threshold": 1.0,
-        "flood_block_prob": 0.1,
+        "flood_block_prob": 0.0,
         "landslide_block_threshold": null,
         "landslide_block_prob": 0.0
       },
@@ -56,9 +56,7 @@
       }
     },
     "active_rain_keys": [
-      "RI1",
-      "RI2",
-      "RI3"
+      "RI1"
     ],
     "flood_time_weight": 0.5,
     "landslide_time_weight": 0.5,
@@ -89,9 +87,9 @@
     "capacity": 10000
   },
   "training": {
-    "num_episodes": 1500,
+    "num_episodes": 2000,
     "gamma": 0.99,
-    "lr": 0.0003,
+    "lr": 0.003,
     "batch_size": 32,
     "epsilon_start": 1.0,
     "epsilon_min": 0.05,
@@ -107,6 +105,9 @@
   },
   "paths": {
     "checkpoints_dir": "checkpoints",
-    "checkpoints_no_spatial_dir": "checkpoints/no_spatial"
+    "checkpoints_no_spatial_dir": "checkpoints/no_spatial",
+    "runs_dir": "runs",
+    "run_log_file": "last_run.txt",
+    "run_log_no_spatial_file": "last_run_no_spatial.txt"
   }
 }

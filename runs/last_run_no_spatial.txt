@@ -1,181 +1,74 @@
-Graph stats | Nodes: 15, Edges: 16, AvgBaseTime: 0.1381, AvgHazard: 0.5375, StateDim: 58, Tmax(min): 92.76, Deliveries: 3
-Episode 20, LastReward: -134.88, AvgReward(20): -135.29, SuccessRate(20): 15.00%, Epsilon: 0.905
-[Eval @ Episode 20] eps=0.00 -> MeanReward: -245.08, SuccessRate: 0.00% | eps=0.05 -> MeanReward: -242.08, SuccessRate: 0.00%     
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 20, success=0.00%, reward=-245.08)
-Episode 40, LastReward: -159.28, AvgReward(20): -173.19, SuccessRate(20): 5.00%, Epsilon: 0.818
-[Eval @ Episode 40] eps=0.00 -> MeanReward: -225.52, SuccessRate: 0.33% | eps=0.05 -> MeanReward: -210.93, SuccessRate: 2.00%     
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 40, success=0.33%, reward=-225.52)
-Episode 60, LastReward: 147.56, AvgReward(20): -53.91, SuccessRate(20): 30.00%, Epsilon: 0.740
-[Eval @ Episode 60] eps=0.00 -> MeanReward: -200.70, SuccessRate: 1.00% | eps=0.05 -> MeanReward: -186.80, SuccessRate: 1.33%
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 60, success=1.00%, reward=-200.70)
-Episode 80, LastReward: 159.87, AvgReward(20): -36.29, SuccessRate(20): 40.00%, Epsilon: 0.670
-[Eval @ Episode 80] eps=0.00 -> MeanReward: -171.49, SuccessRate: 3.33% | eps=0.05 -> MeanReward: -153.05, SuccessRate: 6.67%
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 80, success=3.33%, reward=-171.49)
-Episode 100, LastReward: -214.79, AvgReward(20): -30.59, SuccessRate(20): 40.00%, Epsilon: 0.606
-[Eval @ Episode 100] eps=0.00 -> MeanReward: -174.53, SuccessRate: 4.00% | eps=0.05 -> MeanReward: -148.00, SuccessRate: 8.67%
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 100, success=4.00%, reward=-174.53)
-Episode 120, LastReward: -160.00, AvgReward(20): 5.72, SuccessRate(20): 45.00%, Epsilon: 0.548
-[Eval @ Episode 120] eps=0.00 -> MeanReward: -172.54, SuccessRate: 5.33% | eps=0.05 -> MeanReward: -127.27, SuccessRate: 10.33%
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 120, success=5.33%, reward=-172.54)
-Episode 140, LastReward: -146.95, AvgReward(20): -90.99, SuccessRate(20): 20.00%, Epsilon: 0.496
-[Eval @ Episode 140] eps=0.00 -> MeanReward: -156.46, SuccessRate: 8.00% | eps=0.05 -> MeanReward: -140.71, SuccessRate: 9.67%
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 140, success=8.00%, reward=-156.46)
-Episode 160, LastReward: 172.54, AvgReward(20): -85.89, SuccessRate(20): 25.00%, Epsilon: 0.448
-[Eval @ Episode 160] eps=0.00 -> MeanReward: -148.91, SuccessRate: 9.67% | eps=0.05 -> MeanReward: -142.92, SuccessRate: 11.67%
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 160, success=9.67%, reward=-148.91)
-Episode 180, LastReward: 184.91, AvgReward(20): -42.90, SuccessRate(20): 35.00%, Epsilon: 0.406
-[Eval @ Episode 180] eps=0.00 -> MeanReward: -173.89, SuccessRate: 6.33% | eps=0.05 -> MeanReward: -147.08, SuccessRate: 11.00%
-Episode 200, LastReward: -114.10, AvgReward(20): -116.77, SuccessRate(20): 15.00%, Epsilon: 0.367
-[Eval @ Episode 200] eps=0.00 -> MeanReward: -174.63, SuccessRate: 3.00% | eps=0.05 -> MeanReward: -158.85, SuccessRate: 7.00%
-Episode 220, LastReward: -242.44, AvgReward(20): -37.87, SuccessRate(20): 35.00%, Epsilon: 0.332
-[Eval @ Episode 220] eps=0.00 -> MeanReward: -177.83, SuccessRate: 5.00% | eps=0.05 -> MeanReward: -153.32, SuccessRate: 9.33%
-Episode 240, LastReward: -259.05, AvgReward(20): -90.83, SuccessRate(20): 20.00%, Epsilon: 0.300
-[Eval @ Episode 240] eps=0.00 -> MeanReward: -160.04, SuccessRate: 8.67% | eps=0.05 -> MeanReward: -124.21, SuccessRate: 13.67%
-Episode 260, LastReward: -206.02, AvgReward(20): -28.88, SuccessRate(20): 40.00%, Epsilon: 0.272
-[Eval @ Episode 260] eps=0.00 -> MeanReward: -172.04, SuccessRate: 7.67% | eps=0.05 -> MeanReward: -136.01, SuccessRate: 13.67%
-Episode 280, LastReward: -116.83, AvgReward(20): -48.87, SuccessRate(20): 30.00%, Epsilon: 0.246
-[Eval @ Episode 280] eps=0.00 -> MeanReward: -168.47, SuccessRate: 7.33% | eps=0.05 -> MeanReward: -129.27, SuccessRate: 15.33%
-Episode 300, LastReward: -170.48, AvgReward(20): -89.35, SuccessRate(20): 25.00%, Epsilon: 0.222
-[Eval @ Episode 300] eps=0.00 -> MeanReward: -164.99, SuccessRate: 10.00% | eps=0.05 -> MeanReward: -143.57, SuccessRate: 12.33%
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 300, success=10.00%, reward=-164.99)
-Episode 320, LastReward: 224.90, AvgReward(20): -40.58, SuccessRate(20): 40.00%, Epsilon: 0.201
-[Eval @ Episode 320] eps=0.00 -> MeanReward: -166.81, SuccessRate: 8.67% | eps=0.05 -> MeanReward: -122.28, SuccessRate: 18.33%
-Episode 340, LastReward: -124.85, AvgReward(20): -28.22, SuccessRate(20): 35.00%, Epsilon: 0.182
-[Eval @ Episode 340] eps=0.00 -> MeanReward: -141.48, SuccessRate: 18.67% | eps=0.05 -> MeanReward: -90.53, SuccessRate: 28.00%
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 340, success=18.67%, reward=-141.48)
-Episode 360, LastReward: 224.57, AvgReward(20): 47.39, SuccessRate(20): 60.00%, Epsilon: 0.165
-[Eval @ Episode 360] eps=0.00 -> MeanReward: -176.54, SuccessRate: 14.67% | eps=0.05 -> MeanReward: -135.12, SuccessRate: 23.33%
-Episode 380, LastReward: -298.32, AvgReward(20): -54.08, SuccessRate(20): 40.00%, Epsilon: 0.149
-[Eval @ Episode 380] eps=0.00 -> MeanReward: -125.50, SuccessRate: 22.67% | eps=0.05 -> MeanReward: -77.00, SuccessRate: 30.67%
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 380, success=22.67%, reward=-125.50)
-Episode 400, LastReward: -247.85, AvgReward(20): -63.22, SuccessRate(20): 35.00%, Epsilon: 0.135
-[Eval @ Episode 400] eps=0.00 -> MeanReward: -85.05, SuccessRate: 27.00% | eps=0.05 -> MeanReward: -74.74, SuccessRate: 28.00%
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 400, success=27.00%, reward=-85.05)
-Episode 420, LastReward: -117.15, AvgReward(20): -7.10, SuccessRate(20): 45.00%, Epsilon: 0.122
-[Eval @ Episode 420] eps=0.00 -> MeanReward: -108.45, SuccessRate: 24.33% | eps=0.05 -> MeanReward: -69.29, SuccessRate: 34.00%
-Episode 440, LastReward: -147.19, AvgReward(20): 17.18, SuccessRate(20): 55.00%, Epsilon: 0.110
-[Eval @ Episode 440] eps=0.00 -> MeanReward: -85.31, SuccessRate: 29.67% | eps=0.05 -> MeanReward: -70.70, SuccessRate: 33.33%
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 440, success=29.67%, reward=-85.31)
-Episode 460, LastReward: -110.65, AvgReward(20): 34.30, SuccessRate(20): 55.00%, Epsilon: 0.100
-[Eval @ Episode 460] eps=0.00 -> MeanReward: -88.34, SuccessRate: 22.33% | eps=0.05 -> MeanReward: -48.52, SuccessRate: 32.33%
-Episode 480, LastReward: 88.94, AvgReward(20): -110.59, SuccessRate(20): 25.00%, Epsilon: 0.090
-[Eval @ Episode 480] eps=0.00 -> MeanReward: -50.27, SuccessRate: 37.67% | eps=0.05 -> MeanReward: -6.48, SuccessRate: 46.67%
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 480, success=37.67%, reward=-50.27)
-Episode 500, LastReward: -105.18, AvgReward(20): -14.40, SuccessRate(20): 45.00%, Epsilon: 0.082
-[Eval @ Episode 500] eps=0.00 -> MeanReward: -69.04, SuccessRate: 32.67% | eps=0.05 -> MeanReward: -46.65, SuccessRate: 37.67%
-Episode 520, LastReward: -182.43, AvgReward(20): -47.01, SuccessRate(20): 35.00%, Epsilon: 0.074
-[Eval @ Episode 520] eps=0.00 -> MeanReward: -104.08, SuccessRate: 25.00% | eps=0.05 -> MeanReward: -76.16, SuccessRate: 31.33%
-Episode 540, LastReward: -243.03, AvgReward(20): -102.96, SuccessRate(20): 20.00%, Epsilon: 0.067
-[Eval @ Episode 540] eps=0.00 -> MeanReward: -87.58, SuccessRate: 29.00% | eps=0.05 -> MeanReward: -20.97, SuccessRate: 44.33%
-Episode 560, LastReward: 168.18, AvgReward(20): 9.03, SuccessRate(20): 55.00%, Epsilon: 0.060
-[Eval @ Episode 560] eps=0.00 -> MeanReward: -95.97, SuccessRate: 28.33% | eps=0.05 -> MeanReward: -87.26, SuccessRate: 30.67%
-Episode 580, LastReward: 231.70, AvgReward(20): -6.16, SuccessRate(20): 50.00%, Epsilon: 0.055
-[Eval @ Episode 580] eps=0.00 -> MeanReward: -45.54, SuccessRate: 37.33% | eps=0.05 -> MeanReward: -8.17, SuccessRate: 46.67%
-Episode 600, LastReward: 231.41, AvgReward(20): 25.26, SuccessRate(20): 55.00%, Epsilon: 0.050
-[Eval @ Episode 600] eps=0.00 -> MeanReward: -47.89, SuccessRate: 37.67% | eps=0.05 -> MeanReward: -11.16, SuccessRate: 45.67%
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 600, success=37.67%, reward=-47.89)
-Episode 620, LastReward: 225.66, AvgReward(20): -12.71, SuccessRate(20): 40.00%, Epsilon: 0.050
-[Eval @ Episode 620] eps=0.00 -> MeanReward: -36.72, SuccessRate: 39.00% | eps=0.05 -> MeanReward: -6.04, SuccessRate: 45.33%
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 620, success=39.00%, reward=-36.72)
-Episode 640, LastReward: -173.83, AvgReward(20): 24.66, SuccessRate(20): 50.00%, Epsilon: 0.050
-[Eval @ Episode 640] eps=0.00 -> MeanReward: -38.11, SuccessRate: 39.33% | eps=0.05 -> MeanReward: -23.70, SuccessRate: 41.33%
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 640, success=39.33%, reward=-38.11)
-Episode 660, LastReward: 175.13, AvgReward(20): -15.55, SuccessRate(20): 45.00%, Epsilon: 0.050
-[Eval @ Episode 660] eps=0.00 -> MeanReward: -60.55, SuccessRate: 33.67% | eps=0.05 -> MeanReward: -33.24, SuccessRate: 39.67%
-Episode 680, LastReward: -160.00, AvgReward(20): -98.16, SuccessRate(20): 20.00%, Epsilon: 0.050
-[Eval @ Episode 680] eps=0.00 -> MeanReward: -56.83, SuccessRate: 34.00% | eps=0.05 -> MeanReward: -25.73, SuccessRate: 41.00%
-Episode 700, LastReward: -213.30, AvgReward(20): -19.80, SuccessRate(20): 40.00%, Epsilon: 0.050
-[Eval @ Episode 700] eps=0.00 -> MeanReward: -47.13, SuccessRate: 37.67% | eps=0.05 -> MeanReward: -28.49, SuccessRate: 41.67%
-Episode 720, LastReward: -267.15, AvgReward(20): -30.83, SuccessRate(20): 40.00%, Epsilon: 0.050
-[Eval @ Episode 720] eps=0.00 -> MeanReward: -46.67, SuccessRate: 35.33% | eps=0.05 -> MeanReward: -27.58, SuccessRate: 41.00%
-Episode 740, LastReward: 237.06, AvgReward(20): 84.61, SuccessRate(20): 65.00%, Epsilon: 0.050
-[Eval @ Episode 740] eps=0.00 -> MeanReward: -27.99, SuccessRate: 41.33% | eps=0.05 -> MeanReward: 8.74, SuccessRate: 48.33%
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 740, success=41.33%, reward=-27.99)
-Episode 760, LastReward: 221.18, AvgReward(20): 36.93, SuccessRate(20): 60.00%, Epsilon: 0.050
-[Eval @ Episode 760] eps=0.00 -> MeanReward: 18.99, SuccessRate: 52.67% | eps=0.05 -> MeanReward: 36.11, SuccessRate: 55.67%
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 760, success=52.67%, reward=18.99)
-Episode 780, LastReward: 214.67, AvgReward(20): 47.08, SuccessRate(20): 60.00%, Epsilon: 0.050
-[Eval @ Episode 780] eps=0.00 -> MeanReward: 3.10, SuccessRate: 48.00% | eps=0.05 -> MeanReward: 25.23, SuccessRate: 52.67%
-Episode 800, LastReward: 233.03, AvgReward(20): 98.34, SuccessRate(20): 70.00%, Epsilon: 0.050
-[Eval @ Episode 800] eps=0.00 -> MeanReward: -15.46, SuccessRate: 45.33% | eps=0.05 -> MeanReward: 18.18, SuccessRate: 50.67%
-Episode 820, LastReward: 223.22, AvgReward(20): -20.24, SuccessRate(20): 45.00%, Epsilon: 0.050
-[Eval @ Episode 820] eps=0.00 -> MeanReward: -31.88, SuccessRate: 39.33% | eps=0.05 -> MeanReward: 10.39, SuccessRate: 49.00%
-Episode 840, LastReward: -240.51, AvgReward(20): 47.40, SuccessRate(20): 55.00%, Epsilon: 0.050
-[Eval @ Episode 840] eps=0.00 -> MeanReward: -43.86, SuccessRate: 36.67% | eps=0.05 -> MeanReward: -11.73, SuccessRate: 43.67%
-Episode 860, LastReward: -160.00, AvgReward(20): 2.36, SuccessRate(20): 45.00%, Epsilon: 0.050
-[Eval @ Episode 860] eps=0.00 -> MeanReward: -30.85, SuccessRate: 38.67% | eps=0.05 -> MeanReward: 14.86, SuccessRate: 49.67%
-Episode 880, LastReward: -101.63, AvgReward(20): 61.81, SuccessRate(20): 60.00%, Epsilon: 0.050
-[Eval @ Episode 880] eps=0.00 -> MeanReward: 27.25, SuccessRate: 51.33% | eps=0.05 -> MeanReward: 32.74, SuccessRate: 51.67%
-Episode 900, LastReward: 215.18, AvgReward(20): 99.23, SuccessRate(20): 75.00%, Epsilon: 0.050
-[Eval @ Episode 900] eps=0.00 -> MeanReward: 29.28, SuccessRate: 52.33% | eps=0.05 -> MeanReward: 51.09, SuccessRate: 57.33%
-Episode 920, LastReward: -240.23, AvgReward(20): 26.08, SuccessRate(20): 50.00%, Epsilon: 0.050
-[Eval @ Episode 920] eps=0.00 -> MeanReward: 31.81, SuccessRate: 53.00% | eps=0.05 -> MeanReward: 59.30, SuccessRate: 59.33%
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 920, success=53.00%, reward=31.81)
-Episode 940, LastReward: 194.25, AvgReward(20): 85.15, SuccessRate(20): 70.00%, Epsilon: 0.050
-[Eval @ Episode 940] eps=0.00 -> MeanReward: 64.72, SuccessRate: 60.33% | eps=0.05 -> MeanReward: 75.34, SuccessRate: 63.33%
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 940, success=60.33%, reward=64.72)
-Episode 960, LastReward: 232.10, AvgReward(20): 102.84, SuccessRate(20): 70.00%, Epsilon: 0.050
-[Eval @ Episode 960] eps=0.00 -> MeanReward: 49.02, SuccessRate: 56.33% | eps=0.05 -> MeanReward: 60.48, SuccessRate: 58.33%
-Episode 980, LastReward: 232.13, AvgReward(20): 82.80, SuccessRate(20): 65.00%, Epsilon: 0.050
-[Eval @ Episode 980] eps=0.00 -> MeanReward: 54.91, SuccessRate: 57.00% | eps=0.05 -> MeanReward: 61.60, SuccessRate: 58.67%
-Episode 1000, LastReward: -101.75, AvgReward(20): 108.95, SuccessRate(20): 70.00%, Epsilon: 0.050
-[Eval @ Episode 1000] eps=0.00 -> MeanReward: 24.72, SuccessRate: 49.67% | eps=0.05 -> MeanReward: 29.82, SuccessRate: 52.00%
-Episode 1020, LastReward: -241.68, AvgReward(20): 26.43, SuccessRate(20): 50.00%, Epsilon: 0.050
-[Eval @ Episode 1020] eps=0.00 -> MeanReward: 43.19, SuccessRate: 54.33% | eps=0.05 -> MeanReward: 76.71, SuccessRate: 62.67%
-Episode 1040, LastReward: -249.23, AvgReward(20): 66.56, SuccessRate(20): 60.00%, Epsilon: 0.050
-[Eval @ Episode 1040] eps=0.00 -> MeanReward: -12.03, SuccessRate: 39.00% | eps=0.05 -> MeanReward: 35.71, SuccessRate: 52.33%
-Episode 1060, LastReward: 124.70, AvgReward(20): 73.63, SuccessRate(20): 60.00%, Epsilon: 0.050
-[Eval @ Episode 1060] eps=0.00 -> MeanReward: 66.15, SuccessRate: 60.00% | eps=0.05 -> MeanReward: 60.90, SuccessRate: 58.00%
-Episode 1080, LastReward: -178.28, AvgReward(20): 67.78, SuccessRate(20): 60.00%, Epsilon: 0.050
-[Eval @ Episode 1080] eps=0.00 -> MeanReward: 48.77, SuccessRate: 55.00% | eps=0.05 -> MeanReward: 62.92, SuccessRate: 59.00%
-Episode 1100, LastReward: -192.70, AvgReward(20): 53.64, SuccessRate(20): 60.00%, Epsilon: 0.050
-[Eval @ Episode 1100] eps=0.00 -> MeanReward: 73.68, SuccessRate: 62.00% | eps=0.05 -> MeanReward: 87.40, SuccessRate: 65.33%
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 1100, success=62.00%, reward=73.68)
-Episode 1120, LastReward: -112.35, AvgReward(20): -6.82, SuccessRate(20): 45.00%, Epsilon: 0.050
-[Eval @ Episode 1120] eps=0.00 -> MeanReward: 78.22, SuccessRate: 62.67% | eps=0.05 -> MeanReward: 76.60, SuccessRate: 63.00%
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 1120, success=62.67%, reward=78.22)
-Episode 1140, LastReward: 226.91, AvgReward(20): 59.93, SuccessRate(20): 60.00%, Epsilon: 0.050
-[Eval @ Episode 1140] eps=0.00 -> MeanReward: 49.40, SuccessRate: 57.00% | eps=0.05 -> MeanReward: 77.92, SuccessRate: 62.67%
-Episode 1160, LastReward: 184.18, AvgReward(20): 114.13, SuccessRate(20): 75.00%, Epsilon: 0.050
-[Eval @ Episode 1160] eps=0.00 -> MeanReward: 75.38, SuccessRate: 64.33% | eps=0.05 -> MeanReward: 79.88, SuccessRate: 64.33%
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 1160, success=64.33%, reward=75.38)
-Episode 1180, LastReward: 233.79, AvgReward(20): 193.66, SuccessRate(20): 90.00%, Epsilon: 0.050
-[Eval @ Episode 1180] eps=0.00 -> MeanReward: 68.39, SuccessRate: 62.00% | eps=0.05 -> MeanReward: 83.38, SuccessRate: 64.67%
-Episode 1200, LastReward: 226.42, AvgReward(20): 93.41, SuccessRate(20): 70.00%, Epsilon: 0.050
-[Eval @ Episode 1200] eps=0.00 -> MeanReward: 70.28, SuccessRate: 62.00% | eps=0.05 -> MeanReward: 74.72, SuccessRate: 62.67%
-Episode 1220, LastReward: -114.29, AvgReward(20): 59.13, SuccessRate(20): 55.00%, Epsilon: 0.050
-[Eval @ Episode 1220] eps=0.00 -> MeanReward: 36.59, SuccessRate: 53.67% | eps=0.05 -> MeanReward: 78.87, SuccessRate: 64.00%
-Episode 1240, LastReward: 223.64, AvgReward(20): 133.45, SuccessRate(20): 80.00%, Epsilon: 0.050
-[Eval @ Episode 1240] eps=0.00 -> MeanReward: 30.68, SuccessRate: 53.33% | eps=0.05 -> MeanReward: 62.23, SuccessRate: 61.00%
-Episode 1260, LastReward: 213.42, AvgReward(20): 19.52, SuccessRate(20): 55.00%, Epsilon: 0.050
-[Eval @ Episode 1260] eps=0.00 -> MeanReward: 49.57, SuccessRate: 58.00% | eps=0.05 -> MeanReward: 65.72, SuccessRate: 62.33%
-Episode 1280, LastReward: 233.83, AvgReward(20): 21.41, SuccessRate(20): 50.00%, Epsilon: 0.050
-[Eval @ Episode 1280] eps=0.00 -> MeanReward: 21.88, SuccessRate: 52.33% | eps=0.05 -> MeanReward: 53.77, SuccessRate: 60.00%
-Episode 1300, LastReward: -160.00, AvgReward(20): 76.58, SuccessRate(20): 65.00%, Epsilon: 0.050
-[Eval @ Episode 1300] eps=0.00 -> MeanReward: 34.25, SuccessRate: 55.67% | eps=0.05 -> MeanReward: 55.80, SuccessRate: 59.67%
-Episode 1320, LastReward: 235.42, AvgReward(20): -7.64, SuccessRate(20): 45.00%, Epsilon: 0.050
-[Eval @ Episode 1320] eps=0.00 -> MeanReward: 52.70, SuccessRate: 60.00% | eps=0.05 -> MeanReward: 74.55, SuccessRate: 65.00%
-Episode 1340, LastReward: 217.20, AvgReward(20): 96.68, SuccessRate(20): 70.00%, Epsilon: 0.050
-[Eval @ Episode 1340] eps=0.00 -> MeanReward: 80.00, SuccessRate: 66.33% | eps=0.05 -> MeanReward: 90.01, SuccessRate: 68.67%
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 1340, success=66.33%, reward=80.00)
-Episode 1360, LastReward: -241.53, AvgReward(20): 105.55, SuccessRate(20): 75.00%, Epsilon: 0.050
-[Eval @ Episode 1360] eps=0.00 -> MeanReward: 60.14, SuccessRate: 60.33% | eps=0.05 -> MeanReward: 71.11, SuccessRate: 63.00%
-Episode 1380, LastReward: 217.63, AvgReward(20): 77.87, SuccessRate(20): 70.00%, Epsilon: 0.050
-[Eval @ Episode 1380] eps=0.00 -> MeanReward: 95.91, SuccessRate: 69.33% | eps=0.05 -> MeanReward: 98.35, SuccessRate: 69.67%
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 1380, success=69.33%, reward=95.91)
-Episode 1400, LastReward: 222.42, AvgReward(20): 134.26, SuccessRate(20): 80.00%, Epsilon: 0.050
-[Eval @ Episode 1400] eps=0.00 -> MeanReward: 64.33, SuccessRate: 62.67% | eps=0.05 -> MeanReward: 100.77, SuccessRate: 71.33%
-Episode 1420, LastReward: 233.33, AvgReward(20): 52.41, SuccessRate(20): 60.00%, Epsilon: 0.050
-[Eval @ Episode 1420] eps=0.00 -> MeanReward: 79.63, SuccessRate: 64.33% | eps=0.05 -> MeanReward: 89.12, SuccessRate: 67.00%
-Episode 1440, LastReward: 239.50, AvgReward(20): 89.42, SuccessRate(20): 65.00%, Epsilon: 0.050
-[Eval @ Episode 1440] eps=0.00 -> MeanReward: 85.07, SuccessRate: 66.33% | eps=0.05 -> MeanReward: 89.62, SuccessRate: 69.33%
-Episode 1460, LastReward: 224.43, AvgReward(20): 84.03, SuccessRate(20): 65.00%, Epsilon: 0.050
-[Eval @ Episode 1460] eps=0.00 -> MeanReward: 92.99, SuccessRate: 68.00% | eps=0.05 -> MeanReward: 85.77, SuccessRate: 66.33%
-Episode 1480, LastReward: 232.99, AvgReward(20): 134.10, SuccessRate(20): 80.00%, Epsilon: 0.050
-[Eval @ Episode 1480] eps=0.00 -> MeanReward: 101.93, SuccessRate: 71.33% | eps=0.05 -> MeanReward: 87.22, SuccessRate: 68.33%
-Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 1480, success=71.33%, reward=101.93)
-Episode 1500, LastReward: -176.81, AvgReward(20): 74.36, SuccessRate(20): 65.00%, Epsilon: 0.050
-[Eval @ Episode 1500] eps=0.00 -> MeanReward: 50.00, SuccessRate: 58.67% | eps=0.05 -> MeanReward: 76.83, SuccessRate: 64.33%
+Graph stats | Nodes: 25, Edges: 25, AvgBaseTime: 0.4926, AvgHazard: 0.5760, StateDim: 78, Tmax(min): 587.44, Deliveries: 2
+Episode 50, LastReward: -223.96, AvgReward(50): -163.48, SuccessRate(50): 18.00%, Epsilon: 0.778
+Episode 100, LastReward: -270.36, AvgReward(50): -104.83, SuccessRate(50): 34.00%, Epsilon: 0.606
+[Eval @ Episode 100] eps=0.00 -> MeanReward: -217.12, SuccessRate: 2.00% | eps=0.05 -> MeanReward: -183.79, SuccessRate: 7.00%
+Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 100, success=2.00%, reward=-217.12)
+Episode 150, LastReward: -164.51, AvgReward(50): -132.63, SuccessRate(50): 22.00%, Epsilon: 0.471
+Episode 200, LastReward: -166.02, AvgReward(50): -88.62, SuccessRate(50): 32.00%, Epsilon: 0.367
+[Eval @ Episode 200] eps=0.00 -> MeanReward: -138.33, SuccessRate: 18.00% | eps=0.05 -> MeanReward: -129.01, SuccessRate: 24.00%
+Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 200, success=18.00%, reward=-138.33)
+Episode 250, LastReward: 147.85, AvgReward(50): 39.07, SuccessRate(50): 68.00%, Epsilon: 0.286
+Episode 300, LastReward: 174.73, AvgReward(50): 12.71, SuccessRate(50): 60.00%, Epsilon: 0.222
+[Eval @ Episode 300] eps=0.00 -> MeanReward: -128.83, SuccessRate: 22.00% | eps=0.05 -> MeanReward: -48.55, SuccessRate: 42.00%
+Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 300, success=22.00%, reward=-128.83)
+Episode 350, LastReward: -180.32, AvgReward(50): 32.71, SuccessRate(50): 64.00%, Epsilon: 0.173
+Episode 400, LastReward: 187.50, AvgReward(50): 10.83, SuccessRate(50): 60.00%, Epsilon: 0.135
+[Eval @ Episode 400] eps=0.00 -> MeanReward: -110.01, SuccessRate: 29.00% | eps=0.05 -> MeanReward: -62.80, SuccessRate: 41.00%
+Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 400, success=29.00%, reward=-110.01)
+Episode 450, LastReward: -212.21, AvgReward(50): -31.78, SuccessRate(50): 46.00%, Epsilon: 0.105
+Episode 500, LastReward: -163.75, AvgReward(50): -38.79, SuccessRate(50): 50.00%, Epsilon: 0.082
+[Eval @ Episode 500] eps=0.00 -> MeanReward: -107.13, SuccessRate: 28.00% | eps=0.05 -> MeanReward: -53.56, SuccessRate: 44.00%
+Episode 550, LastReward: -266.76, AvgReward(50): -90.96, SuccessRate(50): 32.00%, Epsilon: 0.063
+Episode 600, LastReward: -266.01, AvgReward(50): -107.06, SuccessRate(50): 28.00%, Epsilon: 0.050
+[Eval @ Episode 600] eps=0.00 -> MeanReward: -105.36, SuccessRate: 24.00% | eps=0.05 -> MeanReward: -34.62, SuccessRate: 44.00%
+Episode 650, LastReward: -264.05, AvgReward(50): 0.05, SuccessRate(50): 58.00%, Epsilon: 0.050
+Episode 700, LastReward: 182.98, AvgReward(50): 1.98, SuccessRate(50): 58.00%, Epsilon: 0.050
+[Eval @ Episode 700] eps=0.00 -> MeanReward: -44.79, SuccessRate: 44.00% | eps=0.05 -> MeanReward: 39.48, SuccessRate: 64.00%
+Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 700, success=44.00%, reward=-44.79)
+Episode 750, LastReward: -203.21, AvgReward(50): -9.42, SuccessRate(50): 52.00%, Epsilon: 0.050
+Episode 800, LastReward: 148.10, AvgReward(50): 19.11, SuccessRate(50): 62.00%, Epsilon: 0.050
+[Eval @ Episode 800] eps=0.00 -> MeanReward: 16.76, SuccessRate: 58.00% | eps=0.05 -> MeanReward: 56.69, SuccessRate: 69.00%
+Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 800, success=58.00%, reward=16.76)
+Episode 850, LastReward: 177.52, AvgReward(50): 62.11, SuccessRate(50): 72.00%, Epsilon: 0.050
+Episode 900, LastReward: 155.54, AvgReward(50): 54.30, SuccessRate(50): 72.00%, Epsilon: 0.050
+[Eval @ Episode 900] eps=0.00 -> MeanReward: -27.00, SuccessRate: 51.00% | eps=0.05 -> MeanReward: 13.31, SuccessRate: 62.00%
+Episode 950, LastReward: 158.21, AvgReward(50): 41.82, SuccessRate(50): 66.00%, Epsilon: 0.050
+Episode 1000, LastReward: 159.33, AvgReward(50): 93.61, SuccessRate(50): 80.00%, Epsilon: 0.050
+[Eval @ Episode 1000] eps=0.00 -> MeanReward: -7.32, SuccessRate: 54.00% | eps=0.05 -> MeanReward: 30.14, SuccessRate: 65.00%
+Episode 1050, LastReward: 139.49, AvgReward(50): 89.39, SuccessRate(50): 80.00%, Epsilon: 0.050
+Episode 1100, LastReward: 191.15, AvgReward(50): 58.16, SuccessRate(50): 74.00%, Epsilon: 0.050
+[Eval @ Episode 1100] eps=0.00 -> MeanReward: -5.90, SuccessRate: 56.00% | eps=0.05 -> MeanReward: 3.24, SuccessRate: 58.00%
+Episode 1150, LastReward: 193.88, AvgReward(50): -17.41, SuccessRate(50): 50.00%, Epsilon: 0.050
+Episode 1200, LastReward: 173.55, AvgReward(50): 1.30, SuccessRate(50): 56.00%, Epsilon: 0.050
+[Eval @ Episode 1200] eps=0.00 -> MeanReward: -28.80, SuccessRate: 47.00% | eps=0.05 -> MeanReward: -19.00, SuccessRate: 52.00%
+Episode 1250, LastReward: 155.13, AvgReward(50): -26.77, SuccessRate(50): 52.00%, Epsilon: 0.050
+Episode 1300, LastReward: 179.11, AvgReward(50): 42.56, SuccessRate(50): 68.00%, Epsilon: 0.050
+[Eval @ Episode 1300] eps=0.00 -> MeanReward: -0.22, SuccessRate: 60.00% | eps=0.05 -> MeanReward: 18.09, SuccessRate: 66.00%
+Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 1300, success=60.00%, reward=-0.22)
+Episode 1350, LastReward: 181.22, AvgReward(50): 9.95, SuccessRate(50): 58.00%, Epsilon: 0.050
+Episode 1400, LastReward: 155.53, AvgReward(50): -35.93, SuccessRate(50): 46.00%, Epsilon: 0.050
+[Eval @ Episode 1400] eps=0.00 -> MeanReward: -13.21, SuccessRate: 53.00% | eps=0.05 -> MeanReward: 52.48, SuccessRate: 70.00%
+Episode 1450, LastReward: 145.68, AvgReward(50): 34.59, SuccessRate(50): 66.00%, Epsilon: 0.050
+Episode 1500, LastReward: 136.25, AvgReward(50): 24.92, SuccessRate(50): 60.00%, Epsilon: 0.050
+[Eval @ Episode 1500] eps=0.00 -> MeanReward: -0.91, SuccessRate: 57.00% | eps=0.05 -> MeanReward: 24.66, SuccessRate: 63.00%
+Episode 1550, LastReward: 96.00, AvgReward(50): 16.12, SuccessRate(50): 60.00%, Epsilon: 0.050
+Episode 1600, LastReward: 173.16, AvgReward(50): -11.86, SuccessRate(50): 52.00%, Epsilon: 0.050
+[Eval @ Episode 1600] eps=0.00 -> MeanReward: -72.99, SuccessRate: 42.00% | eps=0.05 -> MeanReward: 12.03, SuccessRate: 62.00%
+Episode 1650, LastReward: 181.46, AvgReward(50): 93.41, SuccessRate(50): 80.00%, Epsilon: 0.050
+Episode 1700, LastReward: 168.84, AvgReward(50): 44.46, SuccessRate(50): 70.00%, Epsilon: 0.050
+[Eval @ Episode 1700] eps=0.00 -> MeanReward: 52.75, SuccessRate: 70.00% | eps=0.05 -> MeanReward: 120.79, SuccessRate: 88.00%
+Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 1700, success=70.00%, reward=52.75)
+Episode 1750, LastReward: -140.80, AvgReward(50): 79.75, SuccessRate(50): 74.00%, Epsilon: 0.050
+Episode 1800, LastReward: 190.56, AvgReward(50): 75.83, SuccessRate(50): 76.00%, Epsilon: 0.050
+[Eval @ Episode 1800] eps=0.00 -> MeanReward: 36.05, SuccessRate: 66.00% | eps=0.05 -> MeanReward: 61.33, SuccessRate: 71.00%
+Episode 1850, LastReward: 148.35, AvgReward(50): 87.90, SuccessRate(50): 80.00%, Epsilon: 0.050
+Episode 1900, LastReward: 174.79, AvgReward(50): 103.30, SuccessRate(50): 84.00%, Epsilon: 0.050
+[Eval @ Episode 1900] eps=0.00 -> MeanReward: 76.41, SuccessRate: 76.00% | eps=0.05 -> MeanReward: 125.46, SuccessRate: 89.00%
+Saved best checkpoint: checkpoints\no_spatial\best_model.pt (episode 1900, success=76.00%, reward=76.41)
+Episode 1950, LastReward: 194.94, AvgReward(50): 127.98, SuccessRate(50): 90.00%, Epsilon: 0.050
+Episode 2000, LastReward: 131.75, AvgReward(50): 104.51, SuccessRate(50): 86.00%, Epsilon: 0.050
+[Eval @ Episode 2000] eps=0.00 -> MeanReward: 58.23, SuccessRate: 71.00% | eps=0.05 -> MeanReward: 80.18, SuccessRate: 77.00%
 Saved last checkpoint: checkpoints\no_spatial\last_model.pt
-Evaluation over 300 episodes | eps=0.00 MeanReward: 82.32, SuccessRate: 65.67% | eps=0.05 MeanReward: 106.93, SuccessRate: 72.33%
-Best checkpoint summary | Episode: 1480, PrimaryEval MeanReward: 101.93, SuccessRate: 71.33%
+Evaluation over 100 episodes | eps=0.00 MeanReward: 54.53, SuccessRate: 71.00% | eps=0.05 MeanReward: 83.23, SuccessRate: 79.00%
+Best checkpoint summary | Episode: 1900, PrimaryEval MeanReward: 76.41, SuccessRate: 76.00%
+Run log saved to: runs\last_run_no_spatial.txt
