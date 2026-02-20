@@ -1,5 +1,6 @@
 import math
 import importlib
+import argparse
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -231,13 +232,36 @@ def _draw_episode(ax, result, episode_idx):
     ax.set_axis_off()
 
 
+def _resolve_save_path(save_path, checkpoint_path, module_name):
+    if save_path:
+        requested = Path(save_path)
+        # Keep user-provided explicit path unless it is the legacy generic default.
+        if str(requested).replace("\\", "/") not in {
+            "checkpoints/route_visualization.png",
+            "route_visualization.png",
+        }:
+            return requested
+
+    is_no_spatial = module_name.endswith("_no_spatial")
+    if is_no_spatial:
+        out_dir = Path("checkpoints") / "no_spatial"
+        out_name = "route_visualization_no_spatial.png"
+    else:
+        out_dir = Path("checkpoints")
+        out_name = "route_visualization_spatial.png"
+
+    # Add checkpoint stem for easier tracking of multiple snapshots.
+    ckpt_stem = Path(checkpoint_path).stem
+    return out_dir / f"{Path(out_name).stem}_{ckpt_stem}.png"
+
+
 def visualize_episodes(
     config_path="experiment_config.json",
     checkpoint_path="checkpoints/best_model.pt",
     num_episodes=12,
     epsilon=0.0,
     cols=5,
-    save_path="checkpoints/route_visualization.png",
+    save_path=None,
     seed=None,
     use_config_seed=False,
 ):
@@ -276,7 +300,7 @@ def visualize_episodes(
     )
     fig.tight_layout(rect=[0, 0.05, 1, 0.97])
 
-    save_file = Path(save_path)
+    save_file = _resolve_save_path(save_path, checkpoint_path, module.__name__)
     save_file.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(save_file, dpi=180, bbox_inches="tight")
     print(f"Saved visualization to: {save_file}")
@@ -284,14 +308,40 @@ def visualize_episodes(
 
 
 if __name__ == "__main__":
-    visualize_episodes(
-        config_path="experiment_config.json",
-        checkpoint_path="checkpoints/best_model.pt",
-        # checkpoint_path="checkpoints/no_spatial/best_model.pt",
-        num_episodes=12,
-        epsilon=0.05,
-        cols=4,
-        save_path="checkpoints/route_visualization.png",
-        seed=None,
-        use_config_seed=True,
+    parser = argparse.ArgumentParser(description="Visualize RL routing episodes from a checkpoint.")
+    parser.add_argument("--config-path", type=str, default="experiment_config.json")
+    parser.add_argument("--checkpoint-path", type=str, default="checkpoints/best_model.pt")
+    parser.add_argument("--num-episodes", type=int, default=12)
+    parser.add_argument("--epsilon", type=float, default=0.05)
+    parser.add_argument("--cols", type=int, default=4)
+    parser.add_argument(
+        "--save-path",
+        type=str,
+        default="",
+        help="Optional explicit output path. Leave empty to auto-route by model variant.",
     )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="Optional seed override. Ignored unless provided.",
+    )
+    parser.add_argument(
+        "--use-config-seed",
+        action="store_true",
+        help="Use seed from config when --seed is not provided.",
+    )
+    args = parser.parse_args()
+
+    visualize_episodes(
+        config_path=args.config_path,
+        checkpoint_path=args.checkpoint_path,
+        num_episodes=args.num_episodes,
+        epsilon=args.epsilon,
+        cols=args.cols,
+        save_path=(args.save_path if args.save_path else None),
+        seed=args.seed,
+        use_config_seed=args.use_config_seed,
+    )
+    
+# python visualize_routes.py --checkpoint-path checkpoints/no_spatial/best_model.pt --save-path checkpoints/no_spatial/my_routes.png

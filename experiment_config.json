@@ -73,6 +73,7 @@
     "w_flood": 0.6,
     "w_landslide": 0.4,
     "eta_time": 0.2,
+    "step_cost": 0.2,
     "penalty_timeout": -100.0,
     "penalty_blockage": -100.0,
     "penalty_incomplete_per_delivery": -20.0

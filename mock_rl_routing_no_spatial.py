@@ -98,6 +98,7 @@ DEFAULT_CONFIG = {
         "w_flood": 0.6,
         "w_landslide": 0.4,
         "eta_time": 0.2,
+        "step_cost": 0.2,
         "penalty_timeout": -100.0,
         "penalty_blockage": -100.0,
         "penalty_incomplete_per_delivery": -20.0,
@@ -324,6 +325,7 @@ class HazardRoutingEnv:
         self.w_flood = float(reward_cfg.get("w_flood", 0.6))
         self.w_landslide = float(reward_cfg.get("w_landslide", 0.4))
         self.eta_time = float(reward_cfg.get("eta_time", 0.2))
+        self.step_cost = float(reward_cfg.get("step_cost", 0.2))
         self.penalty_timeout = float(reward_cfg.get("penalty_timeout", -100.0))
         self.penalty_blockage = float(reward_cfg.get("penalty_blockage", -100.0))
         self.penalty_incomplete_per_delivery = float(reward_cfg.get("penalty_incomplete_per_delivery", -20.0))
@@ -460,7 +462,8 @@ class HazardRoutingEnv:
         progress_reward = self.k_progress * ((d_before - d_after) / self.max_shortest_len)
         hazard_penalty = -self.hazard_lambda * (self.w_flood * hf + self.w_landslide * hl)
         time_penalty = -self.eta_time * travel_time
-        reward = delivery_reward + progress_reward + hazard_penalty + time_penalty
+        step_penalty = -self.step_cost
+        reward = delivery_reward + progress_reward + hazard_penalty + time_penalty + step_penalty
 
         done = False
         reason = None
