@@ -107,6 +107,7 @@ if __name__ == "__main__":
     base_graph = to_training_graph(raw_graph, num_nodes=60, min_nodes=30, max_nodes=100)
 
     print("Visualizing Raw OSM Road Network")
+    print(f"Raw graph has {raw_graph.number_of_nodes()} nodes and {raw_graph.number_of_edges()} edges.")
     visualize_raw_osm_graph(raw_graph, title="Raw OSM Road Network (MSU-IIT Area)")
 
     print("Visualizing Base Graph (Hazard Scores Only)")
