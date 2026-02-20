@@ -68,6 +68,11 @@ DEFAULT_CONFIG = {
         "min_nodes": 12,
         "max_nodes": 20,
         "force_download": False,
+        "prebuilt_graphml_path": "",
+        "use_existing_hazards": False,
+        "flood_attr": "flood_hazard",
+        "landslide_attr": "landslide_hazard",
+        "travel_time_attr": "travel_time_min",
     },
     "environment": {
         "num_deliveries": 2,
@@ -122,6 +127,7 @@ DEFAULT_CONFIG = {
     },
     "paths": {
         "checkpoints_dir": "checkpoints",
+        "checkpoints_no_spatial_dir": "checkpoints/no_spatial"
     },
 }
 
@@ -204,13 +210,31 @@ def apply_runtime_config(cfg):
 # =========================
 # Graph Construction
 # =========================
-def create_base_graph(num_nodes=30, min_nodes=30, max_nodes=40, force_download=False):
-    raw_graph = get_raw_osm_graph(min_nodes=min_nodes, force_download=force_download)
+def create_base_graph(
+    num_nodes=30,
+    min_nodes=30,
+    max_nodes=40,
+    force_download=False,
+    prebuilt_graphml_path="",
+    use_existing_hazards=False,
+    flood_attr="flood_hazard",
+    landslide_attr="landslide_hazard",
+    travel_time_attr="travel_time_min",
+):
+    if prebuilt_graphml_path:
+        raw_graph = nx.read_graphml(prebuilt_graphml_path)
+    else:
+        raw_graph = get_raw_osm_graph(min_nodes=min_nodes, force_download=force_download)
+
     return to_training_graph(
         raw_graph,
         num_nodes=num_nodes,
         min_nodes=min_nodes,
         max_nodes=max_nodes,
+        use_existing_hazards=use_existing_hazards,
+        flood_attr=flood_attr,
+        landslide_attr=landslide_attr,
+        travel_time_attr=travel_time_attr,
     )
 
 
@@ -565,6 +589,11 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
         min_nodes=int(graph_cfg["min_nodes"]),
         max_nodes=int(graph_cfg["max_nodes"]),
         force_download=bool(graph_cfg.get("force_download", False)),
+        prebuilt_graphml_path=str(graph_cfg.get("prebuilt_graphml_path", "") or ""),
+        use_existing_hazards=bool(graph_cfg.get("use_existing_hazards", False)),
+        flood_attr=str(graph_cfg.get("flood_attr", "flood_hazard")),
+        landslide_attr=str(graph_cfg.get("landslide_attr", "landslide_hazard")),
+        travel_time_attr=str(graph_cfg.get("travel_time_attr", "travel_time_min")),
     )
     env = HazardRoutingEnv(
         base_graph,
@@ -601,7 +630,7 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
     best_eval_reward = -1e9
     best_episode = 0
 
-    checkpoints_dir = Path(paths_cfg["checkpoints_dir"])
+    checkpoints_dir = Path(paths_cfg["checkpoints_no_spatial_dir"])
     checkpoints_dir.mkdir(parents=True, exist_ok=True)
     best_model_path = checkpoints_dir / "best_model.pt"
     last_model_path = checkpoints_dir / "last_model.pt"

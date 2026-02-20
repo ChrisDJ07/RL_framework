@@ -89,11 +89,60 @@ def sample_edge_hazard_scores(low_hazard_edge_prob=0.8):
     return flood_score, landslide_score, flood_class, landslide_class
 
 
-def to_training_graph(raw_graph, num_nodes=60, min_nodes=30, max_nodes=100, low_hazard_edge_prob=0.8):
-    if hasattr(ox, "convert") and hasattr(ox.convert, "to_undirected"):
-        G_work = ox.convert.to_undirected(raw_graph)
+def _safe_float(value, default=0.0):
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return float(default)
+
+
+def _to_undirected_fallback(raw_graph):
+    """Convert arbitrary directed/multi graph to undirected simple graph."""
+    G_u = nx.Graph()
+    for n, d in raw_graph.nodes(data=True):
+        G_u.add_node(n, **dict(d))
+
+    if raw_graph.is_multigraph():
+        edge_iter = raw_graph.edges(keys=True, data=True)
+        for u, v, _, d in edge_iter:
+            payload = dict(d)
+            cand_len = _safe_float(payload.get("length", float("inf")), float("inf"))
+            if G_u.has_edge(u, v):
+                prev_len = _safe_float(G_u[u][v].get("length", float("inf")), float("inf"))
+                if cand_len >= prev_len:
+                    continue
+            G_u.add_edge(u, v, **payload)
     else:
-        G_work = ox.utils_graph.get_undirected(raw_graph)
+        for u, v, d in raw_graph.edges(data=True):
+            payload = dict(d)
+            cand_len = _safe_float(payload.get("length", float("inf")), float("inf"))
+            if G_u.has_edge(u, v):
+                prev_len = _safe_float(G_u[u][v].get("length", float("inf")), float("inf"))
+                if cand_len >= prev_len:
+                    continue
+            G_u.add_edge(u, v, **payload)
+
+    return G_u
+
+
+def to_training_graph(
+    raw_graph,
+    num_nodes=60,
+    min_nodes=30,
+    max_nodes=100,
+    low_hazard_edge_prob=0.8,
+    use_existing_hazards=False,
+    flood_attr="flood_hazard",
+    landslide_attr="landslide_hazard",
+    travel_time_attr="travel_time_min",
+):
+    try:
+        if hasattr(ox, "convert") and hasattr(ox.convert, "to_undirected"):
+            G_work = ox.convert.to_undirected(raw_graph)
+        else:
+            G_work = ox.utils_graph.get_undirected(raw_graph)
+    except Exception:
+        G_work = _to_undirected_fallback(raw_graph)
 
     largest_cc = max(nx.connected_components(G_work), key=len)
     G_work = G_work.subgraph(largest_cc).copy()
@@ -114,26 +163,41 @@ def to_training_graph(raw_graph, num_nodes=60, min_nodes=30, max_nodes=100, low_
 
     G = nx.Graph()
     for node, data in G_work.nodes(data=True):
-        x = float(data.get("x", 0.0))  # longitude
-        y = float(data.get("y", 0.0))  # latitude
+        x = _safe_float(data.get("x", 0.0), 0.0)  # longitude
+        y = _safe_float(data.get("y", 0.0), 0.0)  # latitude
         G.add_node(node, pos=np.array([x, y], dtype=float))
 
     for u, v, data in G_work.edges(data=True):
-        length_m = float(data.get("length", 1.0))
-        # Approx. base travel time in minutes using nominal 30 km/h.
-        base_time = (length_m / 8.33) / 60.0
-        flood_score, landslide_score, flood_class, landslide_class = sample_edge_hazard_scores(
-            low_hazard_edge_prob=low_hazard_edge_prob
-        )
-        G.add_edge(
-            u,
-            v,
+        length_m = max(_safe_float(data.get("length", 1.0), 1.0), 1e-3)
+
+        if use_existing_hazards:
+            flood_score = float(np.clip(_safe_float(data.get(flood_attr, 0.0), 0.0), 0.0, 1.0))
+            landslide_score = float(np.clip(_safe_float(data.get(landslide_attr, 0.0), 0.0), 0.0, 1.0))
+            base_time_raw = _safe_float(data.get(travel_time_attr, np.nan), np.nan)
+            # Fallback to nominal speed (30 km/h) if travel time is missing.
+            base_time = base_time_raw if np.isfinite(base_time_raw) and base_time_raw > 0 else (length_m / 8.33) / 60.0
+            flood_class = str(data.get("flood_class", "from_source"))
+            landslide_class = str(data.get("landslide_class", "from_source"))
+        else:
+            # Approx. base travel time in minutes using nominal 30 km/h.
+            base_time = (length_m / 8.33) / 60.0
+            flood_score, landslide_score, flood_class, landslide_class = sample_edge_hazard_scores(
+                low_hazard_edge_prob=low_hazard_edge_prob
+            )
+
+        edge_payload = dict(
             length=length_m,
-            base_time=max(base_time, 0.01),
+            base_time=max(float(base_time), 0.01),
             flood_score=flood_score,
             landslide_score=landslide_score,
             flood_class=flood_class,
             landslide_class=landslide_class,
         )
+
+        # If multiple parallel edges collapse into one undirected edge, keep the faster one.
+        if G.has_edge(u, v):
+            if edge_payload["base_time"] >= G[u][v].get("base_time", float("inf")):
+                continue
+        G.add_edge(u, v, **edge_payload)
 
     return G

@@ -4,7 +4,12 @@
     "num_nodes": 15,
     "min_nodes": 12,
     "max_nodes": 20,
-    "force_download": false
+    "force_download": false,
+    "prebuilt_graphml_path": "data/la_trinidad_hazard_graph.graphml",
+    "use_existing_hazards": true,
+    "flood_attr": "flood_hazard",
+    "landslide_attr": "landslide_hazard",
+    "travel_time_attr": "travel_time_min"
   },
   "environment": {
     "num_deliveries": 3,
@@ -92,15 +97,16 @@
     "epsilon_min": 0.05,
     "epsilon_decay": 0.995,
     "target_update_every_steps": 500,
-    "log_every": 20,
-    "eval_every": 20
+    "log_every": 50,
+    "eval_every": 100
   },
   "evaluation": {
-    "episodes": 300,
+    "episodes": 100,
     "epsilon_greedy": 0.0,
     "epsilon_noisy": 0.05
   },
   "paths": {
-    "checkpoints_dir": "checkpoints/no_spatial"
+    "checkpoints_dir": "checkpoints",
+    "checkpoints_no_spatial_dir": "checkpoints/no_spatial"
   }
 }
