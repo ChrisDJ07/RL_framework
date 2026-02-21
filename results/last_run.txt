@@ -1,0 +1,22 @@
+Graph stats | Nodes: 10, Edges: 9, AvgBaseTime: 0.6340, AvgHazard: 0.6444, StateDim: 32, ActionDim: 4, Tmax(min): 1409.86, Deliveries: 2
+Episode 50, LastReward: 237.72, AvgReward(50): 238.66, SuccessRate(50): 100.00%, Epsilon: 0.778
+Episode 100, LastReward: 240.17, AvgReward(50): 240.66, SuccessRate(50): 100.00%, Epsilon: 0.606
+[Eval @ Episode 100] eps=0.00 -> MeanReward: 100.19, SuccessRate: 62.00% | eps=0.05 -> MeanReward: 143.26, SuccessRate: 74.00%
+Saved best checkpoint: checkpoints\best_model.pt (episode 100, success=62.00%, reward=100.19)
+Episode 150, LastReward: 245.78, AvgReward(50): 241.11, SuccessRate(50): 100.00%, Epsilon: 0.471
+Episode 200, LastReward: 246.71, AvgReward(50): 241.08, SuccessRate(50): 100.00%, Epsilon: 0.367
+[Eval @ Episode 200] eps=0.00 -> MeanReward: 31.14, SuccessRate: 39.00% | eps=0.05 -> MeanReward: 169.17, SuccessRate: 79.00%
+Episode 250, LastReward: -89.55, AvgReward(50): 226.54, SuccessRate(50): 96.00%, Epsilon: 0.286
+Episode 300, LastReward: 240.07, AvgReward(50): 219.16, SuccessRate(50): 94.00%, Epsilon: 0.222
+[Eval @ Episode 300] eps=0.00 -> MeanReward: -50.68, SuccessRate: 19.00% | eps=0.05 -> MeanReward: 30.04, SuccessRate: 40.00%
+Episode 350, LastReward: -112.08, AvgReward(50): 178.07, SuccessRate(50): 82.00%, Epsilon: 0.173
+Episode 400, LastReward: 244.26, AvgReward(50): 225.82, SuccessRate(50): 96.00%, Epsilon: 0.135
+[Eval @ Episode 400] eps=0.00 -> MeanReward: -103.96, SuccessRate: 9.00% | eps=0.05 -> MeanReward: 53.08, SuccessRate: 49.00%
+Episode 450, LastReward: 242.05, AvgReward(50): 225.61, SuccessRate(50): 96.00%, Epsilon: 0.105
+Episode 500, LastReward: 241.60, AvgReward(50): 218.04, SuccessRate(50): 94.00%, Epsilon: 0.082
+[Eval @ Episode 500] eps=0.00 -> MeanReward: 188.45, SuccessRate: 85.00% | eps=0.05 -> MeanReward: 229.83, SuccessRate: 97.00%
+Saved best checkpoint: checkpoints\best_model.pt (episode 500, success=85.00%, reward=188.45)
+Saved last checkpoint: checkpoints\last_model.pt
+Evaluation over 100 episodes | eps=0.00 MeanReward: 161.84, SuccessRate: 78.00% | eps=0.05 MeanReward: 222.60, SuccessRate: 95.00%
+Best checkpoint summary | Episode: 500, PrimaryEval MeanReward: 188.45, SuccessRate: 85.00%
+Run log saved to: results\last_run.txt

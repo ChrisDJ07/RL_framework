@@ -3,7 +3,10 @@ from pathlib import Path
 
 import networkx as nx
 import numpy as np
-import osmnx as ox
+try:
+    import osmnx as ox
+except ImportError:
+    ox = None
 
 
 MSU_IIT_CENTER = (8.2280, 124.2452)  # Approximate center of MSU-IIT campus (latitude, longitude).
@@ -31,6 +34,11 @@ def get_raw_osm_graph(
     max_attempts=5,
     force_download=False,
 ):
+    if ox is None:
+        raise ImportError(
+            "osmnx is required to download OSM data. Install osmnx or use a prebuilt GraphML path."
+        )
+
     cache_path = Path(cache_path)
     cache_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -137,10 +145,12 @@ def to_training_graph(
     travel_time_attr="travel_time_min",
 ):
     try:
-        if hasattr(ox, "convert") and hasattr(ox.convert, "to_undirected"):
+        if ox is not None and hasattr(ox, "convert") and hasattr(ox.convert, "to_undirected"):
             G_work = ox.convert.to_undirected(raw_graph)
-        else:
+        elif ox is not None:
             G_work = ox.utils_graph.get_undirected(raw_graph)
+        else:
+            G_work = _to_undirected_fallback(raw_graph)
     except Exception:
         G_work = _to_undirected_fallback(raw_graph)
 

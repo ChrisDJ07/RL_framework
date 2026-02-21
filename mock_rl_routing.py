@@ -1,13 +1,14 @@
 """
 Hazard-aware RL routing prototype on a compact OSM road graph.
 
-This script is config-driven. Edit `experiment_config.json` to run ablations
+This script is config-driven. Edit `configs/experiment_config.json` to run ablations
 without touching code.
 """
 
 import json
 import math
 import random
+import argparse
 from collections import deque
 from copy import deepcopy
 from pathlib import Path
@@ -122,6 +123,9 @@ DEFAULT_CONFIG = {
         "target_update_every_steps": 500,
         "log_every": 20,
         "eval_every": 20,
+        "use_pretrained_model": False,
+        "pretrained_model_path": "",
+        "resume_optimizer": False,
     },
     "evaluation": {
         "episodes": 300,
@@ -130,12 +134,12 @@ DEFAULT_CONFIG = {
     },
     "paths": {
         "checkpoints_dir": "checkpoints",
-        "runs_dir": "runs",
+        "runs_dir": "results",
         "run_log_file": "last_run.txt",
     },
 }
 
-CONFIG_PATH_DEFAULT = "experiment_config.json"
+CONFIG_PATH_DEFAULT = "configs/experiment_config.json"
 
 
 # Runtime globals configured from config file.
@@ -175,6 +179,7 @@ def load_config(config_path=CONFIG_PATH_DEFAULT):
     path = Path(config_path)
 
     if not path.exists():
+        path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(cfg, indent=2), encoding="utf-8")
         print(f"Created default config at: {path}")
         return cfg
@@ -680,7 +685,7 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
     eval_cfg = cfg["evaluation"]
     paths_cfg = cfg["paths"]
 
-    runs_dir = Path(paths_cfg.get("runs_dir", "runs"))
+    runs_dir = Path(paths_cfg.get("runs_dir", "results"))
     run_log_file = str(paths_cfg.get("run_log_file", "last_run.txt"))
     run_log_path = Path(run_log_file)
     if not run_log_path.is_absolute() and run_log_path.parent == Path("."):
@@ -712,7 +717,7 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
             env_cfg=env_cfg,
             reward_cfg=reward_cfg,
         )
-        base_graph_node_link = nx.node_link_data(base_graph)
+        base_graph_node_link = nx.node_link_data(base_graph, edges="edges")
 
         online = DQN(
             env.state_dim,
@@ -734,6 +739,35 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
 
         optimizer = optim.Adam(online.parameters(), lr=float(train_cfg["lr"]))
         buffer = ReplayBuffer(capacity=int(replay_cfg["capacity"]))
+
+        use_pretrained = bool(train_cfg.get("use_pretrained_model", False))
+        pretrained_model_path = str(train_cfg.get("pretrained_model_path", "") or "").strip()
+        resume_optimizer = bool(train_cfg.get("resume_optimizer", False))
+
+        if use_pretrained:
+            if not pretrained_model_path:
+                raise ValueError("training.use_pretrained_model=True but training.pretrained_model_path is empty.")
+
+            ckpt_path = Path(pretrained_model_path)
+            if not ckpt_path.exists():
+                raise FileNotFoundError(f"Pretrained checkpoint not found: {ckpt_path}")
+
+            checkpoint = torch.load(ckpt_path, map_location="cpu", weights_only=False)
+            if isinstance(checkpoint, dict) and "model_state_dict" in checkpoint:
+                model_state = checkpoint["model_state_dict"]
+            else:
+                model_state = checkpoint
+
+            missing_keys, unexpected_keys = online.load_state_dict(model_state, strict=False)
+            target.load_state_dict(online.state_dict())
+            log(
+                f"Loaded pretrained model: {ckpt_path} | "
+                f"MissingKeys: {len(missing_keys)}, UnexpectedKeys: {len(unexpected_keys)}"
+            )
+
+            if resume_optimizer and isinstance(checkpoint, dict) and "optimizer_state_dict" in checkpoint:
+                optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+                log("Loaded optimizer state from checkpoint (resume_optimizer=True).")
 
         num_episodes = int(train_cfg["num_episodes"])
         gamma = float(train_cfg["gamma"])
@@ -942,4 +976,12 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
 
 
 if __name__ == "__main__":
-    train()
+    parser = argparse.ArgumentParser(description="Train hazard-aware RL routing model.")
+    parser.add_argument(
+        "--config",
+        type=str,
+        default=CONFIG_PATH_DEFAULT,
+        help="Path to config JSON (default: configs/experiment_config.json).",
+    )
+    args = parser.parse_args()
+    train(config_path=args.config)

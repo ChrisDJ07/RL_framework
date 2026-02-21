@@ -2,6 +2,7 @@ import math
 import importlib
 import argparse
 from pathlib import Path
+import sys
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -9,11 +10,14 @@ import numpy as np
 import torch
 from matplotlib.lines import Line2D
 
-import mock_rl_routing as mrr
+SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPT_DIR.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 
 def load_env_and_model(
-    config_path="experiment_config.json",
+    config_path="configs/experiment_config.json",
     checkpoint_path="checkpoints/best_model.pt",
     seed=None,
     use_config_seed=True,
@@ -23,7 +27,7 @@ def load_env_and_model(
         raise FileNotFoundError(f"Checkpoint not found: {ckpt_file}")
     checkpoint = torch.load(ckpt_file, map_location="cpu", weights_only=False)
 
-    candidate_modules = ["mock_rl_routing", "mock_rl_routing_no_spatial"]
+    candidate_modules = ["mock_rl_routing"]
     last_error = None
 
     for module_name in candidate_modules:
@@ -43,7 +47,7 @@ def load_env_and_model(
         model_cfg = cfg["model"]
 
         if "base_graph_node_link" in checkpoint:
-            base_graph = nx.node_link_graph(checkpoint["base_graph_node_link"])
+            base_graph = nx.node_link_graph(checkpoint["base_graph_node_link"], edges="edges")
             print(f"Visualizer: loaded base graph snapshot from checkpoint ({module_name}).")
         else:
             base_graph = module.create_base_graph(
@@ -87,8 +91,7 @@ def load_env_and_model(
             continue
 
     raise RuntimeError(
-        "Could not load checkpoint with either model variant "
-        "(mock_rl_routing or mock_rl_routing_no_spatial)."
+        "Could not load checkpoint with current model variant (mock_rl_routing)."
     ) from last_error
 
 
@@ -244,31 +247,14 @@ def _draw_episode(ax, result, episode_idx):
     ax.set_axis_off()
 
 
-def _resolve_save_path(save_path, checkpoint_path, module_name):
+def _resolve_save_path(save_path):
     if save_path:
-        requested = Path(save_path)
-        # Keep user-provided explicit path unless it is the legacy generic default.
-        if str(requested).replace("\\", "/") not in {
-            "checkpoints/route_visualization.png",
-            "route_visualization.png",
-        }:
-            return requested
-
-    is_no_spatial = module_name.endswith("_no_spatial")
-    if is_no_spatial:
-        out_dir = Path("checkpoints") / "no_spatial"
-        out_name = "route_visualization_no_spatial.png"
-    else:
-        out_dir = Path("checkpoints")
-        out_name = "route_visualization_spatial.png"
-
-    # Add checkpoint stem for easier tracking of multiple snapshots.
-    ckpt_stem = Path(checkpoint_path).stem
-    return out_dir / f"{Path(out_name).stem}_{ckpt_stem}.png"
+        return Path(save_path)
+    return Path("results") / "last_run_visualization.png"
 
 
 def visualize_episodes(
-    config_path="experiment_config.json",
+    config_path="configs/experiment_config.json",
     checkpoint_path="checkpoints/best_model.pt",
     num_episodes=12,
     epsilon=0.0,
@@ -312,7 +298,7 @@ def visualize_episodes(
     )
     fig.tight_layout(rect=[0, 0.05, 1, 0.97])
 
-    save_file = _resolve_save_path(save_path, checkpoint_path, module.__name__)
+    save_file = _resolve_save_path(save_path)
     save_file.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(save_file, dpi=180, bbox_inches="tight")
     print(f"Saved visualization to: {save_file}")
@@ -321,7 +307,7 @@ def visualize_episodes(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Visualize RL routing episodes from a checkpoint.")
-    parser.add_argument("--config-path", type=str, default="experiment_config.json")
+    parser.add_argument("--config-path", type=str, default="configs/experiment_config.json")
     parser.add_argument("--checkpoint-path", type=str, default="checkpoints/best_model.pt")
     parser.add_argument("--num-episodes", type=int, default=12)
     parser.add_argument("--epsilon", type=float, default=0.05)
@@ -356,4 +342,5 @@ if __name__ == "__main__":
         use_config_seed=args.use_config_seed,
     )
     
-# python visualize_routes.py --checkpoint-path checkpoints/no_spatial/best_model.pt --save-path checkpoints/no_spatial/my_routes.png
+# python utils/visualize_routes.py --checkpoint-path checkpoints/best_model.pt --save-path results/my_routes.png
+# python utils/visualize_routes.py --save-path results/pretrain_routes.png --config-path configs/no_hazard_config.json --num-episodes 6 --cols 3
