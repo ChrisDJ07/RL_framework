@@ -1,0 +1,123 @@
+Curriculum enabled | FullGraphNodes: 1447, FullGraphEdges: 1569, OriginNode: 1089, InitialStageNodes: 10, TargetSuccess: 85.00%, ConsecutivePasses: 2
+Episode 50, Stage 0, StageNodes: 10, LastReward: 242.35, AvgReward(50): 233.95, SuccessRate(50): 98.00%, Epsilon: 0.790
+Episode 100, Stage 0, StageNodes: 10, LastReward: 240.48, AvgReward(50): 241.05, SuccessRate(50): 100.00%, Epsilon: 0.626
+[Eval @ Episode 100] Stage 0, StageNodes: 10 | eps=0.05 -> MeanReward: 188.96, SuccessRate: 86.00% | eps=0.00 -> MeanReward: 140.28, SuccessRate: 74.00%
+Saved best checkpoint: checkpoints\best_model.pt (episode 100, success=86.00%, reward=188.96, stage=0)
+Episode 150, Stage 0, StageNodes: 10, LastReward: 241.72, AvgReward(50): 242.91, SuccessRate(50): 100.00%, Epsilon: 0.499
+Episode 200, Stage 0, StageNodes: 10, LastReward: 242.34, AvgReward(50): 242.55, SuccessRate(50): 100.00%, Epsilon: 0.399
+[Eval @ Episode 200] Stage 0, StageNodes: 10 | eps=0.05 -> MeanReward: 134.33, SuccessRate: 68.00% | eps=0.00 -> MeanReward: 46.62, SuccessRate: 42.00%
+Episode 250, Stage 0, StageNodes: 10, LastReward: 237.06, AvgReward(50): 235.10, SuccessRate(50): 98.00%, Epsilon: 0.322
+Episode 300, Stage 0, StageNodes: 10, LastReward: 242.83, AvgReward(50): 227.95, SuccessRate(50): 96.00%, Epsilon: 0.262
+[Eval @ Episode 300] Stage 0, StageNodes: 10 | eps=0.05 -> MeanReward: 91.16, SuccessRate: 58.00% | eps=0.00 -> MeanReward: -17.44, SuccessRate: 30.00%
+Episode 350, Stage 0, StageNodes: 10, LastReward: 236.95, AvgReward(50): 234.96, SuccessRate(50): 98.00%, Epsilon: 0.215
+Episode 400, Stage 0, StageNodes: 10, LastReward: 240.93, AvgReward(50): 235.12, SuccessRate(50): 98.00%, Epsilon: 0.179
+[Eval @ Episode 400] Stage 0, StageNodes: 10 | eps=0.05 -> MeanReward: 131.75, SuccessRate: 70.00% | eps=0.00 -> MeanReward: 23.93, SuccessRate: 44.00%
+Episode 450, Stage 0, StageNodes: 10, LastReward: 240.35, AvgReward(50): 242.73, SuccessRate(50): 100.00%, Epsilon: 0.150
+Episode 500, Stage 0, StageNodes: 10, LastReward: 237.93, AvgReward(50): 234.65, SuccessRate(50): 98.00%, Epsilon: 0.128
+[Eval @ Episode 500] Stage 0, StageNodes: 10 | eps=0.05 -> MeanReward: 104.65, SuccessRate: 64.00% | eps=0.00 -> MeanReward: -63.73, SuccessRate: 20.00%
+Episode 550, Stage 0, StageNodes: 10, LastReward: 238.35, AvgReward(50): 235.52, SuccessRate(50): 98.00%, Epsilon: 0.111
+Episode 600, Stage 0, StageNodes: 10, LastReward: 242.67, AvgReward(50): 242.73, SuccessRate(50): 100.00%, Epsilon: 0.097
+[Eval @ Episode 600] Stage 0, StageNodes: 10 | eps=0.05 -> MeanReward: 212.21, SuccessRate: 92.00% | eps=0.00 -> MeanReward: 178.78, SuccessRate: 84.00%
+Saved best checkpoint: checkpoints\best_model.pt (episode 600, success=92.00%, reward=212.21, stage=0)
+Episode 650, Stage 0, StageNodes: 10, LastReward: 241.60, AvgReward(50): 243.11, SuccessRate(50): 100.00%, Epsilon: 0.087
+Episode 700, Stage 0, StageNodes: 10, LastReward: 232.95, AvgReward(50): 234.26, SuccessRate(50): 98.00%, Epsilon: 0.079
+[Eval @ Episode 700] Stage 0, StageNodes: 10 | eps=0.05 -> MeanReward: 3.47, SuccessRate: 34.00% | eps=0.00 -> MeanReward: -50.54, SuccessRate: 18.00%
+Episode 750, Stage 0, StageNodes: 10, LastReward: 240.58, AvgReward(50): 221.82, SuccessRate(50): 94.00%, Epsilon: 0.072
+Episode 800, Stage 0, StageNodes: 10, LastReward: 246.19, AvgReward(50): 235.23, SuccessRate(50): 98.00%, Epsilon: 0.067
+[Eval @ Episode 800] Stage 0, StageNodes: 10 | eps=0.05 -> MeanReward: 140.68, SuccessRate: 72.00% | eps=0.00 -> MeanReward: 84.61, SuccessRate: 58.00%
+Episode 850, Stage 0, StageNodes: 10, LastReward: 244.10, AvgReward(50): 242.42, SuccessRate(50): 100.00%, Epsilon: 0.064
+Episode 900, Stage 0, StageNodes: 10, LastReward: 238.90, AvgReward(50): 242.01, SuccessRate(50): 100.00%, Epsilon: 0.061
+[Eval @ Episode 900] Stage 0, StageNodes: 10 | eps=0.05 -> MeanReward: 170.79, SuccessRate: 82.00% | eps=0.00 -> MeanReward: 83.59, SuccessRate: 58.00%
+Episode 950, Stage 0, StageNodes: 10, LastReward: 248.74, AvgReward(50): 213.86, SuccessRate(50): 92.00%, Epsilon: 0.058
+Episode 1000, Stage 0, StageNodes: 10, LastReward: -172.59, AvgReward(50): 216.77, SuccessRate(50): 94.00%, Epsilon: 0.056
+[Eval @ Episode 1000] Stage 0, StageNodes: 10 | eps=0.05 -> MeanReward: 194.05, SuccessRate: 88.00% | eps=0.00 -> MeanReward: 135.12, SuccessRate: 72.00%
+Episode 1050, Stage 0, StageNodes: 10, LastReward: 245.85, AvgReward(50): 241.54, SuccessRate(50): 100.00%, Epsilon: 0.055
+Episode 1100, Stage 0, StageNodes: 10, LastReward: 236.66, AvgReward(50): 235.67, SuccessRate(50): 98.00%, Epsilon: 0.054
+[Eval @ Episode 1100] Stage 0, StageNodes: 10 | eps=0.05 -> MeanReward: 166.18, SuccessRate: 80.00% | eps=0.00 -> MeanReward: 27.78, SuccessRate: 46.00%
+Episode 1150, Stage 0, StageNodes: 10, LastReward: 240.93, AvgReward(50): 206.94, SuccessRate(50): 90.00%, Epsilon: 0.053
+Episode 1200, Stage 0, StageNodes: 10, LastReward: 243.78, AvgReward(50): 235.75, SuccessRate(50): 98.00%, Epsilon: 0.052
+[Eval @ Episode 1200] Stage 0, StageNodes: 10 | eps=0.05 -> MeanReward: 47.78, SuccessRate: 48.00% | eps=0.00 -> MeanReward: 0.35, SuccessRate: 34.00%
+Episode 1250, Stage 0, StageNodes: 10, LastReward: 241.92, AvgReward(50): 242.22, SuccessRate(50): 100.00%, Epsilon: 0.052
+Episode 1300, Stage 0, StageNodes: 10, LastReward: 240.99, AvgReward(50): 242.38, SuccessRate(50): 100.00%, Epsilon: 0.051
+[Eval @ Episode 1300] Stage 0, StageNodes: 10 | eps=0.05 -> MeanReward: 209.19, SuccessRate: 90.00% | eps=0.00 -> MeanReward: 186.96, SuccessRate: 84.00%
+Episode 1350, Stage 0, StageNodes: 10, LastReward: 241.75, AvgReward(50): 243.51, SuccessRate(50): 100.00%, Epsilon: 0.051
+Episode 1400, Stage 0, StageNodes: 10, LastReward: 244.68, AvgReward(50): 242.46, SuccessRate(50): 100.00%, Epsilon: 0.051
+[Eval @ Episode 1400] Stage 0, StageNodes: 10 | eps=0.05 -> MeanReward: 221.61, SuccessRate: 94.00% | eps=0.00 -> MeanReward: 154.03, SuccessRate: 78.00%
+Saved best checkpoint: checkpoints\best_model.pt (episode 1400, success=94.00%, reward=221.61, stage=0)
+Promoted to stage 1: nodes 10 -> 16 (full=1447) | epsilon reset to 0.300 | eps_schedule=exp(stage)
+Episode 1450, Stage 1, StageNodes: 16, LastReward: 239.30, AvgReward(50): 64.53, SuccessRate(50): 50.00%, Epsilon: 0.245
+Episode 1500, Stage 1, StageNodes: 16, LastReward: 243.46, AvgReward(50): 119.19, SuccessRate(50): 66.00%, Epsilon: 0.202
+[Eval @ Episode 1500] Stage 1, StageNodes: 16 | eps=0.05 -> MeanReward: 48.37, SuccessRate: 48.00% | eps=0.00 -> MeanReward: -67.50, SuccessRate: 18.00%
+Episode 1550, Stage 1, StageNodes: 16, LastReward: 240.44, AvgReward(50): 191.18, SuccessRate(50): 86.00%, Epsilon: 0.168
+Episode 1600, Stage 1, StageNodes: 16, LastReward: -92.97, AvgReward(50): 175.31, SuccessRate(50): 82.00%, Epsilon: 0.142
+[Eval @ Episode 1600] Stage 1, StageNodes: 16 | eps=0.05 -> MeanReward: 15.46, SuccessRate: 42.00% | eps=0.00 -> MeanReward: -91.21, SuccessRate: 14.00%
+Episode 1650, Stage 1, StageNodes: 16, LastReward: 242.70, AvgReward(50): 154.78, SuccessRate(50): 76.00%, Epsilon: 0.122
+Episode 1700, Stage 1, StageNodes: 16, LastReward: 237.77, AvgReward(50): 151.71, SuccessRate(50): 74.00%, Epsilon: 0.106
+[Eval @ Episode 1700] Stage 1, StageNodes: 16 | eps=0.05 -> MeanReward: -46.34, SuccessRate: 24.00% | eps=0.00 -> MeanReward: -132.93, SuccessRate: 4.00%
+Episode 1750, Stage 1, StageNodes: 16, LastReward: -88.46, AvgReward(50): 212.21, SuccessRate(50): 92.00%, Epsilon: 0.093
+Episode 1800, Stage 1, StageNodes: 16, LastReward: -94.59, AvgReward(50): 154.55, SuccessRate(50): 76.00%, Epsilon: 0.084
+[Eval @ Episode 1800] Stage 1, StageNodes: 16 | eps=0.05 -> MeanReward: 68.59, SuccessRate: 52.00% | eps=0.00 -> MeanReward: -8.36, SuccessRate: 34.00%
+Episode 1850, Stage 1, StageNodes: 16, LastReward: 233.52, AvgReward(50): 170.38, SuccessRate(50): 80.00%, Epsilon: 0.076
+Episode 1900, Stage 1, StageNodes: 16, LastReward: 242.49, AvgReward(50): 220.24, SuccessRate(50): 94.00%, Epsilon: 0.071
+[Eval @ Episode 1900] Stage 1, StageNodes: 16 | eps=0.05 -> MeanReward: 125.06, SuccessRate: 70.00% | eps=0.00 -> MeanReward: 0.41, SuccessRate: 38.00%
+Episode 1950, Stage 1, StageNodes: 16, LastReward: 232.34, AvgReward(50): 204.01, SuccessRate(50): 90.00%, Epsilon: 0.066
+Episode 2000, Stage 1, StageNodes: 16, LastReward: 239.21, AvgReward(50): 225.87, SuccessRate(50): 96.00%, Epsilon: 0.062
+[Eval @ Episode 2000] Stage 1, StageNodes: 16 | eps=0.05 -> MeanReward: 134.21, SuccessRate: 70.00% | eps=0.00 -> MeanReward: 23.57, SuccessRate: 40.00%
+Episode 2050, Stage 1, StageNodes: 16, LastReward: 246.59, AvgReward(50): 219.14, SuccessRate(50): 94.00%, Epsilon: 0.060
+Episode 2100, Stage 1, StageNodes: 16, LastReward: 239.98, AvgReward(50): 225.71, SuccessRate(50): 96.00%, Epsilon: 0.058
+[Eval @ Episode 2100] Stage 1, StageNodes: 16 | eps=0.05 -> MeanReward: 135.23, SuccessRate: 72.00% | eps=0.00 -> MeanReward: 75.85, SuccessRate: 56.00%
+Episode 2150, Stage 1, StageNodes: 16, LastReward: 233.79, AvgReward(50): 195.26, SuccessRate(50): 88.00%, Epsilon: 0.056
+Episode 2200, Stage 1, StageNodes: 16, LastReward: -90.96, AvgReward(50): 218.78, SuccessRate(50): 94.00%, Epsilon: 0.055
+[Eval @ Episode 2200] Stage 1, StageNodes: 16 | eps=0.05 -> MeanReward: 171.03, SuccessRate: 80.00% | eps=0.00 -> MeanReward: 130.00, SuccessRate: 70.00%
+Episode 2250, Stage 1, StageNodes: 16, LastReward: 236.97, AvgReward(50): 234.47, SuccessRate(50): 98.00%, Epsilon: 0.054
+Episode 2300, Stage 1, StageNodes: 16, LastReward: 241.36, AvgReward(50): 221.39, SuccessRate(50): 94.00%, Epsilon: 0.053
+[Eval @ Episode 2300] Stage 1, StageNodes: 16 | eps=0.05 -> MeanReward: 180.53, SuccessRate: 84.00% | eps=0.00 -> MeanReward: 177.86, SuccessRate: 84.00%
+Episode 2350, Stage 1, StageNodes: 16, LastReward: 237.45, AvgReward(50): 234.15, SuccessRate(50): 98.00%, Epsilon: 0.052
+Episode 2400, Stage 1, StageNodes: 16, LastReward: 234.35, AvgReward(50): 221.49, SuccessRate(50): 94.00%, Epsilon: 0.052
+[Eval @ Episode 2400] Stage 1, StageNodes: 16 | eps=0.05 -> MeanReward: 157.51, SuccessRate: 76.00% | eps=0.00 -> MeanReward: 57.59, SuccessRate: 48.00%
+Episode 2450, Stage 1, StageNodes: 16, LastReward: 241.11, AvgReward(50): 185.36, SuccessRate(50): 84.00%, Epsilon: 0.051
+Episode 2500, Stage 1, StageNodes: 16, LastReward: 234.49, AvgReward(50): 112.69, SuccessRate(50): 64.00%, Epsilon: 0.051
+[Eval @ Episode 2500] Stage 1, StageNodes: 16 | eps=0.05 -> MeanReward: 65.26, SuccessRate: 52.00% | eps=0.00 -> MeanReward: 12.83, SuccessRate: 40.00%
+Episode 2550, Stage 1, StageNodes: 16, LastReward: 243.84, AvgReward(50): 187.95, SuccessRate(50): 86.00%, Epsilon: 0.051
+Episode 2600, Stage 1, StageNodes: 16, LastReward: 235.74, AvgReward(50): 180.84, SuccessRate(50): 84.00%, Epsilon: 0.051
+[Eval @ Episode 2600] Stage 1, StageNodes: 16 | eps=0.05 -> MeanReward: 119.85, SuccessRate: 70.00% | eps=0.00 -> MeanReward: 52.40, SuccessRate: 52.00%
+Episode 2650, Stage 1, StageNodes: 16, LastReward: 240.27, AvgReward(50): 234.20, SuccessRate(50): 98.00%, Epsilon: 0.050
+Episode 2700, Stage 1, StageNodes: 16, LastReward: 240.63, AvgReward(50): 218.40, SuccessRate(50): 94.00%, Epsilon: 0.050
+[Eval @ Episode 2700] Stage 1, StageNodes: 16 | eps=0.05 -> MeanReward: 193.85, SuccessRate: 86.00% | eps=0.00 -> MeanReward: 203.33, SuccessRate: 90.00%
+Episode 2750, Stage 1, StageNodes: 16, LastReward: 242.29, AvgReward(50): 209.66, SuccessRate(50): 92.00%, Epsilon: 0.050
+Episode 2800, Stage 1, StageNodes: 16, LastReward: 240.64, AvgReward(50): 218.35, SuccessRate(50): 94.00%, Epsilon: 0.050
+[Eval @ Episode 2800] Stage 1, StageNodes: 16 | eps=0.05 -> MeanReward: 182.33, SuccessRate: 84.00% | eps=0.00 -> MeanReward: 186.85, SuccessRate: 86.00%
+Episode 2850, Stage 1, StageNodes: 16, LastReward: 236.75, AvgReward(50): 241.45, SuccessRate(50): 100.00%, Epsilon: 0.050
+Episode 2900, Stage 1, StageNodes: 16, LastReward: 245.19, AvgReward(50): 241.31, SuccessRate(50): 100.00%, Epsilon: 0.050
+[Eval @ Episode 2900] Stage 1, StageNodes: 16 | eps=0.05 -> MeanReward: 217.22, SuccessRate: 94.00% | eps=0.00 -> MeanReward: 193.25, SuccessRate: 88.00%
+Episode 2950, Stage 1, StageNodes: 16, LastReward: 233.38, AvgReward(50): 234.83, SuccessRate(50): 98.00%, Epsilon: 0.050
+Episode 3000, Stage 1, StageNodes: 16, LastReward: 234.74, AvgReward(50): 240.50, SuccessRate(50): 100.00%, Epsilon: 0.050
+[Eval @ Episode 3000] Stage 1, StageNodes: 16 | eps=0.05 -> MeanReward: 202.04, SuccessRate: 90.00% | eps=0.00 -> MeanReward: 215.42, SuccessRate: 94.00%
+Promoted to stage 2: nodes 16 -> 22 (full=1447) | epsilon reset to 0.300 | eps_schedule=exp(stage)
+Episode 3050, Stage 2, StageNodes: 22, LastReward: 237.32, AvgReward(50): 124.44, SuccessRate(50): 68.00%, Epsilon: 0.245
+Episode 3100, Stage 2, StageNodes: 22, LastReward: 237.39, AvgReward(50): 122.57, SuccessRate(50): 68.00%, Epsilon: 0.202
+[Eval @ Episode 3100] Stage 2, StageNodes: 22 | eps=0.05 -> MeanReward: 1.00, SuccessRate: 36.00% | eps=0.00 -> MeanReward: -48.82, SuccessRate: 26.00%
+Episode 3150, Stage 2, StageNodes: 22, LastReward: 236.52, AvgReward(50): 96.50, SuccessRate(50): 60.00%, Epsilon: 0.168
+Episode 3200, Stage 2, StageNodes: 22, LastReward: 242.96, AvgReward(50): 132.21, SuccessRate(50): 70.00%, Epsilon: 0.142
+[Eval @ Episode 3200] Stage 2, StageNodes: 22 | eps=0.05 -> MeanReward: -21.69, SuccessRate: 32.00% | eps=0.00 -> MeanReward: -30.60, SuccessRate: 30.00%
+Episode 3250, Stage 2, StageNodes: 22, LastReward: 235.36, AvgReward(50): 146.09, SuccessRate(50): 74.00%, Epsilon: 0.122
+Episode 3300, Stage 2, StageNodes: 22, LastReward: 238.94, AvgReward(50): 149.71, SuccessRate(50): 76.00%, Epsilon: 0.106
+[Eval @ Episode 3300] Stage 2, StageNodes: 22 | eps=0.05 -> MeanReward: 96.87, SuccessRate: 62.00% | eps=0.00 -> MeanReward: -5.03, SuccessRate: 36.00%
+Episode 3350, Stage 2, StageNodes: 22, LastReward: 240.47, AvgReward(50): 182.63, SuccessRate(50): 84.00%, Epsilon: 0.093
+Episode 3400, Stage 2, StageNodes: 22, LastReward: 239.08, AvgReward(50): 132.01, SuccessRate(50): 70.00%, Epsilon: 0.084
+[Eval @ Episode 3400] Stage 2, StageNodes: 22 | eps=0.05 -> MeanReward: 100.18, SuccessRate: 62.00% | eps=0.00 -> MeanReward: 53.22, SuccessRate: 50.00%
+Episode 3450, Stage 2, StageNodes: 22, LastReward: 242.40, AvgReward(50): 130.26, SuccessRate(50): 70.00%, Epsilon: 0.076
+Episode 3500, Stage 2, StageNodes: 22, LastReward: 234.55, AvgReward(50): 123.26, SuccessRate(50): 68.00%, Epsilon: 0.071
+[Eval @ Episode 3500] Stage 2, StageNodes: 22 | eps=0.05 -> MeanReward: 27.42, SuccessRate: 44.00% | eps=0.00 -> MeanReward: -79.38, SuccessRate: 18.00%
+Episode 3550, Stage 2, StageNodes: 22, LastReward: -88.97, AvgReward(50): 88.44, SuccessRate(50): 58.00%, Epsilon: 0.066
+Episode 3600, Stage 2, StageNodes: 22, LastReward: -93.92, AvgReward(50): 139.99, SuccessRate(50): 72.00%, Epsilon: 0.062
+[Eval @ Episode 3600] Stage 2, StageNodes: 22 | eps=0.05 -> MeanReward: 98.33, SuccessRate: 62.00% | eps=0.00 -> MeanReward: 29.83, SuccessRate: 46.00%
+Episode 3650, Stage 2, StageNodes: 22, LastReward: -176.51, AvgReward(50): 116.05, SuccessRate(50): 66.00%, Epsilon: 0.060
+Episode 3700, Stage 2, StageNodes: 22, LastReward: 236.02, AvgReward(50): 20.36, SuccessRate(50): 38.00%, Epsilon: 0.058
+[Eval @ Episode 3700] Stage 2, StageNodes: 22 | eps=0.05 -> MeanReward: -2.39, SuccessRate: 32.00% | eps=0.00 -> MeanReward: -38.19, SuccessRate: 24.00%
+Episode 3750, Stage 2, StageNodes: 22, LastReward: 244.17, AvgReward(50): 100.92, SuccessRate(50): 62.00%, Epsilon: 0.056
+Episode 3800, Stage 2, StageNodes: 22, LastReward: 240.91, AvgReward(50): 65.66, SuccessRate(50): 52.00%, Epsilon: 0.055
+[Eval @ Episode 3800] Stage 2, StageNodes: 22 | eps=0.05 -> MeanReward: 19.54, SuccessRate: 38.00% | eps=0.00 -> MeanReward: -53.45, SuccessRate: 22.00%
+Episode 3850, Stage 2, StageNodes: 22, LastReward: 238.53, AvgReward(50): 65.34, SuccessRate(50): 52.00%, Epsilon: 0.054
+Episode 3900, Stage 2, StageNodes: 22, LastReward: -93.38, AvgReward(50): 63.72, SuccessRate(50): 50.00%, Epsilon: 0.053
+[Eval @ Episode 3900] Stage 2, StageNodes: 22 | eps=0.05 -> MeanReward: -27.27, SuccessRate: 26.00% | eps=0.00 -> MeanReward: -43.06, SuccessRate: 24.00%

@@ -120,6 +120,8 @@ DEFAULT_CONFIG = {
         "epsilon_start": 1.0,
         "epsilon_min": 0.05,
         "epsilon_decay": 0.995,
+        "epsilon_schedule": "multiplicative",
+        "epsilon_exp_decay_rate": 0.005,
         "target_update_every_steps": 500,
         "log_every": 20,
         "eval_every": 20,
@@ -636,6 +638,35 @@ def select_action(model, state, mask, epsilon):
         return torch.argmax(q_values).item()
 
 
+def update_epsilon(
+    epsilon,
+    epsilon_start,
+    epsilon_min,
+    epsilon_decay,
+    epsilon_schedule="multiplicative",
+    epsilon_exp_decay_rate=None,
+    step_index=None,
+):
+    schedule = str(epsilon_schedule).strip().lower()
+    eps_min = float(epsilon_min)
+
+    if schedule == "multiplicative":
+        return max(eps_min, float(epsilon) * float(epsilon_decay))
+
+    if schedule == "exp":
+        if step_index is None:
+            raise ValueError("step_index is required when epsilon_schedule='exp'.")
+        if epsilon_exp_decay_rate is None:
+            decay = min(max(float(epsilon_decay), 1e-12), 0.999999)
+            rate = -math.log(decay)
+        else:
+            rate = float(epsilon_exp_decay_rate)
+        step = max(0, int(step_index))
+        return eps_min + (float(epsilon_start) - eps_min) * math.exp(-rate * step)
+
+    raise ValueError(f"Unsupported epsilon_schedule: {epsilon_schedule}")
+
+
 def evaluate_policy(model, env, num_episodes=100, epsilon=0.0):
     model.eval()
     rewards = []
@@ -771,9 +802,15 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
 
         num_episodes = int(train_cfg["num_episodes"])
         gamma = float(train_cfg["gamma"])
-        epsilon = float(train_cfg["epsilon_start"])
+        epsilon_start = float(train_cfg["epsilon_start"])
+        epsilon = epsilon_start
         epsilon_min = float(train_cfg["epsilon_min"])
         epsilon_decay = float(train_cfg["epsilon_decay"])
+        epsilon_schedule = str(train_cfg.get("epsilon_schedule", "multiplicative"))
+        epsilon_exp_decay_rate = train_cfg.get("epsilon_exp_decay_rate", None)
+        if epsilon_exp_decay_rate is not None:
+            epsilon_exp_decay_rate = float(epsilon_exp_decay_rate)
+        epsilon_step = 0
         batch_size = int(train_cfg["batch_size"])
         target_update_every_steps = int(train_cfg["target_update_every_steps"])
         log_every = int(train_cfg["log_every"])
@@ -884,7 +921,16 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
 
             reward_history.append(total_reward)
             success_history.append(1 if len(env.completed) == len(env.delivery_nodes) else 0)
-            epsilon = max(epsilon_min, epsilon * epsilon_decay)
+            epsilon_step += 1
+            epsilon = update_epsilon(
+                epsilon,
+                epsilon_start=epsilon_start,
+                epsilon_min=epsilon_min,
+                epsilon_decay=epsilon_decay,
+                epsilon_schedule=epsilon_schedule,
+                epsilon_exp_decay_rate=epsilon_exp_decay_rate,
+                step_index=epsilon_step,
+            )
 
             if (episode + 1) % log_every == 0:
                 avg_reward = float(np.mean(reward_history[-log_every:]))

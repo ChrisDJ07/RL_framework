@@ -204,7 +204,7 @@ def _draw_episode(ax, result, episode_idx):
 
     # Nodes.
     nx.draw_networkx_nodes(
-        G, pos, ax=ax, node_color="#d9d9d9", node_size=120, edgecolors="white", linewidths=0.8
+        G, pos, ax=ax, node_color="#d9d9d9", node_size=20, edgecolors="white", linewidths=0.8
     )
 
     start = result["start_node"]

@@ -18,5 +18,6 @@
   "full_graph_min_nodes": 1,
   "full_graph_max_nodes": 1000000,
   "reset_epsilon_on_stage_change": true,
-  "stage_start_epsilon": 0.25
+  "stage_start_epsilon": 0.30,
+  "epsilon_decay_scope": "stage"
 }

@@ -120,6 +120,8 @@ DEFAULT_CONFIG = {
         "epsilon_start": 1.0,
         "epsilon_min": 0.05,
         "epsilon_decay": 0.995,
+        "epsilon_schedule": "multiplicative",
+        "epsilon_exp_decay_rate": 0.005,
         "target_update_every_steps": 500,
         "log_every": 20,
         "eval_every": 20,
@@ -160,6 +162,7 @@ DEFAULT_CURRICULUM_CONFIG = {
     "buffer_reset_on_stage_change": True,
     "reset_epsilon_on_stage_change": True,
     "stage_start_epsilon": 0.25,
+    "epsilon_decay_scope": "stage",
     "stop_on_full_graph_success": True,
     "full_graph_num_nodes": 1000000,
     "full_graph_min_nodes": 1,
@@ -737,6 +740,35 @@ def select_action(model, state, mask, epsilon):
         return torch.argmax(q_values).item()
 
 
+def update_epsilon(
+    epsilon,
+    epsilon_start,
+    epsilon_min,
+    epsilon_decay,
+    epsilon_schedule="multiplicative",
+    epsilon_exp_decay_rate=None,
+    step_index=None,
+):
+    schedule = str(epsilon_schedule).strip().lower()
+    eps_min = float(epsilon_min)
+
+    if schedule == "multiplicative":
+        return max(eps_min, float(epsilon) * float(epsilon_decay))
+
+    if schedule == "exp":
+        if step_index is None:
+            raise ValueError("step_index is required when epsilon_schedule='exp'.")
+        if epsilon_exp_decay_rate is None:
+            decay = min(max(float(epsilon_decay), 1e-12), 0.999999)
+            rate = -math.log(decay)
+        else:
+            rate = float(epsilon_exp_decay_rate)
+        step = max(0, int(step_index))
+        return eps_min + (float(epsilon_start) - eps_min) * math.exp(-rate * step)
+
+    raise ValueError(f"Unsupported epsilon_schedule: {epsilon_schedule}")
+
+
 def evaluate_policy(model, env, num_episodes=100, epsilon=0.0):
     model.eval()
     rewards = []
@@ -868,9 +900,16 @@ def _run_curriculum_training(cfg, curriculum_cfg, log, config_path):
             log("Loaded optimizer state from checkpoint (resume_optimizer=True).")
 
     gamma = float(train_cfg["gamma"])
-    epsilon = float(train_cfg["epsilon_start"])
+    epsilon_start = float(train_cfg["epsilon_start"])
+    epsilon = epsilon_start
     epsilon_min = float(train_cfg["epsilon_min"])
     epsilon_decay = float(train_cfg["epsilon_decay"])
+    epsilon_schedule = str(train_cfg.get("epsilon_schedule", "multiplicative"))
+    epsilon_exp_decay_rate = train_cfg.get("epsilon_exp_decay_rate", None)
+    if epsilon_exp_decay_rate is not None:
+        epsilon_exp_decay_rate = float(epsilon_exp_decay_rate)
+    epsilon_step = 0
+    epsilon_anchor = epsilon_start
     batch_size = int(train_cfg["batch_size"])
     target_update_every_steps = int(train_cfg["target_update_every_steps"])
     log_every = int(train_cfg["log_every"])
@@ -891,6 +930,9 @@ def _run_curriculum_training(cfg, curriculum_cfg, log, config_path):
     buffer_reset = bool(curriculum_cfg.get("buffer_reset_on_stage_change", True))
     reset_epsilon_on_stage_change = bool(curriculum_cfg.get("reset_epsilon_on_stage_change", True))
     stage_start_epsilon = float(curriculum_cfg.get("stage_start_epsilon", 0.25))
+    epsilon_decay_scope = str(curriculum_cfg.get("epsilon_decay_scope", "stage")).strip().lower()
+    if epsilon_decay_scope not in {"global", "stage"}:
+        epsilon_decay_scope = "stage"
     stop_on_full_success = bool(curriculum_cfg.get("stop_on_full_graph_success", True))
 
     checkpoints_dir = Path(paths_cfg["checkpoints_dir"])
@@ -1003,7 +1045,16 @@ def _run_curriculum_training(cfg, curriculum_cfg, log, config_path):
 
         reward_history.append(total_reward)
         success_history.append(1 if len(env.completed) == len(env.delivery_nodes) else 0)
-        epsilon = max(epsilon_min, epsilon * epsilon_decay)
+        epsilon_step += 1
+        epsilon = update_epsilon(
+            epsilon,
+            epsilon_start=epsilon_anchor,
+            epsilon_min=epsilon_min,
+            epsilon_decay=epsilon_decay,
+            epsilon_schedule=epsilon_schedule,
+            epsilon_exp_decay_rate=epsilon_exp_decay_rate,
+            step_index=epsilon_step,
+        )
 
         if global_episode % log_every == 0:
             avg_reward = float(np.mean(reward_history[-log_every:]))
@@ -1111,6 +1162,13 @@ def _run_curriculum_training(cfg, curriculum_cfg, log, config_path):
                             if reset_epsilon_on_stage_change:
                                 stage_eps = float(np.clip(stage_start_epsilon, epsilon_min, 1.0))
                                 epsilon = stage_eps
+                                if epsilon_schedule.strip().lower() == "exp":
+                                    epsilon_anchor = stage_eps
+                                if epsilon_decay_scope == "stage":
+                                    epsilon_step = 0
+                            elif epsilon_schedule.strip().lower() == "exp" and epsilon_decay_scope == "stage":
+                                epsilon_anchor = float(epsilon)
+                                epsilon_step = 0
 
                             promo_msg = (
                                 f"Promoted to stage {stage_id}: nodes {prev_count} -> {len(stage_nodes)} "
@@ -1118,6 +1176,7 @@ def _run_curriculum_training(cfg, curriculum_cfg, log, config_path):
                             )
                             if reset_epsilon_on_stage_change:
                                 promo_msg += f" | epsilon reset to {epsilon:.3f}"
+                            promo_msg += f" | eps_schedule={str(epsilon_schedule).lower()}({epsilon_decay_scope})"
                             log(promo_msg)
 
         if episodes_since_improvement >= stage_patience_episodes:
@@ -1291,9 +1350,15 @@ def train(
 
         num_episodes = int(train_cfg["num_episodes"])
         gamma = float(train_cfg["gamma"])
-        epsilon = float(train_cfg["epsilon_start"])
+        epsilon_start = float(train_cfg["epsilon_start"])
+        epsilon = epsilon_start
         epsilon_min = float(train_cfg["epsilon_min"])
         epsilon_decay = float(train_cfg["epsilon_decay"])
+        epsilon_schedule = str(train_cfg.get("epsilon_schedule", "multiplicative"))
+        epsilon_exp_decay_rate = train_cfg.get("epsilon_exp_decay_rate", None)
+        if epsilon_exp_decay_rate is not None:
+            epsilon_exp_decay_rate = float(epsilon_exp_decay_rate)
+        epsilon_step = 0
         batch_size = int(train_cfg["batch_size"])
         target_update_every_steps = int(train_cfg["target_update_every_steps"])
         log_every = int(train_cfg["log_every"])
@@ -1405,7 +1470,16 @@ def train(
 
             reward_history.append(total_reward)
             success_history.append(1 if len(env.completed) == len(env.delivery_nodes) else 0)
-            epsilon = max(epsilon_min, epsilon * epsilon_decay)
+            epsilon_step += 1
+            epsilon = update_epsilon(
+                epsilon,
+                epsilon_start=epsilon_start,
+                epsilon_min=epsilon_min,
+                epsilon_decay=epsilon_decay,
+                epsilon_schedule=epsilon_schedule,
+                epsilon_exp_decay_rate=epsilon_exp_decay_rate,
+                step_index=epsilon_step,
+            )
 
             if (episode + 1) % log_every == 0:
                 avg_reward = float(np.mean(reward_history[-log_every:]))
@@ -1526,4 +1600,4 @@ if __name__ == "__main__":
     train(config_path=args.config, curriculum_config_path=args.curriculum_config)
 
 # set "enabled": true in the curriculum config to run curriculum training instead of standard training
-# run python mock_rl_routing_curriculum.py --config configs/experiment_config.json --curriculum-config configs/curriculum_config.json
+# run python mock_rl_routing_curriculum.py --config configs/no_hazard_config.json --curriculum-config configs/curriculum_config.json

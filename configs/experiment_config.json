@@ -101,7 +101,9 @@
     "eval_every": 100,
     "use_pretrained_model": false,
     "pretrained_model_path": "",
-    "resume_optimizer": false
+    "resume_optimizer": false,
+    "epsilon_schedule": "exp",
+    "epsilon_exp_decay_rate": 0.005
   },
   "evaluation": {
     "episodes": 100,
