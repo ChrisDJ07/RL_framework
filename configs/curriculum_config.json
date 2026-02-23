@@ -12,9 +12,11 @@
   "max_total_episodes": 15000,
   "eval_every": 100,
   "eval_episodes": 50,
-  "buffer_reset_on_stage_change": true,
+  "buffer_reset_on_stage_change": false,
   "stop_on_full_graph_success": true,
   "full_graph_num_nodes": 1000000,
   "full_graph_min_nodes": 1,
-  "full_graph_max_nodes": 1000000
+  "full_graph_max_nodes": 1000000,
+  "reset_epsilon_on_stage_change": true,
+  "stage_start_epsilon": 0.25
 }

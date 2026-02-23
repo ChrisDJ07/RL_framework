@@ -158,6 +158,8 @@ DEFAULT_CURRICULUM_CONFIG = {
     "eval_every": 100,
     "eval_episodes": 100,
     "buffer_reset_on_stage_change": True,
+    "reset_epsilon_on_stage_change": True,
+    "stage_start_epsilon": 0.25,
     "stop_on_full_graph_success": True,
     "full_graph_num_nodes": 1000000,
     "full_graph_min_nodes": 1,
@@ -887,6 +889,8 @@ def _run_curriculum_training(cfg, curriculum_cfg, log, config_path):
     expansion_hops = max(1, int(curriculum_cfg.get("expansion_hops_per_stage", 1)))
     max_new_nodes_per_stage = max(0, int(curriculum_cfg.get("max_new_nodes_per_stage", 0)))
     buffer_reset = bool(curriculum_cfg.get("buffer_reset_on_stage_change", True))
+    reset_epsilon_on_stage_change = bool(curriculum_cfg.get("reset_epsilon_on_stage_change", True))
+    stage_start_epsilon = float(curriculum_cfg.get("stage_start_epsilon", 0.25))
     stop_on_full_success = bool(curriculum_cfg.get("stop_on_full_graph_success", True))
 
     checkpoints_dir = Path(paths_cfg["checkpoints_dir"])
@@ -1103,10 +1107,18 @@ def _run_curriculum_training(cfg, curriculum_cfg, log, config_path):
                             env = make_env(stage_nodes)
                             if buffer_reset:
                                 buffer = ReplayBuffer(capacity=int(replay_cfg["capacity"]))
-                            log(
+
+                            if reset_epsilon_on_stage_change:
+                                stage_eps = float(np.clip(stage_start_epsilon, epsilon_min, 1.0))
+                                epsilon = stage_eps
+
+                            promo_msg = (
                                 f"Promoted to stage {stage_id}: nodes {prev_count} -> {len(stage_nodes)} "
                                 f"(full={full_graph.number_of_nodes()})"
                             )
+                            if reset_epsilon_on_stage_change:
+                                promo_msg += f" | epsilon reset to {epsilon:.3f}"
+                            log(promo_msg)
 
         if episodes_since_improvement >= stage_patience_episodes:
             termination_reason = "no_improvement_patience"

@@ -82,7 +82,7 @@
       64,
       64
     ],
-    "node_embedding_dim": 16
+    "node_embedding_dim": 32
   },
   "replay": {
     "capacity": 10000
@@ -105,7 +105,7 @@
   "evaluation": {
     "episodes": 100,
     "epsilon_primary": 0.05,
-    "run_epsilon_greedy_eval": false,
+    "run_epsilon_greedy_eval": true,
     "epsilon_greedy": 0.0,
     "epsilon_noisy": 0.05
   },
