@@ -104,6 +104,8 @@
   },
   "evaluation": {
     "episodes": 100,
+    "epsilon_primary": 0.05,
+    "run_epsilon_greedy_eval": false,
     "epsilon_greedy": 0.0,
     "epsilon_noisy": 0.05
   },

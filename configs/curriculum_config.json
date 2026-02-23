@@ -1,0 +1,20 @@
+{
+  "enabled": true,
+  "origin_mode": "centroid",
+  "origin_node": null,
+  "initial_nodes": 10,
+  "expansion_hops_per_stage": 1,
+  "max_new_nodes_per_stage": 0,
+  "success_threshold": 0.85,
+  "consecutive_eval_passes": 2,
+  "min_stage_episodes": 0,
+  "stage_patience_episodes": 3000,
+  "max_total_episodes": 15000,
+  "eval_every": 100,
+  "eval_episodes": 50,
+  "buffer_reset_on_stage_change": true,
+  "stop_on_full_graph_success": true,
+  "full_graph_num_nodes": 1000000,
+  "full_graph_min_nodes": 1,
+  "full_graph_max_nodes": 1000000
+}
