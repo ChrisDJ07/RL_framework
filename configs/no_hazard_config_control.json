@@ -1,9 +1,9 @@
 {
   "seed": 40,
   "graph": {
-    "num_nodes": 30,
-    "min_nodes": 30,
-    "max_nodes": 30,
+    "num_nodes": 40,
+    "min_nodes": 40,
+    "max_nodes": 40,
     "force_download": false,
     "prebuilt_graphml_path": "data/la_trinidad_hazard_graph.graphml",
     "use_existing_hazards": true,
@@ -79,7 +79,7 @@
   },
   "model": {
     "hidden_sizes": [
-      64,
+      128,
       64
     ],
     "node_embedding_dim": 32
@@ -90,14 +90,14 @@
   "training": {
     "num_episodes": 20000,
     "gamma": 0.99,
-    "lr": 0.001,
-    "batch_size": 32,
+    "lr": 0.0003,
+    "batch_size": 64,
     "epsilon_start": 1.0,
     "epsilon_min": 0.05,
     "epsilon_decay": 0.995,
     "target_update_every_steps": 500,
     "log_every": 50,
-    "eval_every": 150,
+    "eval_every": 200,
     "use_pretrained_model": false,
     "pretrained_model_path": "",
     "resume_optimizer": false,

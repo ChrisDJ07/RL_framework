@@ -1,0 +1,4 @@
+Graph stats | Nodes: 40, Edges: 40, AvgBaseTime: 0.4311, AvgHazard: 0.5350, StateDim: 40, ActionDim: 4, Tmax(min): 1409.86, Deliveries: 2, Device: cpu
+Episode 50, LastReward: -178.22, AvgReward(50): -79.50, SuccessRate(50): 12.00%, Epsilon: 0.981
+Episode 100, LastReward: -101.01, AvgReward(50): -28.80, SuccessRate(50): 28.00%, Epsilon: 0.963
+Episode 150, LastReward: -96.35, AvgReward(50): -18.60, SuccessRate(50): 30.00%, Epsilon: 0.945
