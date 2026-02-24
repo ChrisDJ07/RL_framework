@@ -63,7 +63,7 @@
     "high_risk_flood_threshold": 1.1,
     "high_risk_landslide_threshold": 1.1,
     "max_neighbor_slots": 4,
-    "neighbor_feature_dim": 5
+    "neighbor_feature_dim": 7
   },
   "reward": {
     "delivery": 60.0,
@@ -88,7 +88,7 @@
     "capacity": 10000
   },
   "training": {
-    "num_episodes": 5050,
+    "num_episodes": 2500,
     "gamma": 0.99,
     "lr": 0.003,
     "batch_size": 32,
@@ -102,7 +102,7 @@
     "pretrained_model_path": "",
     "resume_optimizer": false,
     "epsilon_schedule": "exp",
-    "epsilon_exp_decay_rate": 0.001
+    "epsilon_exp_decay_rate": 0.005
   },
   "evaluation": {
     "episodes": 100,

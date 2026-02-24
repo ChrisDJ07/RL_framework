@@ -90,7 +90,7 @@ DEFAULT_CONFIG = {
         "high_risk_flood_threshold": 0.6,
         "high_risk_landslide_threshold": 0.5,
         "max_neighbor_slots": 4,
-        "neighbor_feature_dim": 5,
+        "neighbor_feature_dim": 7,
     },
     "reward": {
         "delivery": 50.0,
@@ -334,7 +334,8 @@ class HazardRoutingEnv:
 
         self.rain_dim = len(RAIN_KEYS)
         self.max_neighbor_slots = MAX_NEIGHBOR_SLOTS
-        self.neighbor_feature_dim = NEIGHBOR_FEATURE_DIM
+        # Goal-aware neighbor features require at least 7 slots per neighbor.
+        self.neighbor_feature_dim = max(NEIGHBOR_FEATURE_DIM, 7)
 
         edge_data = list(base_graph.edges(data=True))
         avg_base_time = np.mean([d["base_time"] for _, _, d in edge_data]) if edge_data else 1.0
@@ -459,8 +460,10 @@ class HazardRoutingEnv:
         )
         return neighbors[: self.max_neighbor_slots]
 
-    def _build_neighbor_features(self, action_slots):
+    def _build_neighbor_features(self, action_slots, unvisited):
         features = []
+        current_nearest = self._nearest_unvisited_shortest(self.current_node, unvisited)
+
         for nbr in action_slots:
             edge = self.G[self.current_node][nbr]
             flood_score = edge.get("flood_score", 0.0)
@@ -469,7 +472,25 @@ class HazardRoutingEnv:
             travel_time = edge.get("travel_time", None)
             travel_time_norm = 0.0 if travel_time is None else min(travel_time / self.max_episode_time, 1.0)
             feasible = 0.0 if edge.get("blocked", False) else 1.0
-            features.extend([flood_score, landslide_score, length_norm, travel_time_norm, feasible])
+
+            # Goal-aware neighbor context for action ranking.
+            next_nearest = self._nearest_unvisited_shortest(nbr, unvisited)
+            next_nearest_norm = min(next_nearest / self.max_shortest_len, 1.0)
+            progress_delta_norm = float(
+                np.clip((current_nearest - next_nearest) / self.max_shortest_len, -1.0, 1.0)
+            )
+
+            features.extend(
+                [
+                    flood_score,
+                    landslide_score,
+                    length_norm,
+                    travel_time_norm,
+                    feasible,
+                    next_nearest_norm,
+                    progress_delta_norm,
+                ]
+            )
 
         expected = self.max_neighbor_slots * self.neighbor_feature_dim
         if len(features) < expected:
@@ -480,7 +501,7 @@ class HazardRoutingEnv:
         unvisited, unvisited_idx, unvisited_mask = self._build_unvisited_delivery_state()
         target_feats = self._build_target_features(unvisited)
         action_slots = self._get_action_slots()
-        neighbor_feats = self._build_neighbor_features(action_slots)
+        neighbor_feats = self._build_neighbor_features(action_slots, unvisited)
         state_vec = np.concatenate([target_feats, neighbor_feats, self.rain_onehot])
         return {
             "state_vec": torch.tensor(state_vec, dtype=torch.float32),
