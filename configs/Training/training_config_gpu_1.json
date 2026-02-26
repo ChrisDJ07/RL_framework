@@ -1,0 +1,120 @@
+{
+  "seed": 40,
+  "graph": {
+    "num_nodes": 100,
+    "min_nodes": 100,
+    "max_nodes": 100,
+    "force_download": false,
+    "prebuilt_graphml_path": "data/selected_subgraph_n100.graphml",
+    "use_existing_hazards": true,
+    "flood_attr": "flood_hazard",
+    "landslide_attr": "landslide_hazard",
+    "travel_time_attr": "travel_time_min"
+  },
+  "environment": {
+    "num_deliveries": 2,
+    "min_max_steps": 120,
+    "max_steps_multiplier": 0.3,
+    "episode_time_scale": 6.0
+  },
+  "hazard": {
+    "rain_levels": {
+      "RI1": {
+        "speed_mult": 1.0,
+        "flood_block_threshold": 1.1,
+        "flood_block_prob": 0.0,
+        "landslide_block_threshold": 1.1,
+        "landslide_block_prob": 0.0
+      },
+      "RI2": {
+        "speed_mult": 0.9,
+        "flood_block_threshold": 1.0,
+        "flood_block_prob": 0.3,
+        "landslide_block_threshold": 0.8,
+        "landslide_block_prob": 0.05
+      },
+      "RI3": {
+        "speed_mult": 0.85,
+        "flood_block_threshold": 0.6,
+        "flood_block_prob": 0.6,
+        "landslide_block_threshold": 0.8,
+        "landslide_block_prob": 0.15
+      },
+      "RI4": {
+        "speed_mult": 0.4,
+        "flood_block_threshold": 0.6,
+        "flood_block_prob": 0.9,
+        "landslide_block_threshold": 0.5,
+        "landslide_block_prob": 0.3
+      },
+      "RI5": {
+        "speed_mult": 0.2,
+        "flood_block_threshold": 0.2,
+        "flood_block_prob": 1.0,
+        "landslide_block_threshold": 0.5,
+        "landslide_block_prob": 1.0
+      }
+    },
+    "active_rain_keys": [
+      "RI1"
+    ],
+    "flood_time_weight": 0.0,
+    "landslide_time_weight": 0.0,
+    "high_risk_flood_threshold": 1.1,
+    "high_risk_landslide_threshold": 1.1,
+    "max_neighbor_slots": 4,
+    "neighbor_feature_dim": 7
+  },
+  "reward": {
+    "delivery": 60.0,
+    "mission_success": 120.0,
+    "k_progress": 10.0,
+    "hazard_lambda": 0.0,
+    "w_flood": 0.0,
+    "w_landslide": 0.0,
+    "eta_time": 0.2,
+    "step_cost": 0.05,
+    "penalty_timeout": -120.0,
+    "penalty_incomplete_per_delivery": -20.0
+  },
+  "model": {
+    "hidden_sizes": [
+      128,
+      128
+    ],
+    "node_embedding_dim": 64
+  },
+  "replay": {
+    "capacity": 30000
+  },
+  "training": {
+    "num_episodes": 15000,
+    "gamma": 0.99,
+    "lr": 0.0005,
+    "batch_size": 128,
+    "epsilon_start": 1.0,
+    "epsilon_min": 0.05,
+    "epsilon_decay": 0.995,
+    "target_update_every_steps": 500,
+    "log_every": 50,
+    "eval_every": 200,
+    "use_pretrained_model": false,
+    "pretrained_model_path": "",
+    "resume_optimizer": false,
+    "epsilon_schedule": "exp",
+    "epsilon_exp_decay_rate": 0.00035,
+    "device": "cuda"
+  },
+  "evaluation": {
+    "episodes": 100,
+    "epsilon_primary": 0.05,
+    "run_epsilon_greedy_eval": true,
+    "epsilon_greedy": 0.0,
+    "epsilon_noisy": 0.05
+  },
+  "paths": {
+    "checkpoints_dir": "checkpoints/training_config_gpu_1",
+    "runs_dir": "results",
+    "run_log_file": "training_config_gpu_1.txt"
+  }
+}

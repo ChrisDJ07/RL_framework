@@ -1,4 +1,3 @@
-Graph stats | Nodes: 40, Edges: 40, AvgBaseTime: 0.4311, AvgHazard: 0.5350, StateDim: 40, ActionDim: 4, Tmax(min): 1409.86, Deliveries: 2, Device: cpu
-Episode 50, LastReward: -178.22, AvgReward(50): -79.50, SuccessRate(50): 12.00%, Epsilon: 0.981
-Episode 100, LastReward: -101.01, AvgReward(50): -28.80, SuccessRate(50): 28.00%, Epsilon: 0.963
-Episode 150, LastReward: -96.35, AvgReward(50): -18.60, SuccessRate(50): 30.00%, Epsilon: 0.945
+Graph stats | Nodes: 100, Edges: 102, AvgBaseTime: 0.3556, AvgHazard: 0.5961, StateDim: 40, ActionDim: 4, Tmax(min): 1706.70, Deliveries: 2
+Episode 50, LastReward: -175.38, AvgReward(50): -122.09, SuccessRate(50): 4.00%, Epsilon: 0.981
+Episode 100, LastReward: -173.62, AvgReward(50): -110.13, SuccessRate(50): 8.00%, Epsilon: 0.963
