@@ -34,11 +34,11 @@ DEFAULT_PREBUILT = "data/la_trinidad_hazard_graph.graphml"
 
 HAZARD_BINS = ("safe", "very_low", "low", "moderate", "high", "very_high")
 TARGET_HAZARD_DIST = {
-    "safe": 0.05,
-    "very_low": 0.30,
-    "low": 0.30,
-    "moderate": 0.20,
-    "high": 0.10,
+    "safe": 0.15,
+    "very_low": 0.40,
+    "low": 0.20,
+    "moderate": 0.15,
+    "high": 0.05,
     "very_high": 0.05,
 }
 
@@ -534,11 +534,13 @@ def main():
     parser = build_arg_parser()
     args = parser.parse_args()
 
-    _, candidates = select_best_subgraph(args)
+    source_graph, candidates = select_best_subgraph(args)
     _print_top(candidates, args.top_k)
 
     best = candidates[0]
     best_graph = best["graph"].copy()
+    if not best_graph.graph.get("crs"):
+        best_graph.graph["crs"] = source_graph.graph.get("crs", "epsg:4326")
     best_graph.graph["selection_score_total"] = float(best["score_total"])
     best_graph.graph["selection_score_hazard"] = float(best["score_hazard"])
     best_graph.graph["selection_score_redundancy"] = float(best["score_redundancy"])

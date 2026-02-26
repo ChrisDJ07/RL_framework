@@ -38,7 +38,7 @@ def create_base_graph_from_source(
     travel_time_attr="travel_time_min",
 ):
     if prebuilt_graphml_path:
-        raw_graph = nx.read_graphml(prebuilt_graphml_path)
+        raw_graph = nx.read_graphml(prebuilt_graphml_path, force_multigraph=True)
     else:
         raw_graph = get_raw_osm_graph(min_nodes=min_nodes, force_download=force_download)
 
@@ -56,6 +56,11 @@ def create_base_graph_from_source(
 
 
 def visualize_raw_osm_graph(raw_graph, title="Raw OSM Road Network (La Trinidad Area)"):
+    if not raw_graph.is_multigraph():
+        raw_graph = nx.MultiGraph(raw_graph)
+    if not raw_graph.graph.get("crs"):
+        raw_graph.graph["crs"] = "epsg:4326"
+
     # GraphML stores geometry as WKT strings; convert them back for OSMnx plotting.
     converted = 0
     if raw_graph.is_multigraph():
