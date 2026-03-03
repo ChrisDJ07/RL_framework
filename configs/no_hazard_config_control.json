@@ -1,11 +1,11 @@
 {
   "seed": 40,
   "graph": {
-    "num_nodes": 40,
-    "min_nodes": 40,
-    "max_nodes": 40,
+    "num_nodes": 100,
+    "min_nodes": 100,
+    "max_nodes": 100,
     "force_download": false,
-    "prebuilt_graphml_path": "data/la_trinidad_hazard_graph.graphml",
+    "prebuilt_graphml_path": "data/selected_subgraph_n100.graphml",
     "use_existing_hazards": true,
     "flood_attr": "flood_hazard",
     "landslide_attr": "landslide_hazard",
@@ -88,7 +88,7 @@
     "capacity": 10000
   },
   "training": {
-    "num_episodes": 20000,
+    "num_episodes": 30000,
     "gamma": 0.99,
     "lr": 0.0003,
     "batch_size": 64,
@@ -102,7 +102,7 @@
     "pretrained_model_path": "",
     "resume_optimizer": false,
     "epsilon_schedule": "exp",
-    "epsilon_exp_decay_rate": 0.0004
+    "epsilon_exp_decay_rate": 0.00015
   },
   "evaluation": {
     "episodes": 100,
@@ -112,8 +112,8 @@
     "epsilon_noisy": 0.05
   },
   "paths": {
-    "checkpoints_dir": "checkpoints",
+    "checkpoints_dir": "checkpoints/best_model_control",
     "runs_dir": "results",
-    "run_log_file": "last_run.txt"
+    "run_log_file": "last_run_control.txt"
   }
 }
