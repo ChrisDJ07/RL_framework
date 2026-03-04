@@ -5,7 +5,7 @@
     "min_nodes": 100,
     "max_nodes": 100,
     "force_download": false,
-    "prebuilt_graphml_path": "data/selected_subgraph_n100.graphml",
+    "prebuilt_graphml_path": "data/subgraphs/selected_subgraph_n100.graphml",
     "use_existing_hazards": true,
     "flood_attr": "flood_hazard",
     "landslide_attr": "landslide_hazard",
@@ -80,22 +80,22 @@
   "model": {
     "hidden_sizes": [
       128,
-      64
+      128
     ],
-    "node_embedding_dim": 32
+    "node_embedding_dim": 64
   },
   "replay": {
-    "capacity": 15000
+    "capacity": 30000
   },
   "training": {
     "num_episodes": 15000,
     "gamma": 0.99,
     "lr": 0.0005,
-    "batch_size": 32,
+    "batch_size": 128,
     "epsilon_start": 1.0,
     "epsilon_min": 0.05,
     "epsilon_decay": 0.995,
-    "target_update_every_steps": 400,
+    "target_update_every_steps": 500,
     "log_every": 50,
     "eval_every": 200,
     "use_pretrained_model": false,
@@ -103,7 +103,7 @@
     "resume_optimizer": false,
     "epsilon_schedule": "exp",
     "epsilon_exp_decay_rate": 0.00035,
-    "device": "auto"
+    "device": "cuda"
   },
   "evaluation": {
     "episodes": 100,
@@ -113,8 +113,8 @@
     "epsilon_noisy": 0.05
   },
   "paths": {
-    "checkpoints_dir": "checkpoints/training_config_1",
-    "runs_dir": "results",
-    "run_log_file": "training_config_1.txt"
+    "checkpoints_dir": "checkpoints/training_config_gpu_1",
+    "runs_dir": "results/runs/",
+    "run_log_file": "training_config_gpu_1.txt"
   }
 }

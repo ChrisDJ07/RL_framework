@@ -1,3 +1,9 @@
+"""
+Utility functions for graph manipulation and hazard scoring. 
+Includes OSM graph fetching, conversion to training format, and edge hazard sampling. 
+Designed for use in hazard-aware routing experiments.
+"""
+
 import random
 from pathlib import Path
 

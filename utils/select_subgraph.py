@@ -1,3 +1,10 @@
+"""
+Select and export a hazard-diverse, redundant, spatially-spread subgraph from a larger OSM graph.
+The selection process samples candidate subgraphs via BFS from random seed nodes, 
+evaluates them based on a composite score of hazard distribution, redundancy, and spatial spread,
+and exports the best candidate as GraphML along with a visualization.
+"""
+
 import argparse
 import json
 import math
@@ -523,8 +530,8 @@ def build_arg_parser():
     parser.add_argument("--w-spatial", type=float, default=0.20)
 
     parser.add_argument("--top-k", type=int, default=5, help="Print top-K scored candidates.")
-    parser.add_argument("--output-graphml", type=str, default="", help="Output GraphML path. Defaults to data/selected_subgraph_n{N}.graphml.")
-    parser.add_argument("--output-plot", type=str, default="", help="Output plot path. Defaults to results/selected_subgraph_n{N}.png.")
+    parser.add_argument("--output-graphml", type=str, default="", help="Output GraphML path. Defaults to data/subgraphs/selected_subgraph_n{N}.graphml.")
+    parser.add_argument("--output-plot", type=str, default="", help="Output plot path. Defaults to results/subgraphs/selected_subgraph_n{N}.png.")
     parser.add_argument("--show-plot", action="store_true", help="Show matplotlib plot window.")
     parser.add_argument("--dry-run", action="store_true", help="Score and print candidates without writing files.")
     return parser
@@ -551,11 +558,11 @@ def main():
     if args.output_graphml:
         output_graphml = Path(args.output_graphml)
     else:
-        output_graphml = Path("data") / f"selected_subgraph_n{args.num_nodes}.graphml"
+        output_graphml = Path("data/subgraphs/") / f"selected_subgraph_n{args.num_nodes}.graphml"
     if args.output_plot:
         output_plot = Path(args.output_plot)
     else:
-        output_plot = Path("results") / f"selected_subgraph_n{args.num_nodes}.png"
+        output_plot = Path("results/subgraphs/") / f"selected_subgraph_n{args.num_nodes}.png"
 
     if args.dry_run:
         print("Dry run mode enabled. No files written.")

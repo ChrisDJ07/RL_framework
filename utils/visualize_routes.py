@@ -1,3 +1,13 @@
+"""
+Visualize routing episodes from a trained RL model checkpoint. This script loads the 
+specified checkpoint, reconstructs the environment and model, and runs multiple episodes
+to visualize the agent's routing decisions in the context of the underlying graph and hazards.
+The resulting visualizations show the traversed route, blocked edges, hazard levels,
+and key nodes (start, delivery targets, completed deliveries). Command-line options allow 
+customization of the number of episodes, epsilon for action selection, layout of subplots,
+and output path for saving the visualization.
+"""
+
 import math
 import importlib
 import argparse
@@ -27,11 +37,20 @@ def load_env_and_model(
         raise FileNotFoundError(f"Checkpoint not found: {ckpt_file}")
     checkpoint = torch.load(ckpt_file, map_location="cpu", weights_only=False)
 
-    candidate_modules = ["mock_rl_routing"]
+    candidate_modules = [
+        "rl_routing",
+        "rl_routing_wCUDA",
+        "rl_routing_curriculum",
+        "mock_rl_routing",
+    ]
     last_error = None
 
     for module_name in candidate_modules:
-        module = importlib.import_module(module_name)
+        try:
+            module = importlib.import_module(module_name)
+        except ModuleNotFoundError as e:
+            last_error = e
+            continue
         cfg = module.load_config(config_path)
         resolved_seed = seed
         if resolved_seed is None and use_config_seed:
@@ -91,7 +110,7 @@ def load_env_and_model(
             continue
 
     raise RuntimeError(
-        "Could not load checkpoint with current model variant (mock_rl_routing)."
+        f"Could not load checkpoint with supported model variants: {', '.join(candidate_modules)}."
     ) from last_error
 
 
@@ -250,7 +269,7 @@ def _draw_episode(ax, result, episode_idx):
 def _resolve_save_path(save_path):
     if save_path:
         return Path(save_path)
-    return Path("results") / "last_run_visualization.png"
+    return Path("results/visualization_runs") / "last_run_visualization.png"
 
 
 def visualize_episodes(
@@ -316,7 +335,7 @@ if __name__ == "__main__":
         "--save-path",
         type=str,
         default="",
-        help="Optional explicit output path. Leave empty to auto-route by model variant.",
+        help="Optional explicit output path. Leave empty to use results/visualization_runs/last_run_visualization.png.",
     )
     parser.add_argument(
         "--seed",
@@ -342,5 +361,5 @@ if __name__ == "__main__":
         use_config_seed=args.use_config_seed,
     )
     
-# python utils/visualize_routes.py --checkpoint-path checkpoints/best_model.pt --save-path results/my_routes.png
-# python utils/visualize_routes.py --save-path results/pretrain_routes.png --config-path configs/no_hazard_config.json --num-episodes 6 --cols 3
+# python utils/visualize_routes.py --checkpoint-path checkpoints/no_hazard_control/best_model.pt --save-path results/visualization_runs/my_routes.png
+# python utils/visualize_routes.py --save-path results/visualization_runs/pretrain_routes.png --config-path configs/no_hazard_training/no_hazard_config.json --num-episodes 6 --cols 3

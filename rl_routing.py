@@ -90,7 +90,7 @@ DEFAULT_CONFIG = {
         "high_risk_flood_threshold": 0.6,
         "high_risk_landslide_threshold": 0.5,
         "max_neighbor_slots": 4,
-        "neighbor_feature_dim": 5,
+        "neighbor_feature_dim": 7,
     },
     "reward": {
         "delivery": 50.0,
@@ -131,43 +131,17 @@ DEFAULT_CONFIG = {
     },
     "evaluation": {
         "episodes": 300,
-        "epsilon_primary": 0.05,
-        "run_epsilon_greedy_eval": False,
         "epsilon_greedy": 0.0,
+        "epsilon_noisy": 0.05,
     },
     "paths": {
         "checkpoints_dir": "checkpoints",
-        "runs_dir": "results",
+        "runs_dir": "results/runs/",
         "run_log_file": "last_run.txt",
     },
 }
 
 CONFIG_PATH_DEFAULT = "configs/experiment_config.json"
-CURRICULUM_CONFIG_PATH_DEFAULT = "configs/curriculum_config.json"
-
-DEFAULT_CURRICULUM_CONFIG = {
-    "enabled": False,
-    "origin_mode": "centroid",  # centroid | random
-    "origin_node": None,  # explicit node id if you want to force start center/origin
-    "initial_nodes": 10,
-    "expansion_hops_per_stage": 1,
-    "max_new_nodes_per_stage": 0,  # 0 = unlimited
-    "success_threshold": 0.90,
-    "consecutive_eval_passes": 3,
-    "min_stage_episodes": 0,
-    "stage_patience_episodes": 3000,
-    "max_total_episodes": 15000,
-    "eval_every": 100,
-    "eval_episodes": 100,
-    "buffer_reset_on_stage_change": True,
-    "reset_epsilon_on_stage_change": True,
-    "stage_start_epsilon": 0.25,
-    "epsilon_decay_scope": "stage",
-    "stop_on_full_graph_success": True,
-    "full_graph_num_nodes": 1000000,
-    "full_graph_min_nodes": 1,
-    "full_graph_max_nodes": 1000000,
-}
 
 
 # Runtime globals configured from config file.
@@ -215,60 +189,6 @@ def load_config(config_path=CONFIG_PATH_DEFAULT):
     with path.open("r", encoding="utf-8") as f:
         user_cfg = json.load(f)
     return deep_update(cfg, user_cfg)
-
-
-def load_curriculum_config(curriculum_config_path=CURRICULUM_CONFIG_PATH_DEFAULT):
-    cfg = deepcopy(DEFAULT_CURRICULUM_CONFIG)
-    path = Path(curriculum_config_path)
-    if not path.exists():
-        return cfg
-    with path.open("r", encoding="utf-8") as f:
-        user_cfg = json.load(f)
-    return deep_update(cfg, user_cfg)
-
-
-def _select_origin_node(graph, mode="centroid", origin_node=None):
-    if origin_node is not None and origin_node in graph.nodes:
-        return origin_node
-    if mode == "random":
-        return random.choice(list(graph.nodes()))
-    pos = nx.get_node_attributes(graph, "pos")
-    if not pos:
-        return random.choice(list(graph.nodes()))
-    centroid = np.mean(np.array(list(pos.values()), dtype=float), axis=0)
-    return min(pos.keys(), key=lambda n: float(np.linalg.norm(np.array(pos[n], dtype=float) - centroid)))
-
-
-def _seed_stage_nodes_bfs(graph, origin, initial_nodes):
-    bfs_nodes = list(nx.bfs_tree(graph, origin).nodes())
-    if not bfs_nodes:
-        return set()
-    return set(bfs_nodes[: max(1, int(initial_nodes))])
-
-
-def _expand_stage_nodes(graph, stage_nodes, hops=1, max_new_nodes=0):
-    stage_nodes = set(stage_nodes)
-    max_new_nodes = int(max_new_nodes)
-    hops = max(1, int(hops))
-    frontier = set(stage_nodes)
-    added = set()
-
-    for _ in range(hops):
-        next_frontier = set()
-        for node in frontier:
-            for nbr in graph.neighbors(node):
-                if nbr not in stage_nodes and nbr not in added:
-                    added.add(nbr)
-                    next_frontier.add(nbr)
-                    if max_new_nodes > 0 and len(added) >= max_new_nodes:
-                        break
-            if max_new_nodes > 0 and len(added) >= max_new_nodes:
-                break
-        frontier = next_frontier
-        if not frontier or (max_new_nodes > 0 and len(added) >= max_new_nodes):
-            break
-
-    return stage_nodes | added
 
 
 def apply_runtime_config(cfg):
@@ -399,35 +319,13 @@ def activate_hazards(G_base, rain_key):
 # Environment
 # =========================
 class HazardRoutingEnv:
-    def __init__(
-        self,
-        base_graph,
-        num_deliveries=2,
-        env_cfg=None,
-        reward_cfg=None,
-        node_index_map=None,
-        embedding_num_nodes=None,
-    ):
+    def __init__(self, base_graph, num_deliveries=2, env_cfg=None, reward_cfg=None):
         env_cfg = env_cfg or {}
         reward_cfg = reward_cfg or {}
 
         self.base_graph = base_graph
         self.num_nodes = base_graph.number_of_nodes()
-        self.node_list = list(base_graph.nodes())
         self.num_deliveries = min(int(num_deliveries), self.num_nodes - 1)
-
-        if node_index_map is None:
-            self.node_to_embed_idx = {n: i for i, n in enumerate(sorted(self.node_list))}
-        else:
-            missing = [n for n in self.node_list if n not in node_index_map]
-            if missing:
-                raise ValueError(f"node_index_map missing {len(missing)} active nodes.")
-            self.node_to_embed_idx = {n: int(node_index_map[n]) for n in self.node_list}
-
-        if embedding_num_nodes is None:
-            self.embedding_num_nodes = max(self.node_to_embed_idx.values(), default=-1) + 1
-        else:
-            self.embedding_num_nodes = int(embedding_num_nodes)
 
         min_max_steps = int(env_cfg.get("min_max_steps", 50))
         step_multiplier = float(env_cfg.get("max_steps_multiplier", 2.0))
@@ -436,7 +334,8 @@ class HazardRoutingEnv:
 
         self.rain_dim = len(RAIN_KEYS)
         self.max_neighbor_slots = MAX_NEIGHBOR_SLOTS
-        self.neighbor_feature_dim = NEIGHBOR_FEATURE_DIM
+        # Goal-aware neighbor features require at least 7 slots per neighbor.
+        self.neighbor_feature_dim = max(NEIGHBOR_FEATURE_DIM, 7)
 
         edge_data = list(base_graph.edges(data=True))
         avg_base_time = np.mean([d["base_time"] for _, _, d in edge_data]) if edge_data else 1.0
@@ -502,8 +401,8 @@ class HazardRoutingEnv:
         self.rain_onehot = np.zeros(self.rain_dim, dtype=float)
         self.rain_onehot[rain_idx] = 1.0
 
-        self.current_node = random.choice(self.node_list)
-        all_nodes = list(self.node_list)
+        self.current_node = random.randint(0, self.num_nodes - 1)
+        all_nodes = list(self.G.nodes())
         all_nodes.remove(self.current_node)
         self.delivery_nodes = set(random.sample(all_nodes, self.num_deliveries))
         self.completed = set()
@@ -518,7 +417,7 @@ class HazardRoutingEnv:
         unvisited_idx = np.zeros(self.num_deliveries, dtype=np.int64)
         unvisited_mask = np.zeros(self.num_deliveries, dtype=np.float32)
         for i, node_id in enumerate(unvisited[: self.num_deliveries]):
-            unvisited_idx[i] = int(self.node_to_embed_idx[node_id])
+            unvisited_idx[i] = int(node_id)
             unvisited_mask[i] = 1.0
         return unvisited, unvisited_idx, unvisited_mask
 
@@ -561,8 +460,10 @@ class HazardRoutingEnv:
         )
         return neighbors[: self.max_neighbor_slots]
 
-    def _build_neighbor_features(self, action_slots):
+    def _build_neighbor_features(self, action_slots, unvisited):
         features = []
+        current_nearest = self._nearest_unvisited_shortest(self.current_node, unvisited)
+
         for nbr in action_slots:
             edge = self.G[self.current_node][nbr]
             flood_score = edge.get("flood_score", 0.0)
@@ -571,7 +472,25 @@ class HazardRoutingEnv:
             travel_time = edge.get("travel_time", None)
             travel_time_norm = 0.0 if travel_time is None else min(travel_time / self.max_episode_time, 1.0)
             feasible = 0.0 if edge.get("blocked", False) else 1.0
-            features.extend([flood_score, landslide_score, length_norm, travel_time_norm, feasible])
+
+            # Goal-aware neighbor context for action ranking.
+            next_nearest = self._nearest_unvisited_shortest(nbr, unvisited)
+            next_nearest_norm = min(next_nearest / self.max_shortest_len, 1.0)
+            progress_delta_norm = float(
+                np.clip((current_nearest - next_nearest) / self.max_shortest_len, -1.0, 1.0)
+            )
+
+            features.extend(
+                [
+                    flood_score,
+                    landslide_score,
+                    length_norm,
+                    travel_time_norm,
+                    feasible,
+                    next_nearest_norm,
+                    progress_delta_norm,
+                ]
+            )
 
         expected = self.max_neighbor_slots * self.neighbor_feature_dim
         if len(features) < expected:
@@ -582,11 +501,11 @@ class HazardRoutingEnv:
         unvisited, unvisited_idx, unvisited_mask = self._build_unvisited_delivery_state()
         target_feats = self._build_target_features(unvisited)
         action_slots = self._get_action_slots()
-        neighbor_feats = self._build_neighbor_features(action_slots)
+        neighbor_feats = self._build_neighbor_features(action_slots, unvisited)
         state_vec = np.concatenate([target_feats, neighbor_feats, self.rain_onehot])
         return {
             "state_vec": torch.tensor(state_vec, dtype=torch.float32),
-            "current_idx": torch.tensor(int(self.node_to_embed_idx[self.current_node]), dtype=torch.long),
+            "current_idx": torch.tensor(int(self.current_node), dtype=torch.long),
             "unvisited_idx": torch.tensor(unvisited_idx, dtype=torch.long),
             "unvisited_mask": torch.tensor(unvisited_mask, dtype=torch.float32),
         }
@@ -798,455 +717,13 @@ def evaluate_policy(model, env, num_episodes=100, epsilon=0.0):
     return float(np.mean(rewards)), successes / max(num_episodes, 1)
 
 
-def _run_curriculum_training(cfg, curriculum_cfg, log, config_path):
-    graph_cfg = cfg["graph"]
-    env_cfg = cfg["environment"]
-    reward_cfg = cfg["reward"]
-    model_cfg = cfg["model"]
-    replay_cfg = cfg["replay"]
-    train_cfg = cfg["training"]
-    eval_cfg = cfg["evaluation"]
-    paths_cfg = cfg["paths"]
-
-    full_graph = create_base_graph(
-        num_nodes=int(curriculum_cfg.get("full_graph_num_nodes", graph_cfg["num_nodes"])),
-        min_nodes=int(curriculum_cfg.get("full_graph_min_nodes", 1)),
-        max_nodes=int(curriculum_cfg.get("full_graph_max_nodes", graph_cfg["max_nodes"])),
-        force_download=bool(graph_cfg.get("force_download", False)),
-        prebuilt_graphml_path=str(graph_cfg.get("prebuilt_graphml_path", "") or ""),
-        use_existing_hazards=bool(graph_cfg.get("use_existing_hazards", False)),
-        flood_attr=str(graph_cfg.get("flood_attr", "flood_hazard")),
-        landslide_attr=str(graph_cfg.get("landslide_attr", "landslide_hazard")),
-        travel_time_attr=str(graph_cfg.get("travel_time_attr", "travel_time_min")),
-    )
-
-    full_nodes = list(full_graph.nodes())
-    full_nodes_sorted = sorted(full_nodes)
-    node_index_map = {n: i for i, n in enumerate(full_nodes_sorted)}
-    embedding_num_nodes = len(node_index_map)
-
-    origin = _select_origin_node(
-        full_graph,
-        mode=str(curriculum_cfg.get("origin_mode", "centroid")),
-        origin_node=curriculum_cfg.get("origin_node"),
-    )
-    initial_nodes = min(max(1, int(curriculum_cfg.get("initial_nodes", 10))), full_graph.number_of_nodes())
-    stage_nodes = _seed_stage_nodes_bfs(full_graph, origin, initial_nodes)
-    if not stage_nodes:
-        raise RuntimeError("Curriculum could not initialize stage nodes.")
-
-    def make_env(active_nodes):
-        stage_graph = full_graph.subgraph(active_nodes).copy()
-        return HazardRoutingEnv(
-            stage_graph,
-            num_deliveries=int(env_cfg["num_deliveries"]),
-            env_cfg=env_cfg,
-            reward_cfg=reward_cfg,
-            node_index_map=node_index_map,
-            embedding_num_nodes=embedding_num_nodes,
-        )
-
-    env = make_env(stage_nodes)
-    base_graph_node_link = nx.node_link_data(full_graph, edges="edges")
-
-    online = DQN(
-        env.state_dim,
-        env.action_dim,
-        num_nodes=embedding_num_nodes,
-        num_delivery_slots=env.num_deliveries,
-        hidden_sizes=tuple(model_cfg["hidden_sizes"]),
-        node_embedding_dim=int(model_cfg.get("node_embedding_dim", 16)),
-    )
-    target = DQN(
-        env.state_dim,
-        env.action_dim,
-        num_nodes=embedding_num_nodes,
-        num_delivery_slots=env.num_deliveries,
-        hidden_sizes=tuple(model_cfg["hidden_sizes"]),
-        node_embedding_dim=int(model_cfg.get("node_embedding_dim", 16)),
-    )
-    target.load_state_dict(online.state_dict())
-
-    optimizer = optim.Adam(online.parameters(), lr=float(train_cfg["lr"]))
-    buffer = ReplayBuffer(capacity=int(replay_cfg["capacity"]))
-
-    use_pretrained = bool(train_cfg.get("use_pretrained_model", False))
-    pretrained_model_path = str(train_cfg.get("pretrained_model_path", "") or "").strip()
-    resume_optimizer = bool(train_cfg.get("resume_optimizer", False))
-
-    if use_pretrained:
-        if not pretrained_model_path:
-            raise ValueError("training.use_pretrained_model=True but training.pretrained_model_path is empty.")
-
-        ckpt_path = Path(pretrained_model_path)
-        if not ckpt_path.exists():
-            raise FileNotFoundError(f"Pretrained checkpoint not found: {ckpt_path}")
-
-        checkpoint = torch.load(ckpt_path, map_location="cpu", weights_only=False)
-        if isinstance(checkpoint, dict) and "model_state_dict" in checkpoint:
-            model_state = checkpoint["model_state_dict"]
-        else:
-            model_state = checkpoint
-
-        missing_keys, unexpected_keys = online.load_state_dict(model_state, strict=False)
-        target.load_state_dict(online.state_dict())
-        log(
-            f"Loaded pretrained model: {ckpt_path} | "
-            f"MissingKeys: {len(missing_keys)}, UnexpectedKeys: {len(unexpected_keys)}"
-        )
-
-        if resume_optimizer and isinstance(checkpoint, dict) and "optimizer_state_dict" in checkpoint:
-            optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
-            log("Loaded optimizer state from checkpoint (resume_optimizer=True).")
-
-    gamma = float(train_cfg["gamma"])
-    epsilon_start = float(train_cfg["epsilon_start"])
-    epsilon = epsilon_start
-    epsilon_min = float(train_cfg["epsilon_min"])
-    epsilon_decay = float(train_cfg["epsilon_decay"])
-    epsilon_schedule = str(train_cfg.get("epsilon_schedule", "multiplicative"))
-    epsilon_exp_decay_rate = train_cfg.get("epsilon_exp_decay_rate", None)
-    if epsilon_exp_decay_rate is not None:
-        epsilon_exp_decay_rate = float(epsilon_exp_decay_rate)
-    epsilon_step = 0
-    epsilon_anchor = epsilon_start
-    batch_size = int(train_cfg["batch_size"])
-    target_update_every_steps = int(train_cfg["target_update_every_steps"])
-    log_every = int(train_cfg["log_every"])
-
-    eval_every = max(1, int(curriculum_cfg.get("eval_every", train_cfg["eval_every"])))
-    eval_episodes = max(1, int(curriculum_cfg.get("eval_episodes", eval_cfg["episodes"])))
-    eval_eps_primary = float(eval_cfg.get("epsilon_primary", 0.05))
-    run_eval_eps0 = bool(eval_cfg.get("run_epsilon_greedy_eval", False))
-    eval_eps0 = float(eval_cfg.get("epsilon_greedy", 0.0))
-
-    success_threshold = float(curriculum_cfg.get("success_threshold", 0.90))
-    consecutive_eval_passes = max(1, int(curriculum_cfg.get("consecutive_eval_passes", 3)))
-    min_stage_episodes = max(0, int(curriculum_cfg.get("min_stage_episodes", 0)))
-    stage_patience_episodes = max(1, int(curriculum_cfg.get("stage_patience_episodes", 3000)))
-    max_total_episodes = max(1, int(curriculum_cfg.get("max_total_episodes", train_cfg["num_episodes"])))
-    expansion_hops = max(1, int(curriculum_cfg.get("expansion_hops_per_stage", 1)))
-    max_new_nodes_per_stage = max(0, int(curriculum_cfg.get("max_new_nodes_per_stage", 0)))
-    buffer_reset = bool(curriculum_cfg.get("buffer_reset_on_stage_change", True))
-    reset_epsilon_on_stage_change = bool(curriculum_cfg.get("reset_epsilon_on_stage_change", True))
-    stage_start_epsilon = float(curriculum_cfg.get("stage_start_epsilon", 0.25))
-    epsilon_decay_scope = str(curriculum_cfg.get("epsilon_decay_scope", "stage")).strip().lower()
-    if epsilon_decay_scope not in {"global", "stage"}:
-        epsilon_decay_scope = "stage"
-    stop_on_full_success = bool(curriculum_cfg.get("stop_on_full_graph_success", True))
-
-    checkpoints_dir = Path(paths_cfg["checkpoints_dir"])
-    checkpoints_dir.mkdir(parents=True, exist_ok=True)
-    best_model_path = checkpoints_dir / "best_model.pt"
-    last_model_path = checkpoints_dir / "last_model.pt"
-
-    stage_id = 0
-    stage_start_episode = 1
-    stage_eval_passes = 0
-    stage_best_eval_success = -1.0
-    stage_best_eval_reward = -1e9
-    episodes_since_improvement = 0
-    train_steps = 0
-    reward_history = []
-    success_history = []
-    best_eval_success = -1.0
-    best_eval_reward = -1e9
-    best_episode = 0
-    termination_reason = "max_total_episodes_reached"
-    global_episode = 0
-
-    log(
-        f"Curriculum enabled | FullGraphNodes: {full_graph.number_of_nodes()}, FullGraphEdges: {full_graph.number_of_edges()}, "
-        f"OriginNode: {origin}, InitialStageNodes: {len(stage_nodes)}, TargetSuccess: {success_threshold:.2%}, "
-        f"ConsecutivePasses: {consecutive_eval_passes}"
-    )
-
-    while global_episode < max_total_episodes:
-        global_episode += 1
-        episodes_since_improvement += 1
-        state = env.reset()
-        done = False
-        total_reward = 0.0
-
-        while not done:
-            mask = env.get_action_mask()
-            action = select_action(online, state, mask, epsilon)
-            if action is None:
-                total_reward += env.failure_penalty("blockage")
-                break
-
-            next_state, reward, done, _ = env.step(action)
-            next_mask = env.get_action_mask() if not done else torch.zeros(env.action_dim, dtype=torch.float32)
-
-            buffer.store(
-                (
-                    state["state_vec"],
-                    state["current_idx"],
-                    state["unvisited_idx"],
-                    state["unvisited_mask"],
-                    action,
-                    reward,
-                    next_state["state_vec"],
-                    next_state["current_idx"],
-                    next_state["unvisited_idx"],
-                    next_state["unvisited_mask"],
-                    done,
-                    next_mask,
-                )
-            )
-            state = next_state
-            total_reward += reward
-
-            if len(buffer) >= batch_size:
-                (
-                    state_vecs,
-                    current_idxs,
-                    unvisited_idxs,
-                    unvisited_masks,
-                    actions,
-                    rewards,
-                    next_state_vecs,
-                    next_current_idxs,
-                    next_unvisited_idxs,
-                    next_unvisited_masks,
-                    dones,
-                    next_masks,
-                ) = buffer.sample(batch_size)
-
-                q_values = online(state_vecs, current_idxs, unvisited_idxs, unvisited_masks)
-                q_selected = q_values.gather(1, actions.unsqueeze(1)).squeeze()
-
-                with torch.no_grad():
-                    next_online_q = online(
-                        next_state_vecs,
-                        next_current_idxs,
-                        next_unvisited_idxs,
-                        next_unvisited_masks,
-                    )
-                    next_online_q[next_masks == 0] = -1e9
-                    next_actions = next_online_q.argmax(dim=1)
-                    next_q = target(
-                        next_state_vecs,
-                        next_current_idxs,
-                        next_unvisited_idxs,
-                        next_unvisited_masks,
-                    ).gather(1, next_actions.unsqueeze(1)).squeeze()
-                    has_valid_next = (next_masks.sum(dim=1) > 0).float()
-                    target_q = rewards + gamma * next_q * (1 - dones) * has_valid_next
-
-                loss = nn.MSELoss()(q_selected, target_q)
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
-
-                train_steps += 1
-                if train_steps % target_update_every_steps == 0:
-                    target.load_state_dict(online.state_dict())
-
-        reward_history.append(total_reward)
-        success_history.append(1 if len(env.completed) == len(env.delivery_nodes) else 0)
-        epsilon_step += 1
-        epsilon = update_epsilon(
-            epsilon,
-            epsilon_start=epsilon_anchor,
-            epsilon_min=epsilon_min,
-            epsilon_decay=epsilon_decay,
-            epsilon_schedule=epsilon_schedule,
-            epsilon_exp_decay_rate=epsilon_exp_decay_rate,
-            step_index=epsilon_step,
-        )
-
-        if global_episode % log_every == 0:
-            avg_reward = float(np.mean(reward_history[-log_every:]))
-            success_rate = float(np.mean(success_history[-log_every:]))
-            log(
-                f"Episode {global_episode}, Stage {stage_id}, StageNodes: {len(stage_nodes)}, "
-                f"LastReward: {total_reward:.2f}, AvgReward({log_every}): {avg_reward:.2f}, "
-                f"SuccessRate({log_every}): {success_rate:.2%}, Epsilon: {epsilon:.3f}"
-            )
-
-        if global_episode % eval_every == 0:
-            eval_reward_primary, eval_success_primary = evaluate_policy(
-                online, env, num_episodes=eval_episodes, epsilon=eval_eps_primary
-            )
-            if run_eval_eps0:
-                eval_reward_eps0, eval_success_eps0 = evaluate_policy(
-                    online, env, num_episodes=eval_episodes, epsilon=eval_eps0
-                )
-                log(
-                    f"[Eval @ Episode {global_episode}] Stage {stage_id}, StageNodes: {len(stage_nodes)} | "
-                    f"eps={eval_eps_primary:.2f} -> MeanReward: {eval_reward_primary:.2f}, SuccessRate: {eval_success_primary:.2%} | "
-                    f"eps={eval_eps0:.2f} -> MeanReward: {eval_reward_eps0:.2f}, SuccessRate: {eval_success_eps0:.2%}"
-                )
-            else:
-                log(
-                    f"[Eval @ Episode {global_episode}] Stage {stage_id}, StageNodes: {len(stage_nodes)} | "
-                    f"eps={eval_eps_primary:.2f} -> MeanReward: {eval_reward_primary:.2f}, SuccessRate: {eval_success_primary:.2%}"
-                )
-
-            if eval_success_primary > stage_best_eval_success or (
-                eval_success_primary == stage_best_eval_success and eval_reward_primary > stage_best_eval_reward
-            ):
-                stage_best_eval_success = eval_success_primary
-                stage_best_eval_reward = eval_reward_primary
-
-            if (eval_success_primary > best_eval_success) or (
-                eval_success_primary == best_eval_success and eval_reward_primary > best_eval_reward
-            ):
-                best_eval_success = eval_success_primary
-                best_eval_reward = eval_reward_primary
-                best_episode = global_episode
-                episodes_since_improvement = 0
-                torch.save(
-                    {
-                        "episode": best_episode,
-                        "model_state_dict": online.state_dict(),
-                        "optimizer_state_dict": optimizer.state_dict(),
-                        "eval_success_rate_primary": best_eval_success,
-                        "eval_mean_reward_primary": best_eval_reward,
-                        "graph_num_nodes": env.num_nodes,
-                        "action_dim": env.action_dim,
-                        "num_deliveries": env.num_deliveries,
-                        "seed": SEED,
-                        "model_variant": "spatial_neighbor_head_curriculum",
-                        "config_path": str(config_path),
-                        "base_graph_node_link": base_graph_node_link,
-                        "curriculum_stage": stage_id,
-                        "curriculum_stage_nodes": len(stage_nodes),
-                    },
-                    best_model_path,
-                )
-                log(
-                    f"Saved best checkpoint: {best_model_path} "
-                    f"(episode {best_episode}, success={best_eval_success:.2%}, reward={best_eval_reward:.2f}, stage={stage_id})"
-                )
-
-            if (global_episode - stage_start_episode + 1) >= min_stage_episodes:
-                if eval_success_primary >= success_threshold:
-                    stage_eval_passes += 1
-                else:
-                    stage_eval_passes = 0
-
-                if stage_eval_passes >= consecutive_eval_passes:
-                    if len(stage_nodes) >= full_graph.number_of_nodes():
-                        log(
-                            f"Curriculum reached full graph with sustained success at episode {global_episode} "
-                            f"(success={eval_success_primary:.2%})."
-                        )
-                        if stop_on_full_success:
-                            termination_reason = "full_graph_sustained_success"
-                            break
-                        stage_eval_passes = 0
-                    else:
-                        expanded_nodes = _expand_stage_nodes(
-                            full_graph,
-                            stage_nodes,
-                            hops=expansion_hops,
-                            max_new_nodes=max_new_nodes_per_stage,
-                        )
-                        if len(expanded_nodes) == len(stage_nodes):
-                            log("Curriculum stage expansion produced no new nodes; keeping current stage.")
-                            stage_eval_passes = 0
-                        else:
-                            prev_count = len(stage_nodes)
-                            stage_nodes = expanded_nodes
-                            stage_id += 1
-                            stage_start_episode = global_episode + 1
-                            stage_eval_passes = 0
-                            stage_best_eval_success = -1.0
-                            stage_best_eval_reward = -1e9
-                            env = make_env(stage_nodes)
-                            if buffer_reset:
-                                buffer = ReplayBuffer(capacity=int(replay_cfg["capacity"]))
-
-                            if reset_epsilon_on_stage_change:
-                                stage_eps = float(np.clip(stage_start_epsilon, epsilon_min, 1.0))
-                                epsilon = stage_eps
-                                if epsilon_schedule.strip().lower() == "exp":
-                                    epsilon_anchor = stage_eps
-                                if epsilon_decay_scope == "stage":
-                                    epsilon_step = 0
-                            elif epsilon_schedule.strip().lower() == "exp" and epsilon_decay_scope == "stage":
-                                epsilon_anchor = float(epsilon)
-                                epsilon_step = 0
-
-                            promo_msg = (
-                                f"Promoted to stage {stage_id}: nodes {prev_count} -> {len(stage_nodes)} "
-                                f"(full={full_graph.number_of_nodes()})"
-                            )
-                            if reset_epsilon_on_stage_change:
-                                promo_msg += f" | epsilon reset to {epsilon:.3f}"
-                            promo_msg += f" | eps_schedule={str(epsilon_schedule).lower()}({epsilon_decay_scope})"
-                            log(promo_msg)
-
-        if episodes_since_improvement >= stage_patience_episodes:
-            termination_reason = "no_improvement_patience"
-            log(
-                f"Stopping curriculum early due to no eval improvement for {episodes_since_improvement} episodes "
-                f"(patience={stage_patience_episodes})."
-            )
-            break
-
-    torch.save(
-        {
-            "episode": global_episode,
-            "model_state_dict": online.state_dict(),
-            "optimizer_state_dict": optimizer.state_dict(),
-            "graph_num_nodes": env.num_nodes,
-            "action_dim": env.action_dim,
-            "num_deliveries": env.num_deliveries,
-            "seed": SEED,
-            "model_variant": "spatial_neighbor_head_curriculum",
-            "config_path": str(config_path),
-            "base_graph_node_link": base_graph_node_link,
-            "curriculum_stage": stage_id,
-            "curriculum_stage_nodes": len(stage_nodes),
-            "curriculum_termination_reason": termination_reason,
-        },
-        last_model_path,
-    )
-    log(f"Saved last checkpoint: {last_model_path}")
-
-    final_reward_primary, final_success_primary = evaluate_policy(
-        online, env, num_episodes=eval_episodes, epsilon=eval_eps_primary
-    )
-    if run_eval_eps0:
-        final_reward_eps0, final_success_eps0 = evaluate_policy(
-            online, env, num_episodes=eval_episodes, epsilon=eval_eps0
-        )
-        log(
-            f"Final evaluation over {eval_episodes} episodes | Stage: {stage_id}, StageNodes: {len(stage_nodes)}, "
-            f"FullNodes: {full_graph.number_of_nodes()} | "
-            f"eps={eval_eps_primary:.2f} MeanReward: {final_reward_primary:.2f}, SuccessRate: {final_success_primary:.2%} | "
-            f"eps={eval_eps0:.2f} MeanReward: {final_reward_eps0:.2f}, SuccessRate: {final_success_eps0:.2%}"
-        )
-    else:
-        log(
-            f"Final evaluation over {eval_episodes} episodes | Stage: {stage_id}, StageNodes: {len(stage_nodes)}, "
-            f"FullNodes: {full_graph.number_of_nodes()} | "
-            f"eps={eval_eps_primary:.2f} MeanReward: {final_reward_primary:.2f}, SuccessRate: {final_success_primary:.2%}"
-        )
-    log(
-        f"Curriculum summary | Termination: {termination_reason}, Episodes: {global_episode}, "
-        f"BestEval Episode: {best_episode}, BestSuccess: {best_eval_success:.2%}, BestReward: {best_eval_reward:.2f}"
-    )
-
-
 # =========================
 # Training
 # =========================
-def train(
-    config_path=CONFIG_PATH_DEFAULT,
-    config_overrides=None,
-    curriculum_config_path=CURRICULUM_CONFIG_PATH_DEFAULT,
-    curriculum_overrides=None,
-):
+def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
     cfg = load_config(config_path)
     if config_overrides:
         cfg = deep_update(cfg, config_overrides)
-    curriculum_cfg = load_curriculum_config(curriculum_config_path)
-    if curriculum_overrides:
-        curriculum_cfg = deep_update(curriculum_cfg, curriculum_overrides)
 
     set_seed(cfg["seed"])
     apply_runtime_config(cfg)
@@ -1275,10 +752,6 @@ def train(
         run_log_fp.flush()
 
     try:
-        if bool(curriculum_cfg.get("enabled", False)):
-            _run_curriculum_training(cfg, curriculum_cfg, log, config_path=str(config_path))
-            return
-
         base_graph = create_base_graph(
             num_nodes=int(graph_cfg["num_nodes"]),
             min_nodes=int(graph_cfg["min_nodes"]),
@@ -1301,7 +774,7 @@ def train(
         online = DQN(
             env.state_dim,
             env.action_dim,
-            num_nodes=env.embedding_num_nodes,
+            num_nodes=env.num_nodes,
             num_delivery_slots=env.num_deliveries,
             hidden_sizes=tuple(model_cfg["hidden_sizes"]),
             node_embedding_dim=int(model_cfg.get("node_embedding_dim", 16)),
@@ -1309,7 +782,7 @@ def train(
         target = DQN(
             env.state_dim,
             env.action_dim,
-            num_nodes=env.embedding_num_nodes,
+            num_nodes=env.num_nodes,
             num_delivery_slots=env.num_deliveries,
             hidden_sizes=tuple(model_cfg["hidden_sizes"]),
             node_embedding_dim=int(model_cfg.get("node_embedding_dim", 16)),
@@ -1365,9 +838,8 @@ def train(
         eval_every = int(train_cfg["eval_every"])
 
         eval_episodes = int(eval_cfg["episodes"])
-        eval_eps_primary = float(eval_cfg.get("epsilon_primary", 0.05))
-        run_eval_eps0 = bool(eval_cfg.get("run_epsilon_greedy_eval", False))
-        eval_eps0 = float(eval_cfg.get("epsilon_greedy", 0.0))
+        eval_eps0 = float(eval_cfg["epsilon_greedy"])
+        eval_eps_noise = float(eval_cfg["epsilon_noisy"])
 
         train_steps = 0
         reward_history = []
@@ -1493,29 +965,23 @@ def train(
                 )
 
             if (episode + 1) % eval_every == 0:
-                eval_reward_primary, eval_success_primary = evaluate_policy(
-                    online, env, num_episodes=eval_episodes, epsilon=eval_eps_primary
+                eval_reward_eps0, eval_success_eps0 = evaluate_policy(
+                    online, env, num_episodes=eval_episodes, epsilon=eval_eps0
                 )
-                if run_eval_eps0:
-                    eval_reward_eps0, eval_success_eps0 = evaluate_policy(
-                        online, env, num_episodes=eval_episodes, epsilon=eval_eps0
-                    )
-                    log(
-                        f"[Eval @ Episode {episode + 1}] "
-                        f"eps={eval_eps_primary:.2f} -> MeanReward: {eval_reward_primary:.2f}, SuccessRate: {eval_success_primary:.2%} | "
-                        f"eps={eval_eps0:.2f} -> MeanReward: {eval_reward_eps0:.2f}, SuccessRate: {eval_success_eps0:.2%}"
-                    )
-                else:
-                    log(
-                        f"[Eval @ Episode {episode + 1}] "
-                        f"eps={eval_eps_primary:.2f} -> MeanReward: {eval_reward_primary:.2f}, SuccessRate: {eval_success_primary:.2%}"
-                    )
+                eval_reward_epsn, eval_success_epsn = evaluate_policy(
+                    online, env, num_episodes=eval_episodes, epsilon=eval_eps_noise
+                )
+                log(
+                    f"[Eval @ Episode {episode + 1}] "
+                    f"eps={eval_eps0:.2f} -> MeanReward: {eval_reward_eps0:.2f}, SuccessRate: {eval_success_eps0:.2%} | "
+                    f"eps={eval_eps_noise:.2f} -> MeanReward: {eval_reward_epsn:.2f}, SuccessRate: {eval_success_epsn:.2%}"
+                )
 
-                if (eval_success_primary > best_eval_success) or (
-                    eval_success_primary == best_eval_success and eval_reward_primary > best_eval_reward
+                if (eval_success_eps0 > best_eval_success) or (
+                    eval_success_eps0 == best_eval_success and eval_reward_eps0 > best_eval_reward
                 ):
-                    best_eval_success = eval_success_primary
-                    best_eval_reward = eval_reward_primary
+                    best_eval_success = eval_success_eps0
+                    best_eval_reward = eval_reward_eps0
                     best_episode = episode + 1
                     torch.save(
                         {
@@ -1556,23 +1022,17 @@ def train(
         )
         log(f"Saved last checkpoint: {last_model_path}")
 
-        final_reward_primary, final_success_primary = evaluate_policy(
-            online, env, num_episodes=eval_episodes, epsilon=eval_eps_primary
+        final_reward_eps0, final_success_eps0 = evaluate_policy(
+            online, env, num_episodes=eval_episodes, epsilon=eval_eps0
         )
-        if run_eval_eps0:
-            final_reward_eps0, final_success_eps0 = evaluate_policy(
-                online, env, num_episodes=eval_episodes, epsilon=eval_eps0
-            )
-            log(
-                f"Evaluation over {eval_episodes} episodes | "
-                f"eps={eval_eps_primary:.2f} MeanReward: {final_reward_primary:.2f}, SuccessRate: {final_success_primary:.2%} | "
-                f"eps={eval_eps0:.2f} MeanReward: {final_reward_eps0:.2f}, SuccessRate: {final_success_eps0:.2%}"
-            )
-        else:
-            log(
-                f"Evaluation over {eval_episodes} episodes | "
-                f"eps={eval_eps_primary:.2f} MeanReward: {final_reward_primary:.2f}, SuccessRate: {final_success_primary:.2%}"
-            )
+        final_reward_epsn, final_success_epsn = evaluate_policy(
+            online, env, num_episodes=eval_episodes, epsilon=eval_eps_noise
+        )
+        log(
+            f"Evaluation over {eval_episodes} episodes | "
+            f"eps={eval_eps0:.2f} MeanReward: {final_reward_eps0:.2f}, SuccessRate: {final_success_eps0:.2%} | "
+            f"eps={eval_eps_noise:.2f} MeanReward: {final_reward_epsn:.2f}, SuccessRate: {final_success_epsn:.2%}"
+        )
         log(
             f"Best checkpoint summary | Episode: {best_episode}, "
             f"PrimaryEval MeanReward: {best_eval_reward:.2f}, SuccessRate: {best_eval_success:.2%}"
@@ -1590,14 +1050,5 @@ if __name__ == "__main__":
         default=CONFIG_PATH_DEFAULT,
         help="Path to config JSON (default: configs/experiment_config.json).",
     )
-    parser.add_argument(
-        "--curriculum-config",
-        type=str,
-        default=CURRICULUM_CONFIG_PATH_DEFAULT,
-        help="Path to curriculum config JSON (default: configs/curriculum_config.json).",
-    )
     args = parser.parse_args()
-    train(config_path=args.config, curriculum_config_path=args.curriculum_config)
-
-# set "enabled": true in the curriculum config to run curriculum training instead of standard training
-# run python mock_rl_routing_curriculum.py --config configs/no_hazard_config.json --curriculum-config configs/curriculum_config.json
+    train(config_path=args.config)
