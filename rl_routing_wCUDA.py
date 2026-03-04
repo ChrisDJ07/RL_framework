@@ -116,6 +116,7 @@ DEFAULT_CONFIG = {
         "num_episodes": 1500,
         "gamma": 0.99,
         "lr": 3e-4,
+        "device": "auto", # "auto", "cpu", "cuda"
         "batch_size": 32,
         "epsilon_start": 1.0,
         "epsilon_min": 0.05,
@@ -136,7 +137,7 @@ DEFAULT_CONFIG = {
     },
     "paths": {
         "checkpoints_dir": "checkpoints",
-        "runs_dir": "results",
+        "runs_dir": "results/runs/",
         "run_log_file": "last_run.txt",
     },
 }
@@ -163,6 +164,20 @@ def set_seed(seed):
     random.seed(SEED)
     np.random.seed(SEED)
     torch.manual_seed(SEED)
+
+
+def resolve_device(train_cfg):
+    requested = str(train_cfg.get("device", "auto")).strip().lower()
+    if requested == "auto":
+        return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    if requested == "cpu":
+        return torch.device("cpu")
+    if requested.startswith("cuda"):
+        if torch.cuda.is_available():
+            return torch.device(requested)
+        print(f"Warning: requested device '{requested}' but CUDA is unavailable. Falling back to CPU.")
+        return torch.device("cpu")
+    raise ValueError(f"Unsupported training.device value: {requested}. Use one of: auto, cpu, cuda, cuda:0, ...")
 
 
 def deep_update(base, override):
@@ -643,20 +658,22 @@ class ReplayBuffer:
 
 
 def select_action(model, state, mask, epsilon):
+    model_device = next(model.parameters()).device
+    mask = mask.to(model_device)
     valid_actions = torch.where(mask == 1)[0]
     if valid_actions.numel() == 0:
         return None
     if random.random() < epsilon:
-        return random.choice(valid_actions).item()
+        return int(random.choice(valid_actions.tolist()))
     with torch.no_grad():
         q_values = model(
-            state["state_vec"].unsqueeze(0),
-            state["current_idx"].unsqueeze(0),
-            state["unvisited_idx"].unsqueeze(0),
-            state["unvisited_mask"].unsqueeze(0),
+            state["state_vec"].unsqueeze(0).to(model_device),
+            state["current_idx"].unsqueeze(0).to(model_device),
+            state["unvisited_idx"].unsqueeze(0).to(model_device),
+            state["unvisited_mask"].unsqueeze(0).to(model_device),
         ).squeeze(0).clone()
         q_values[mask == 0] = -1e9
-        return torch.argmax(q_values).item()
+        return int(torch.argmax(q_values).item())
 
 
 def update_epsilon(
@@ -736,6 +753,7 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
     train_cfg = cfg["training"]
     eval_cfg = cfg["evaluation"]
     paths_cfg = cfg["paths"]
+    device = resolve_device(train_cfg)
 
     runs_dir = Path(paths_cfg.get("runs_dir", "results"))
     run_log_file = str(paths_cfg.get("run_log_file", "last_run.txt"))
@@ -788,6 +806,8 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
             node_embedding_dim=int(model_cfg.get("node_embedding_dim", 16)),
         )
         target.load_state_dict(online.state_dict())
+        online.to(device)
+        target.to(device)
 
         optimizer = optim.Adam(online.parameters(), lr=float(train_cfg["lr"]))
         buffer = ReplayBuffer(capacity=int(replay_cfg["capacity"]))
@@ -857,7 +877,7 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
             f"Graph stats | Nodes: {env.num_nodes}, Edges: {base_graph.number_of_edges()}, "
             f"AvgBaseTime: {env.avg_base_time:.4f}, AvgHazard: {env.avg_edge_hazard:.4f}, "
             f"StateDim: {env.state_dim}, ActionDim: {env.action_dim}, Tmax(min): {env.max_elapsed_time:.2f}, "
-            f"Deliveries: {env.num_deliveries}"
+            f"Deliveries: {env.num_deliveries}, Device: {device}"
         )
 
         for episode in range(num_episodes):
@@ -909,6 +929,18 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
                         dones,
                         next_masks,
                     ) = buffer.sample(batch_size)
+                    state_vecs = state_vecs.to(device)
+                    current_idxs = current_idxs.to(device)
+                    unvisited_idxs = unvisited_idxs.to(device)
+                    unvisited_masks = unvisited_masks.to(device)
+                    actions = actions.to(device)
+                    rewards = rewards.to(device)
+                    next_state_vecs = next_state_vecs.to(device)
+                    next_current_idxs = next_current_idxs.to(device)
+                    next_unvisited_idxs = next_unvisited_idxs.to(device)
+                    next_unvisited_masks = next_unvisited_masks.to(device)
+                    dones = dones.to(device)
+                    next_masks = next_masks.to(device)
 
                     q_values = online(state_vecs, current_idxs, unvisited_idxs, unvisited_masks)
                     q_selected = q_values.gather(1, actions.unsqueeze(1)).squeeze()
@@ -1052,3 +1084,6 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     train(config_path=args.config)
+
+# python rl_routing_wCUDA.py --config configs/no_hazard_training/no_hazard_config.json
+# python rl_routing_wCUDA.py --config configs/no_hazard_training/no_hazard_config_control.json

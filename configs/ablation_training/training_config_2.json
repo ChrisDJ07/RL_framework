@@ -5,7 +5,7 @@
     "min_nodes": 100,
     "max_nodes": 100,
     "force_download": false,
-    "prebuilt_graphml_path": "data/selected_subgraph_n100.graphml",
+    "prebuilt_graphml_path": "data/subgraphs/selected_subgraph_n100.graphml",
     "use_existing_hazards": true,
     "flood_attr": "flood_hazard",
     "landslide_attr": "landslide_hazard",
@@ -79,30 +79,30 @@
   },
   "model": {
     "hidden_sizes": [
-      64,
+      128,
       64
     ],
     "node_embedding_dim": 32
   },
   "replay": {
-    "capacity": 12000
+    "capacity": 20000
   },
   "training": {
-    "num_episodes": 12000,
+    "num_episodes": 20000,
     "gamma": 0.99,
-    "lr": 0.001,
-    "batch_size": 32,
+    "lr": 0.0003,
+    "batch_size": 64,
     "epsilon_start": 1.0,
     "epsilon_min": 0.05,
     "epsilon_decay": 0.995,
-    "target_update_every_steps": 300,
+    "target_update_every_steps": 500,
     "log_every": 50,
-    "eval_every": 150,
+    "eval_every": 250,
     "use_pretrained_model": false,
     "pretrained_model_path": "",
     "resume_optimizer": false,
     "epsilon_schedule": "exp",
-    "epsilon_exp_decay_rate": 0.00045,
+    "epsilon_exp_decay_rate": 0.0003,
     "device": "auto"
   },
   "evaluation": {
@@ -113,8 +113,8 @@
     "epsilon_noisy": 0.05
   },
   "paths": {
-    "checkpoints_dir": "checkpoints/training_config_3",
-    "runs_dir": "results",
-    "run_log_file": "training_config_3.txt"
+    "checkpoints_dir": "checkpoints/training_config_2",
+    "runs_dir": "results/runs/",
+    "run_log_file": "training_config_2.txt"
   }
 }

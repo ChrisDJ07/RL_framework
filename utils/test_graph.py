@@ -1,3 +1,10 @@
+"""
+Test and visualize the raw OSM graph and the processed RL graph to ensure correct construction
+and hazard attribute assignment. This script can also be used to verify that pre-built GraphML 
+files are correctly loaded and visualized. It provides command-line options to specify the number 
+of nodes, whether to force re-download.
+"""
+
 import random
 import argparse
 from pathlib import Path
