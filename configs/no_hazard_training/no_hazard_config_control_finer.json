@@ -73,7 +73,7 @@
     "w_flood": 0.0,
     "w_landslide": 0.0,
     "eta_time": 0.2,
-    "step_cost": 0.5,
+    "step_cost": 0.05,
     "penalty_timeout": -120.0,
     "penalty_incomplete_per_delivery": -20.0
   },
@@ -112,8 +112,8 @@
     "epsilon_noisy": 0.05
   },
   "paths": {
-    "checkpoints_dir": "checkpoints/best_model_further",
-    "runs_dir": "results",
-    "run_log_file": "last_run_further.txt"
+    "checkpoints_dir": "checkpoints/best_model_finer",
+    "runs_dir": "results/runs/",
+    "run_log_file": "last_run_finer.txt"
   }
 }
