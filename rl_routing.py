@@ -752,6 +752,25 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
         run_log_fp.flush()
 
     try:
+        config_path_resolved = str(Path(config_path).resolve())
+        configured_step_cost = float(reward_cfg.get("step_cost", 0.2))
+        if configured_step_cost < 0.0:
+            raise ValueError(f"reward.step_cost must be >= 0.0, got {configured_step_cost}")
+
+        use_pretrained = bool(train_cfg.get("use_pretrained_model", False))
+        pretrained_model_path = str(train_cfg.get("pretrained_model_path", "") or "").strip()
+        resume_optimizer = bool(train_cfg.get("resume_optimizer", False))
+        log(
+            "Run config | "
+            f"config_path={config_path_resolved} | "
+            f"seed={cfg['seed']} | "
+            f"num_deliveries={env_cfg.get('num_deliveries')} | "
+            f"step_cost={configured_step_cost} | "
+            f"use_pretrained_model={use_pretrained} | "
+            f"pretrained_model_path={pretrained_model_path if pretrained_model_path else '<none>'} | "
+            f"resume_optimizer={resume_optimizer}"
+        )
+
         base_graph = create_base_graph(
             num_nodes=int(graph_cfg["num_nodes"]),
             min_nodes=int(graph_cfg["min_nodes"]),
@@ -792,10 +811,6 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
         optimizer = optim.Adam(online.parameters(), lr=float(train_cfg["lr"]))
         buffer = ReplayBuffer(capacity=int(replay_cfg["capacity"]))
 
-        use_pretrained = bool(train_cfg.get("use_pretrained_model", False))
-        pretrained_model_path = str(train_cfg.get("pretrained_model_path", "") or "").strip()
-        resume_optimizer = bool(train_cfg.get("resume_optimizer", False))
-
         if use_pretrained:
             if not pretrained_model_path:
                 raise ValueError("training.use_pretrained_model=True but training.pretrained_model_path is empty.")
@@ -809,6 +824,9 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
                 model_state = checkpoint["model_state_dict"]
             else:
                 model_state = checkpoint
+            checkpoint_config_path = ""
+            if isinstance(checkpoint, dict):
+                checkpoint_config_path = str(checkpoint.get("config_path", "") or "").strip()
 
             missing_keys, unexpected_keys = online.load_state_dict(model_state, strict=False)
             target.load_state_dict(online.state_dict())
@@ -816,6 +834,14 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
                 f"Loaded pretrained model: {ckpt_path} | "
                 f"MissingKeys: {len(missing_keys)}, UnexpectedKeys: {len(unexpected_keys)}"
             )
+            if checkpoint_config_path:
+                log(f"Pretrained checkpoint config_path: {checkpoint_config_path}")
+                checkpoint_config_path_resolved = str(Path(checkpoint_config_path).resolve())
+                if checkpoint_config_path_resolved != config_path_resolved:
+                    log(
+                        "WARNING: current run config_path differs from checkpoint config_path. "
+                        "This is valid for transfer/fine-tuning, but verify this is intentional."
+                    )
 
             if resume_optimizer and isinstance(checkpoint, dict) and "optimizer_state_dict" in checkpoint:
                 optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
@@ -996,6 +1022,7 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
                             "seed": SEED,
                             "model_variant": "spatial_neighbor_head",
                             "config_path": str(config_path),
+                            "config_path_resolved": config_path_resolved,
                             "base_graph_node_link": base_graph_node_link,
                         },
                         best_model_path,
@@ -1016,6 +1043,7 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
                 "seed": SEED,
                 "model_variant": "spatial_neighbor_head",
                 "config_path": str(config_path),
+                "config_path_resolved": config_path_resolved,
                 "base_graph_node_link": base_graph_node_link,
             },
             last_model_path,

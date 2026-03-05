@@ -1,11 +1,11 @@
 {
   "seed": 40,
   "graph": {
-    "num_nodes": 100,
-    "min_nodes": 100,
-    "max_nodes": 100,
+    "num_nodes": 150,
+    "min_nodes": 150,
+    "max_nodes": 150,
     "force_download": false,
-    "prebuilt_graphml_path": "data/subgraphs/selected_subgraph_n100.graphml",
+    "prebuilt_graphml_path": "data/staged_subgraphs/selected_subgraph_n150.graphml",
     "use_existing_hazards": true,
     "flood_attr": "flood_hazard",
     "landslide_attr": "landslide_hazard",
@@ -13,9 +13,9 @@
   },
   "environment": {
     "num_deliveries": 2,
-    "min_max_steps": 120,
-    "max_steps_multiplier": 0.3,
-    "episode_time_scale": 6.0
+    "min_max_steps": 180,
+    "max_steps_multiplier": 0.6,
+    "episode_time_scale": 7.0
   },
   "hazard": {
     "rain_levels": {
@@ -39,20 +39,6 @@
         "flood_block_prob": 0.6,
         "landslide_block_threshold": 0.8,
         "landslide_block_prob": 0.15
-      },
-      "RI4": {
-        "speed_mult": 0.4,
-        "flood_block_threshold": 0.6,
-        "flood_block_prob": 0.9,
-        "landslide_block_threshold": 0.5,
-        "landslide_block_prob": 0.3
-      },
-      "RI5": {
-        "speed_mult": 0.2,
-        "flood_block_threshold": 0.2,
-        "flood_block_prob": 1.0,
-        "landslide_block_threshold": 0.5,
-        "landslide_block_prob": 1.0
       }
     },
     "active_rain_keys": [
@@ -75,6 +61,7 @@
     "eta_time": 0.2,
     "step_cost": 0.05,
     "penalty_timeout": -120.0,
+    "penalty_blockage": -120.0,
     "penalty_incomplete_per_delivery": -20.0
   },
   "model": {
@@ -85,49 +72,35 @@
     "node_embedding_dim": 32
   },
   "replay": {
-    "capacity": 10000
+    "capacity": 40000
   },
   "training": {
-    "num_episodes": 30000,
+    "num_episodes": 16000,
     "gamma": 0.99,
-    "lr": 0.0003,
-    "batch_size": 64,
-    "epsilon_start": 1.0,
+    "lr": 0.00015,
+    "batch_size": 128,
+    "epsilon_start": 0.25,
     "epsilon_min": 0.05,
     "epsilon_decay": 0.995,
+    "epsilon_schedule": "exp",
+    "epsilon_exp_decay_rate": 0.00017,
     "target_update_every_steps": 500,
     "log_every": 50,
     "eval_every": 200,
-    "use_pretrained_model": false,
-    "pretrained_model_path": "",
-    "resume_optimizer": false,
-    "epsilon_schedule": "exp",
-    "epsilon_exp_decay_rate": 0.00015
+    "use_pretrained_model": true,
+    "pretrained_model_path": "checkpoints/staged_training/stage_100/best_model.pt",
+    "resume_optimizer": true
   },
   "evaluation": {
-    "episodes": 100,
+    "episodes": 200,
     "epsilon_primary": 0.05,
     "run_epsilon_greedy_eval": true,
     "epsilon_greedy": 0.0,
     "epsilon_noisy": 0.05
   },
   "paths": {
-    "checkpoints_dir": "checkpoints/no_hazard_control",
-    "runs_dir": "results/runs/",
-    "run_log_file": "last_run_control_BC.txt"
-  },
-  "behavior_cloning": {
-    "enabled": true,
-    "expert_weight": "travel_time",
-    "demo_episodes": 200,
-    "max_demo_steps_per_episode": 0,
-    "prefill_replay": true,
-    "prefill_limit": 20000,
-    "pretrain_steps": 2000,
-    "batch_size": 128,
-    "lr": 0.0003,
-    "aux_loss_weight_start": 0.2,
-    "aux_loss_decay": 0.9995,
-    "aux_loss_weight_min": 0.0
+    "checkpoints_dir": "checkpoints/staged_training/stage_150",
+    "runs_dir": "results/runs/staged_training",
+    "run_log_file": "last_run_stage_150.txt"
   }
 }
