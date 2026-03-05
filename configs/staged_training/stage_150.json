@@ -89,7 +89,11 @@
     "eval_every": 200,
     "use_pretrained_model": true,
     "pretrained_model_path": "checkpoints/staged_training/stage_100/best_model.pt",
-    "resume_optimizer": true
+    "resume_optimizer": true,
+        
+    "resume_training": false,
+    "resume_checkpoint_path": "",
+    "save_last_every_episodes": 400
   },
   "evaluation": {
     "episodes": 200,

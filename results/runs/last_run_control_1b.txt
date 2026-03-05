@@ -1,1 +1,0 @@
-Graph stats | Nodes: 100, Edges: 102, AvgBaseTime: 0.3556, AvgHazard: 0.5961, StateDim: 40, ActionDim: 4, Tmax(min): 1706.70, Deliveries: 2, Device: cuda
