@@ -1212,8 +1212,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     train(config_path=args.config)
 
-# python rl_routing_wCUDA.py --config configs/no_hazard_training/no_hazard_config.json
-# python rl_routing_wCUDA.py --config configs/no_hazard_training/no_hazard_config_control.json
+# python rl_routing_wCUDA_wCheckP.py --config configs/no_hazard_training/no_hazard_config.json
+# python rl_routing_wCUDA_wCheckP.py --config configs/no_hazard_training/no_hazard_config_control.json
 
 """ 
 1. First run

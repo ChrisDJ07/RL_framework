@@ -1,0 +1,42 @@
+Run config | config_path=C:\Users\japaullu.tsis\Desktop\projects\RL_framework\configs\no_hazard_training\no_hazard_config_control_1c.json | seed=40 | num_deliveries=2 | step_cost=0.05 | resume_training=False | resume_checkpoint_path=checkpoints\no_hazard_control_1c\last_model.pt | use_pretrained_model=False | pretrained_model_path=<none> | resume_optimizer=False
+Graph stats | Nodes: 100, Edges: 102, AvgBaseTime: 0.3556, AvgHazard: 0.5961, StateDim: 40, ActionDim: 4, Tmax(min): 1706.70, Deliveries: 2, Device: cuda
+Episode 50, LastReward: -90.77, AvgReward(50): -95.83, SuccessRate(50): 12.00%, Epsilon: 0.991
+Episode 100, LastReward: -169.51, AvgReward(50): -118.32, SuccessRate(50): 6.00%, Epsilon: 0.983
+Episode 150, LastReward: -99.69, AvgReward(50): -141.60, SuccessRate(50): 2.00%, Epsilon: 0.975
+Episode 200, LastReward: -169.44, AvgReward(50): -129.63, SuccessRate(50): 2.00%, Epsilon: 0.966
+[Eval @ Episode 200] eps=0.00 -> MeanReward: -166.55, SuccessRate: 0.00% | eps=0.05 -> MeanReward: -156.66, SuccessRate: 1.00%
+Saved best checkpoint: checkpoints\no_hazard_control_1c\best_model.pt (episode 200, success=0.00%, reward=-166.55)
+Episode 250, LastReward: 232.97, AvgReward(50): -120.08, SuccessRate(50): 6.00%, Epsilon: 0.958
+Episode 300, LastReward: -171.80, AvgReward(50): -109.50, SuccessRate(50): 8.00%, Epsilon: 0.950
+Episode 350, LastReward: -169.40, AvgReward(50): -126.76, SuccessRate(50): 4.00%, Epsilon: 0.942
+Episode 400, LastReward: -171.71, AvgReward(50): -136.86, SuccessRate(50): 4.00%, Epsilon: 0.934
+[Eval @ Episode 400] eps=0.00 -> MeanReward: -167.63, SuccessRate: 1.00% | eps=0.05 -> MeanReward: -162.18, SuccessRate: 0.00%
+Saved best checkpoint: checkpoints\no_hazard_control_1c\best_model.pt (episode 400, success=1.00%, reward=-167.63)
+Saved resumable checkpoint: checkpoints\no_hazard_control_1c\last_model.pt (episode 400)
+Episode 450, LastReward: -94.25, AvgReward(50): -94.74, SuccessRate(50): 12.00%, Epsilon: 0.926
+Episode 500, LastReward: 233.86, AvgReward(50): -117.57, SuccessRate(50): 6.00%, Epsilon: 0.918
+Episode 550, LastReward: -96.71, AvgReward(50): -125.21, SuccessRate(50): 4.00%, Epsilon: 0.910
+Episode 600, LastReward: -89.46, AvgReward(50): -101.90, SuccessRate(50): 10.00%, Epsilon: 0.903
+[Eval @ Episode 600] eps=0.00 -> MeanReward: -159.94, SuccessRate: 2.00% | eps=0.05 -> MeanReward: -163.71, SuccessRate: 0.00%
+Saved best checkpoint: checkpoints\no_hazard_control_1c\best_model.pt (episode 600, success=2.00%, reward=-159.94)
+Episode 650, LastReward: -174.75, AvgReward(50): -99.20, SuccessRate(50): 10.00%, Epsilon: 0.895
+Episode 700, LastReward: -174.56, AvgReward(50): -129.99, SuccessRate(50): 2.00%, Epsilon: 0.888
+Episode 750, LastReward: -100.54, AvgReward(50): -113.06, SuccessRate(50): 6.00%, Epsilon: 0.880
+Episode 800, LastReward: -94.36, AvgReward(50): -125.28, SuccessRate(50): 6.00%, Epsilon: 0.873
+[Eval @ Episode 800] eps=0.00 -> MeanReward: -168.45, SuccessRate: 0.00% | eps=0.05 -> MeanReward: -165.20, SuccessRate: 0.00%
+Saved resumable checkpoint: checkpoints\no_hazard_control_1c\last_model.pt (episode 800)
+Episode 850, LastReward: -92.27, AvgReward(50): -132.98, SuccessRate(50): 4.00%, Epsilon: 0.865
+Episode 900, LastReward: -175.53, AvgReward(50): -109.01, SuccessRate(50): 10.00%, Epsilon: 0.858
+Episode 950, LastReward: 234.28, AvgReward(50): -104.93, SuccessRate(50): 12.00%, Epsilon: 0.851
+Episode 1000, LastReward: -171.12, AvgReward(50): -125.35, SuccessRate(50): 6.00%, Epsilon: 0.844
+[Eval @ Episode 1000] eps=0.00 -> MeanReward: -165.41, SuccessRate: 0.00% | eps=0.05 -> MeanReward: -153.55, SuccessRate: 3.00%
+Episode 1050, LastReward: -174.86, AvgReward(50): -85.92, SuccessRate(50): 10.00%, Epsilon: 0.836
+Episode 1100, LastReward: -101.11, AvgReward(50): -87.50, SuccessRate(50): 14.00%, Epsilon: 0.829
+Episode 1150, LastReward: -175.82, AvgReward(50): -119.58, SuccessRate(50): 6.00%, Epsilon: 0.822
+Episode 1200, LastReward: 228.51, AvgReward(50): -124.50, SuccessRate(50): 4.00%, Epsilon: 0.815
+[Eval @ Episode 1200] eps=0.00 -> MeanReward: -163.19, SuccessRate: 0.00% | eps=0.05 -> MeanReward: -157.09, SuccessRate: 1.00%
+Saved resumable checkpoint: checkpoints\no_hazard_control_1c\last_model.pt (episode 1200)
+Episode 1250, LastReward: -172.25, AvgReward(50): -87.35, SuccessRate(50): 14.00%, Epsilon: 0.809
+Training interrupted by user. Saving resumable checkpoint...
+Saved resumable checkpoint: checkpoints\no_hazard_control_1c\last_model.pt (episode 1250, epsilon=0.809).
+Resume by setting training.resume_training=true.

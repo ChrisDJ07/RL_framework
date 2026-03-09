@@ -103,7 +103,11 @@
     "pretrained_model_path": "",
     "resume_optimizer": false,
     "epsilon_schedule": "exp",
-    "epsilon_exp_decay_rate": 0.00012
+    "epsilon_exp_decay_rate": 0.00012,
+      
+    "resume_training": true,
+    "resume_checkpoint_path": "checkpoints/no_hazard_control_1b/best_model.pt",
+    "save_last_every_episodes": 400
   },
   "evaluation": {
     "episodes": 100,
