@@ -780,6 +780,55 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
         run_log_fp.write(f"{msg}\n")
         run_log_fp.flush()
 
+    def _load_model_state_with_transfer(model, incoming_state, allow_partial_node_embedding=False):
+        """
+        Load a checkpoint state dict into `model` while tolerating selected shape changes.
+
+        If `allow_partial_node_embedding=True`, `node_embedding.weight` is warm-started by
+        copying overlapping rows when row count changes but embedding dim matches.
+        """
+        if not isinstance(incoming_state, dict):
+            raise TypeError("incoming_state must be a state_dict-like dict.")
+
+        model_state = model.state_dict()
+        filtered_state = {}
+        skipped_mismatch = []
+        partial_transfer = []
+
+        for key, src_val in incoming_state.items():
+            if key not in model_state:
+                continue
+            dst_val = model_state[key]
+            if not torch.is_tensor(src_val):
+                continue
+
+            if tuple(src_val.shape) == tuple(dst_val.shape):
+                filtered_state[key] = src_val
+                continue
+
+            if (
+                allow_partial_node_embedding
+                and key == "node_embedding.weight"
+                and src_val.ndim == 2
+                and dst_val.ndim == 2
+                and int(src_val.shape[1]) == int(dst_val.shape[1])
+            ):
+                rows_to_copy = min(int(src_val.shape[0]), int(dst_val.shape[0]))
+                merged = dst_val.detach().clone()
+                merged[:rows_to_copy] = src_val[:rows_to_copy].to(dtype=dst_val.dtype)
+                filtered_state[key] = merged
+                partial_transfer.append(
+                    f"{key}: copied {rows_to_copy}/{dst_val.shape[0]} rows from checkpoint ({src_val.shape[0]} rows)"
+                )
+                continue
+
+            skipped_mismatch.append(
+                f"{key}: checkpoint{tuple(src_val.shape)} != model{tuple(dst_val.shape)}"
+            )
+
+        missing_keys, unexpected_keys = model.load_state_dict(filtered_state, strict=False)
+        return missing_keys, unexpected_keys, skipped_mismatch, partial_transfer
+
     try:
         config_path_resolved = str(Path(config_path).resolve())
         configured_step_cost = float(reward_cfg.get("step_cost", 0.2))
@@ -913,6 +962,7 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
                 "config_path": str(config_path),
                 "config_path_resolved": config_path_resolved,
                 "base_graph_node_link": base_graph_node_link,
+                "graph_node_ids": [int(n) for n in base_graph.nodes()],
             }
 
         if resume_training:
@@ -929,10 +979,24 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
             else:
                 model_state = checkpoint
 
-            missing_keys, unexpected_keys = online.load_state_dict(model_state, strict=False)
+            missing_keys, unexpected_keys, skipped_mismatch, partial_transfer = _load_model_state_with_transfer(
+                online, model_state, allow_partial_node_embedding=False
+            )
+            if skipped_mismatch:
+                raise RuntimeError(
+                    "Resume checkpoint is incompatible with current model shape. "
+                    f"First mismatch: {skipped_mismatch[0]}"
+                )
+            if partial_transfer:
+                log(f"Resume partial transfer: {partial_transfer[0]}")
             target_state = checkpoint.get("target_state_dict") if isinstance(checkpoint, dict) else None
             if isinstance(target_state, dict):
-                target.load_state_dict(target_state, strict=False)
+                _, _, target_skipped, _ = _load_model_state_with_transfer(
+                    target, target_state, allow_partial_node_embedding=False
+                )
+                if target_skipped:
+                    target.load_state_dict(online.state_dict())
+                    log("WARNING: target_state_dict incompatible on resume; cloned online weights into target.")
             else:
                 target.load_state_dict(online.state_dict())
 
@@ -992,12 +1056,27 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
             if isinstance(checkpoint, dict):
                 checkpoint_config_path = str(checkpoint.get("config_path", "") or "").strip()
 
-            missing_keys, unexpected_keys = online.load_state_dict(model_state, strict=False)
+            (
+                missing_keys,
+                unexpected_keys,
+                skipped_mismatch,
+                partial_transfer,
+            ) = _load_model_state_with_transfer(
+                online, model_state, allow_partial_node_embedding=True
+            )
             target.load_state_dict(online.state_dict())
             log(
                 f"Loaded pretrained model: {ckpt_path} | "
                 f"MissingKeys: {len(missing_keys)}, UnexpectedKeys: {len(unexpected_keys)}"
             )
+            if partial_transfer:
+                for msg in partial_transfer:
+                    log(f"Pretrained partial transfer: {msg}")
+            if skipped_mismatch:
+                log(
+                    "WARNING: skipped incompatible pretrained tensors "
+                    f"(count={len(skipped_mismatch)}). First: {skipped_mismatch[0]}"
+                )
             if checkpoint_config_path:
                 log(f"Pretrained checkpoint config_path: {checkpoint_config_path}")
                 checkpoint_config_path_resolved = str(Path(checkpoint_config_path).resolve())
@@ -1007,9 +1086,17 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
                         "This is valid for transfer/fine-tuning, but verify this is intentional."
                     )
 
+            ckpt_graph_nodes = int(checkpoint.get("graph_num_nodes", -1)) if isinstance(checkpoint, dict) else -1
+            optimizer_compatible = (ckpt_graph_nodes == env.num_nodes) and (len(skipped_mismatch) == 0)
             if resume_optimizer and isinstance(checkpoint, dict) and "optimizer_state_dict" in checkpoint:
-                optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
-                log("Loaded optimizer state from checkpoint (resume_optimizer=True).")
+                if optimizer_compatible:
+                    optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+                    log("Loaded optimizer state from checkpoint (resume_optimizer=True).")
+                else:
+                    log(
+                        "Skipped optimizer state load: checkpoint/model are not shape-compatible "
+                        f"(checkpoint graph nodes={ckpt_graph_nodes}, current graph nodes={env.num_nodes})."
+                    )
 
         log(
             f"Graph stats | Nodes: {env.num_nodes}, Edges: {base_graph.number_of_edges()}, "
