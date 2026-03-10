@@ -89,7 +89,7 @@
     "eval_every": 200,
     "use_pretrained_model": true,
     "pretrained_model_path": "checkpoints/staged_training/stage_control/best_model.pt",
-    "resume_optimizer": true,
+    "resume_optimizer": false,
     
     "resume_training": false,
     "resume_checkpoint_path": "",
@@ -103,8 +103,8 @@
     "epsilon_noisy": 0.05
   },
   "paths": {
-    "checkpoints_dir": "checkpoints/staged_training/stage_100",
+    "checkpoints_dir": "checkpoints/staged_training/stage_100_no_optim",
     "runs_dir": "results/runs/staged_training",
-    "run_log_file": "last_run_stage_100.txt"
+    "run_log_file": "last_run_stage_100_no_optim.txt"
   }
 }
