@@ -363,3 +363,9 @@ if __name__ == "__main__":
     
 # python utils/visualize_routes.py --checkpoint-path checkpoints/no_hazard_control/best_model.pt --save-path results/visualization_runs/my_routes.png
 # python utils/visualize_routes.py --save-path results/visualization_runs/pretrain_routes.png --config-path configs/no_hazard_training/no_hazard_config.json --num-episodes 6 --cols 3
+
+# Nodes: 150
+# python utils/visualize_routes.py --checkpoint-path checkpoints/staged_training/stage_150_further/best_model.pt --save-path results/visualization_runs/my_routes_150_further_test.png --config-path configs/staged_training/stage_150_further.json --num-episodes 1 --cols 1
+
+#Nodes: 200
+# python utils/visualize_routes.py --checkpoint-path checkpoints/stage_control_1_200n_further/best_model.pt --save-path results/visualization_runs/my_routes_200_further_d5_test.png --config-path configs/staged_training/stage_control_1_200n_further.json --num-episodes 1 --cols 1

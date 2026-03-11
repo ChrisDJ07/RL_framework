@@ -708,33 +708,54 @@ def update_epsilon(
     raise ValueError(f"Unsupported epsilon_schedule: {epsilon_schedule}")
 
 
-def evaluate_policy(model, env, num_episodes=100, epsilon=0.0):
+def evaluate_policy(model, env, num_episodes=100, epsilon=0.0, return_reason_counts=False):
     model.eval()
     rewards = []
     successes = 0
+    reason_counts = {}
 
     for _ in range(num_episodes):
         state = env.reset()
         done = False
         total_reward = 0.0
+        reason = None
 
         while not done:
             mask = env.get_action_mask()
             action = select_action(model, state, mask, epsilon)
             if action is None:
                 total_reward += env.failure_penalty("blockage")
+                reason = "no_valid_action"
                 break
 
-            next_state, reward, done, _ = env.step(action)
+            next_state, reward, done, info = env.step(action)
             state = next_state
             total_reward += reward
+            if done:
+                reason = info.get("termination_reason")
 
         rewards.append(total_reward)
-        if len(env.completed) == len(env.delivery_nodes):
+        success = len(env.completed) == len(env.delivery_nodes)
+        if success:
             successes += 1
+        if reason is None:
+            reason = "success" if success else "unknown"
+        reason_counts[reason] = reason_counts.get(reason, 0) + 1
 
     model.train()
-    return float(np.mean(rewards)), successes / max(num_episodes, 1)
+    mean_reward = float(np.mean(rewards))
+    success_rate = successes / max(num_episodes, 1)
+    if return_reason_counts:
+        return mean_reward, success_rate, reason_counts
+    return mean_reward, success_rate
+
+
+def format_reason_counts(reason_counts, total_episodes):
+    if not reason_counts:
+        return "none"
+    total = max(int(total_episodes), 1)
+    ordered = sorted(reason_counts.items(), key=lambda kv: (-kv[1], kv[0]))
+    return ", ".join(f"{k}:{v} ({(v / total) * 100:.1f}%)" for k, v in ordered)
 
 
 # =========================
@@ -1224,16 +1245,29 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
                     )
 
                 if (episode + 1) % eval_every == 0:
-                    eval_reward_eps0, eval_success_eps0 = evaluate_policy(
-                        online, env, num_episodes=eval_episodes, epsilon=eval_eps0
+                    eval_reward_eps0, eval_success_eps0, eval_reasons_eps0 = evaluate_policy(
+                        online,
+                        env,
+                        num_episodes=eval_episodes,
+                        epsilon=eval_eps0,
+                        return_reason_counts=True,
                     )
-                    eval_reward_epsn, eval_success_epsn = evaluate_policy(
-                        online, env, num_episodes=eval_episodes, epsilon=eval_eps_noise
+                    eval_reward_epsn, eval_success_epsn, eval_reasons_epsn = evaluate_policy(
+                        online,
+                        env,
+                        num_episodes=eval_episodes,
+                        epsilon=eval_eps_noise,
+                        return_reason_counts=True,
                     )
                     log(
                         f"[Eval @ Episode {episode + 1}] "
                         f"eps={eval_eps0:.2f} -> MeanReward: {eval_reward_eps0:.2f}, SuccessRate: {eval_success_eps0:.2%} | "
                         f"eps={eval_eps_noise:.2f} -> MeanReward: {eval_reward_epsn:.2f}, SuccessRate: {eval_success_epsn:.2%}"
+                    )
+                    log(
+                        f"[EvalReasons @ Episode {episode + 1}] "
+                        f"eps={eval_eps0:.2f} -> {format_reason_counts(eval_reasons_eps0, eval_episodes)} | "
+                        f"eps={eval_eps_noise:.2f} -> {format_reason_counts(eval_reasons_epsn, eval_episodes)}"
                     )
 
                     if (eval_success_eps0 > best_eval_success) or (
@@ -1268,16 +1302,29 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
         torch.save(_make_checkpoint_payload(num_episodes), last_model_path)
         log(f"Saved last checkpoint: {last_model_path}")
 
-        final_reward_eps0, final_success_eps0 = evaluate_policy(
-            online, env, num_episodes=eval_episodes, epsilon=eval_eps0
+        final_reward_eps0, final_success_eps0, final_reasons_eps0 = evaluate_policy(
+            online,
+            env,
+            num_episodes=eval_episodes,
+            epsilon=eval_eps0,
+            return_reason_counts=True,
         )
-        final_reward_epsn, final_success_epsn = evaluate_policy(
-            online, env, num_episodes=eval_episodes, epsilon=eval_eps_noise
+        final_reward_epsn, final_success_epsn, final_reasons_epsn = evaluate_policy(
+            online,
+            env,
+            num_episodes=eval_episodes,
+            epsilon=eval_eps_noise,
+            return_reason_counts=True,
         )
         log(
             f"Evaluation over {eval_episodes} episodes | "
             f"eps={eval_eps0:.2f} MeanReward: {final_reward_eps0:.2f}, SuccessRate: {final_success_eps0:.2%} | "
             f"eps={eval_eps_noise:.2f} MeanReward: {final_reward_epsn:.2f}, SuccessRate: {final_success_epsn:.2%}"
+        )
+        log(
+            f"Evaluation termination reasons | "
+            f"eps={eval_eps0:.2f}: {format_reason_counts(final_reasons_eps0, eval_episodes)} | "
+            f"eps={eval_eps_noise:.2f}: {format_reason_counts(final_reasons_epsn, eval_episodes)}"
         )
         log(
             f"Best checkpoint summary | Episode: {best_episode}, "
