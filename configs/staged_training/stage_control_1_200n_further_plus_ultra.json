@@ -5,7 +5,7 @@
     "min_nodes": 200,
     "max_nodes": 200,
     "force_download": false,
-    "prebuilt_graphml_path": "data/staged_subgraphs/selected_subgraph_n200.graphml",
+    "prebuilt_graphml_path": "data/subgraphs/selected_subgraph_n200.graphml",
     "use_existing_hazards": true,
     "flood_attr": "flood_hazard",
     "landslide_attr": "landslide_hazard",
@@ -13,9 +13,9 @@
   },
   "environment": {
     "num_deliveries": 2,
-    "min_max_steps": 220,
-    "max_steps_multiplier": 0.7,
-    "episode_time_scale": 8.0
+    "min_max_steps": 120,
+    "max_steps_multiplier": 0.5,
+    "episode_time_scale": 6.0
   },
   "hazard": {
     "rain_levels": {
@@ -39,6 +39,20 @@
         "flood_block_prob": 0.6,
         "landslide_block_threshold": 0.8,
         "landslide_block_prob": 0.15
+      },
+      "RI4": {
+        "speed_mult": 0.4,
+        "flood_block_threshold": 0.6,
+        "flood_block_prob": 0.9,
+        "landslide_block_threshold": 0.5,
+        "landslide_block_prob": 0.3
+      },
+      "RI5": {
+        "speed_mult": 0.2,
+        "flood_block_threshold": 0.2,
+        "flood_block_prob": 1.0,
+        "landslide_block_threshold": 0.5,
+        "landslide_block_prob": 1.0
       }
     },
     "active_rain_keys": [
@@ -61,50 +75,50 @@
     "eta_time": 0.2,
     "step_cost": 0.05,
     "penalty_timeout": -120.0,
-    "penalty_blockage": -120.0,
     "penalty_incomplete_per_delivery": -20.0
   },
   "model": {
     "hidden_sizes": [
       128,
-      64
+      128
     ],
     "node_embedding_dim": 32
   },
   "replay": {
-    "capacity": 60000
+    "capacity": 25000
   },
   "training": {
-    "num_episodes": 22000,
+    "num_episodes": 15000,
     "gamma": 0.99,
-    "lr": 0.0001,
+    "lr": 0.0002,
+    "device": "cuda",
     "batch_size": 128,
-    "epsilon_start": 0.2,
+    "epsilon_start": 0.4,
     "epsilon_min": 0.05,
     "epsilon_decay": 0.995,
-    "epsilon_schedule": "exp",
-    "epsilon_exp_decay_rate": 0.00014,
     "target_update_every_steps": 500,
     "log_every": 50,
     "eval_every": 300,
     "use_pretrained_model": true,
-    "pretrained_model_path": "checkpoints/staged_training/stage_150_further/best_model.pt",
+    "pretrained_model_path": "checkpoints/stage_control_1_200n/best_model.pt",
     "resume_optimizer": true,
+    "epsilon_schedule": "exp",
+    "epsilon_exp_decay_rate": 0.0008281471,
 
     "resume_training": false,
     "resume_checkpoint_path": "",
     "save_last_every_episodes": 400
   },
   "evaluation": {
-    "episodes": 200,
+    "episodes": 100,
     "epsilon_primary": 0.05,
     "run_epsilon_greedy_eval": true,
     "epsilon_greedy": 0.0,
     "epsilon_noisy": 0.05
   },
   "paths": {
-    "checkpoints_dir": "checkpoints/staged_training/stage_200",
-    "runs_dir": "results/runs/staged_training",
-    "run_log_file": "last_run_stage_200.txt"
+    "checkpoints_dir": "checkpoints/stage_control_1_200n_further",
+    "runs_dir": "results/runs/",
+    "run_log_file": "stage_control_1_200n_further.txt"
   }
 }
