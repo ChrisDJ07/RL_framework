@@ -2,10 +2,6 @@
 Barebones end-to-end demo: load RL checkpoint + config, build/load graph,
 accept mock route request (depot, delivery stops, rain intensity, route type),
 run policy inference, and print a JSON response.
-
-Purpose:
-- Show how a frontend/REST API can "query" your trained model.
-- Keep wiring simple and explainable for team integration.
 """
 
 from __future__ import annotations
@@ -371,3 +367,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# python mock_visualization_demo.py --config-path mock_visualization/sample_config_200.json --checkpoint-path checkpoints/staged_training/stage_200/best_model.pt --request-json mock_visualization/sample_request.json --output-json mock_visualization/sample_response.json

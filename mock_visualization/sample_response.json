@@ -1,0 +1,310 @@
+{
+  "id": "demo-request-001",
+  "type": "balanced",
+  "rainIntensity": "RI1",
+  "graphSource": "checkpoint_snapshot",
+  "success": true,
+  "terminationReason": "success",
+  "segments": [
+    {
+      "id": "segment-1",
+      "coordinates": [
+        {
+          "lat": 16.4885651,
+          "lng": 120.5945807
+        },
+        {
+          "lat": 16.4885978,
+          "lng": 120.5948679
+        }
+      ],
+      "distanceMeters": 30.83705410858743,
+      "travelTimeSeconds": 3.700446493030491,
+      "hazardScore": 1.0
+    },
+    {
+      "id": "segment-2",
+      "coordinates": [
+        {
+          "lat": 16.4885978,
+          "lng": 120.5948679
+        },
+        {
+          "lat": 16.4866847,
+          "lng": 120.5949384
+        }
+      ],
+      "distanceMeters": 279.45909204367155,
+      "travelTimeSeconds": 33.535091045240584,
+      "hazardScore": 1.6
+    },
+    {
+      "id": "segment-3",
+      "coordinates": [
+        {
+          "lat": 16.4866847,
+          "lng": 120.5949384
+        },
+        {
+          "lat": 16.4862843,
+          "lng": 120.5958047
+        }
+      ],
+      "distanceMeters": 103.09906809101824,
+      "travelTimeSeconds": 12.371888170922189,
+      "hazardScore": 0.3
+    },
+    {
+      "id": "segment-4",
+      "coordinates": [
+        {
+          "lat": 16.4862843,
+          "lng": 120.5958047
+        },
+        {
+          "lat": 16.4857796,
+          "lng": 120.5968273
+        }
+      ],
+      "distanceMeters": 124.25820708688754,
+      "travelTimeSeconds": 14.910984850426503,
+      "hazardScore": 0.6
+    },
+    {
+      "id": "segment-5",
+      "coordinates": [
+        {
+          "lat": 16.4857796,
+          "lng": 120.5968273
+        },
+        {
+          "lat": 16.4853938,
+          "lng": 120.5973342
+        }
+      ],
+      "distanceMeters": 70.00204946160378,
+      "travelTimeSeconds": 8.400245935392453,
+      "hazardScore": 0.6
+    },
+    {
+      "id": "segment-6",
+      "coordinates": [
+        {
+          "lat": 16.4853938,
+          "lng": 120.5973342
+        },
+        {
+          "lat": 16.4772978,
+          "lng": 120.6000513
+        }
+      ],
+      "distanceMeters": 1185.2114775460723,
+      "travelTimeSeconds": 142.22537730552867,
+      "hazardScore": 1.0
+    },
+    {
+      "id": "segment-7",
+      "coordinates": [
+        {
+          "lat": 16.4772978,
+          "lng": 120.6000513
+        },
+        {
+          "lat": 16.476728,
+          "lng": 120.6058589
+        }
+      ],
+      "distanceMeters": 845.0100785370354,
+      "travelTimeSeconds": 101.40120942444425,
+      "hazardScore": 1.6
+    },
+    {
+      "id": "segment-8",
+      "coordinates": [
+        {
+          "lat": 16.476728,
+          "lng": 120.6058589
+        },
+        {
+          "lat": 16.4785671,
+          "lng": 120.6075028
+        }
+      ],
+      "distanceMeters": 289.85249451526954,
+      "travelTimeSeconds": 34.78229934183235,
+      "hazardScore": 0.6
+    },
+    {
+      "id": "segment-9",
+      "coordinates": [
+        {
+          "lat": 16.4785671,
+          "lng": 120.6075028
+        },
+        {
+          "lat": 16.474309,
+          "lng": 120.6114882
+        }
+      ],
+      "distanceMeters": 883.9550968887058,
+      "travelTimeSeconds": 106.07461162664471,
+      "hazardScore": 2.0
+    },
+    {
+      "id": "segment-10",
+      "coordinates": [
+        {
+          "lat": 16.474309,
+          "lng": 120.6114882
+        },
+        {
+          "lat": 16.4785671,
+          "lng": 120.6075028
+        }
+      ],
+      "distanceMeters": 883.9550968887058,
+      "travelTimeSeconds": 106.07461162664471,
+      "hazardScore": 2.0
+    },
+    {
+      "id": "segment-11",
+      "coordinates": [
+        {
+          "lat": 16.4785671,
+          "lng": 120.6075028
+        },
+        {
+          "lat": 16.476728,
+          "lng": 120.6058589
+        }
+      ],
+      "distanceMeters": 289.85249451526954,
+      "travelTimeSeconds": 34.78229934183235,
+      "hazardScore": 0.6
+    },
+    {
+      "id": "segment-12",
+      "coordinates": [
+        {
+          "lat": 16.476728,
+          "lng": 120.6058589
+        },
+        {
+          "lat": 16.4772978,
+          "lng": 120.6000513
+        }
+      ],
+      "distanceMeters": 845.0100785370354,
+      "travelTimeSeconds": 101.40120942444425,
+      "hazardScore": 1.6
+    },
+    {
+      "id": "segment-13",
+      "coordinates": [
+        {
+          "lat": 16.4772978,
+          "lng": 120.6000513
+        },
+        {
+          "lat": 16.4746279,
+          "lng": 120.5999688
+        }
+      ],
+      "distanceMeters": 313.34640249034936,
+      "travelTimeSeconds": 37.60156829884192,
+      "hazardScore": 0.6
+    },
+    {
+      "id": "segment-14",
+      "coordinates": [
+        {
+          "lat": 16.4746279,
+          "lng": 120.5999688
+        },
+        {
+          "lat": 16.4728288,
+          "lng": 120.5988614
+        }
+      ],
+      "distanceMeters": 254.35641463024757,
+      "travelTimeSeconds": 30.522769755629707,
+      "hazardScore": 0.6
+    },
+    {
+      "id": "segment-15",
+      "coordinates": [
+        {
+          "lat": 16.4728288,
+          "lng": 120.5988614
+        },
+        {
+          "lat": 16.4723677,
+          "lng": 120.5996959
+        }
+      ],
+      "distanceMeters": 108.71724629136779,
+      "travelTimeSeconds": 13.046069554964134,
+      "hazardScore": 0.6
+    }
+  ],
+  "depot": {
+    "lat": 16.4885651,
+    "lng": 120.5945807
+  },
+  "deliveryStops": [
+    {
+      "id": "depot",
+      "location": {
+        "lat": 16.4885651,
+        "lng": 120.5945807
+      },
+      "sequence": 1,
+      "label": "Mock Depot"
+    },
+    {
+      "id": "stop-1",
+      "location": {
+        "lat": 16.4723677,
+        "lng": 120.5996959
+      },
+      "sequence": 2,
+      "label": "Mock Stop 1"
+    },
+    {
+      "id": "stop-2",
+      "location": {
+        "lat": 16.474309,
+        "lng": 120.6114882
+      },
+      "sequence": 3,
+      "label": "Mock Stop 2"
+    }
+  ],
+  "totalDistanceMeters": 6506.922351631827,
+  "totalTravelTimeSeconds": 780.8306821958192,
+  "averageHazardScore": 1.02,
+  "debug": {
+    "steps": 15,
+    "routeNodes": [
+      1,
+      5,
+      122,
+      63,
+      8,
+      23,
+      60,
+      59,
+      75,
+      137,
+      75,
+      59,
+      60,
+      144,
+      41,
+      66
+    ],
+    "completedDeliveries": 2,
+    "requiredDeliveries": 2,
+    "totalReward": 239.6592741250434
+  }
+}

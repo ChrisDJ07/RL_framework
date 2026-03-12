@@ -1,0 +1,22 @@
+{
+    "id": "demo-request-001",
+    "routeType": "balanced",
+    "rainIntensity": "RI1",
+    "depot": {
+        "id": "depot",
+        "location": {"lat": 16.4885651, "lng": 120.5945807},
+        "label": "Mock Depot"
+    },
+    "deliveryStops": [
+        {
+            "id": "stop-1",
+            "location": {"lat": 16.4723677, "lng": 120.5996959},
+            "label": "Mock Stop 1"
+        },
+        {
+            "id": "stop-2",
+            "location": {"lat": 16.4743090, "lng": 120.6114882},
+            "label": "Mock Stop 2"
+        }
+    ]
+}
