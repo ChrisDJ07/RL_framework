@@ -117,8 +117,8 @@
     "epsilon_noisy": 0.05
   },
   "paths": {
-    "checkpoints_dir": "checkpoints/stage_control_1_200n_further",
+    "checkpoints_dir": "checkpoints/stage_control_1_200n_further_plus_exp",
     "runs_dir": "results/runs/",
-    "run_log_file": "stage_control_1_200n_further.txt"
+    "run_log_file": "stage_control_1_200n_further_plus_exp.txt"
   }
 }

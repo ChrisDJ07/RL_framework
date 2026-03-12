@@ -369,3 +369,4 @@ if __name__ == "__main__":
 
 #Nodes: 200
 # python utils/visualize_routes.py --checkpoint-path checkpoints/stage_control_1_200n_further/best_model.pt --save-path results/visualization_runs/my_routes_200_further_d5_test.png --config-path configs/staged_training/stage_control_1_200n_further.json --num-episodes 1 --cols 1
+# python utils/visualize_routes.py --checkpoint-path checkpoints/staged_training/stage_200/best_model.pt --save-path results/visualization_runs/my_routes_stage_200_test.png --config-path configs/staged_training/stage_200.json --num-episodes 1 --cols 1
