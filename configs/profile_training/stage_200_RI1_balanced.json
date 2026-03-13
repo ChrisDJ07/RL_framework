@@ -20,34 +20,48 @@
   "hazard": {
     "rain_levels": {
       "RI1": {
-        "speed_mult": 1.0,
-        "flood_block_threshold": 1.1,
-        "flood_block_prob": 0.0,
-        "landslide_block_threshold": 1.1,
+        "speed_mult": 0.94,
+        "flood_block_threshold": 1.0,
+        "flood_block_prob": 0.1,
+        "landslide_block_threshold": 1.0,
         "landslide_block_prob": 0.0
       },
       "RI2": {
         "speed_mult": 0.9,
         "flood_block_threshold": 1.0,
-        "flood_block_prob": 0.3,
-        "landslide_block_threshold": 0.8,
+        "flood_block_prob": 0.2,
+        "landslide_block_threshold": 0.6,
         "landslide_block_prob": 0.05
       },
       "RI3": {
         "speed_mult": 0.85,
         "flood_block_threshold": 0.6,
         "flood_block_prob": 0.6,
-        "landslide_block_threshold": 0.8,
+        "landslide_block_threshold": 0.6,
         "landslide_block_prob": 0.15
+      },
+      "RI4": {
+        "speed_mult": 0.4,
+        "flood_block_threshold": 0.6,
+        "flood_block_prob": 0.9,
+        "landslide_block_threshold": 0.3,
+        "landslide_block_prob": 0.3
+      },
+      "RI5": {
+        "speed_mult": 0.2,
+        "flood_block_threshold": 0.2,
+        "flood_block_prob": 1.0,
+        "landslide_block_threshold": 0.3,
+        "landslide_block_prob": 1.0
       }
     },
     "active_rain_keys": [
       "RI1"
     ],
-    "flood_time_weight": 0.0,
-    "landslide_time_weight": 0.0,
-    "high_risk_flood_threshold": 1.1,
-    "high_risk_landslide_threshold": 1.1,
+    "flood_time_weight": 0.5,
+    "landslide_time_weight": 0.5,
+    "high_risk_flood_threshold": 0.6,
+    "high_risk_landslide_threshold": 0.5,
     "max_neighbor_slots": 4,
     "neighbor_feature_dim": 7
   },
@@ -55,10 +69,10 @@
     "delivery": 60.0,
     "mission_success": 120.0,
     "k_progress": 10.0,
-    "hazard_lambda": 0.0,
-    "w_flood": 0.0,
-    "w_landslide": 0.0,
-    "eta_time": 0.2,
+    "hazard_lambda": 10.0,
+    "w_flood": 0.6,
+    "w_landslide": 0.4,
+    "eta_time": 0.3,
     "step_cost": 0.05,
     "penalty_timeout": -120.0,
     "penalty_blockage": -120.0,
@@ -75,7 +89,7 @@
     "capacity": 60000
   },
   "training": {
-    "num_episodes": 22000,
+    "num_episodes": 12000,
     "gamma": 0.99,
     "lr": 0.0001,
     "batch_size": 128,
@@ -88,11 +102,11 @@
     "log_every": 50,
     "eval_every": 300,
     "use_pretrained_model": true,
-    "pretrained_model_path": "checkpoints/staged_training/stage_150_further/best_model.pt",
-    "resume_optimizer": true,
+    "pretrained_model_path": "checkpoints/hazard_training/stage_200_RI1/best_model.pt",
+    "resume_optimizer": false,
 
-    "resume_training": true,
-    "resume_checkpoint_path": "checkpoints/staged_training/stage_200/last_model.pt",
+    "resume_training": false,
+    "resume_checkpoint_path": "",
     "save_last_every_episodes": 400
   },
   "evaluation": {
@@ -103,8 +117,8 @@
     "epsilon_noisy": 0.05
   },
   "paths": {
-    "checkpoints_dir": "checkpoints/staged_training/stage_200",
-    "runs_dir": "results/runs/staged_training",
-    "run_log_file": "last_run_stage_200.txt"
+    "checkpoints_dir": "checkpoints/profile_training/stage_200_RI1_balanced",
+    "runs_dir": "results/runs/profile_training",
+    "run_log_file": "last_run_stage_200_RI1_balanced.txt"
   }
 }

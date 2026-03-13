@@ -75,23 +75,23 @@
     "capacity": 60000
   },
   "training": {
-    "num_episodes": 22000,
+    "num_episodes": 20000,
     "gamma": 0.99,
     "lr": 0.0001,
     "batch_size": 128,
     "epsilon_start": 0.2,
-    "epsilon_min": 0.05,
+    "epsilon_min": 0.04,
     "epsilon_decay": 0.995,
     "epsilon_schedule": "exp",
-    "epsilon_exp_decay_rate": 0.00014,
+    "epsilon_exp_decay_rate": 0.00013,
     "target_update_every_steps": 500,
     "log_every": 50,
     "eval_every": 300,
     "use_pretrained_model": true,
-    "pretrained_model_path": "checkpoints/staged_training/stage_150_further/best_model.pt",
+    "pretrained_model_path": "checkpoints/staged_training/stage_200/best_model.pt",
     "resume_optimizer": true,
 
-    "resume_training": true,
+    "resume_training": false,
     "resume_checkpoint_path": "checkpoints/staged_training/stage_200/last_model.pt",
     "save_last_every_episodes": 400
   },
@@ -103,8 +103,8 @@
     "epsilon_noisy": 0.05
   },
   "paths": {
-    "checkpoints_dir": "checkpoints/staged_training/stage_200",
+    "checkpoints_dir": "checkpoints/staged_training/stage_200_further",
     "runs_dir": "results/runs/staged_training",
-    "run_log_file": "last_run_stage_200.txt"
+    "run_log_file": "last_run_stage_200_further.txt"
   }
 }

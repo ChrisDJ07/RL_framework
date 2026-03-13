@@ -329,7 +329,7 @@ if __name__ == "__main__":
     parser.add_argument("--config-path", type=str, default="configs/experiment_config.json")
     parser.add_argument("--checkpoint-path", type=str, default="checkpoints/best_model.pt")
     parser.add_argument("--num-episodes", type=int, default=12)
-    parser.add_argument("--epsilon", type=float, default=0.05)
+    parser.add_argument("--epsilon", type=float, default=0.00) # Changed from 0.05
     parser.add_argument("--cols", type=int, default=4)
     parser.add_argument(
         "--save-path",
@@ -367,6 +367,8 @@ if __name__ == "__main__":
 # Nodes: 150
 # python utils/visualize_routes.py --checkpoint-path checkpoints/staged_training/stage_150_further/best_model.pt --save-path results/visualization_runs/my_routes_150_further_test.png --config-path configs/staged_training/stage_150_further.json --num-episodes 1 --cols 1
 
-#Nodes: 200
-# python utils/visualize_routes.py --checkpoint-path checkpoints/stage_control_1_200n_further/best_model.pt --save-path results/visualization_runs/my_routes_200_further_d5_test.png --config-path configs/staged_training/stage_control_1_200n_further.json --num-episodes 1 --cols 1
-# python utils/visualize_routes.py --checkpoint-path checkpoints/staged_training/stage_200/best_model.pt --save-path results/visualization_runs/my_routes_stage_200_test.png --config-path configs/staged_training/stage_200.json --num-episodes 1 --cols 1
+# Nodes: 200 control_1
+# python utils/visualize_routes.py --checkpoint-path checkpoints/stage_control_1_200n_further/best_model.pt --save-path results/visualization_runs/my_routes_200_further_d5_temp.png --config-path configs/staged_training/stage_control_1_200n_further.json --num-episodes 1 --cols 1
+
+# Nodes: stage 200
+# python utils/visualize_routes.py --checkpoint-path checkpoints/staged_training/stage_200/best_model.pt --save-path results/visualization_runs/my_routes_stage_200_temp.png --config-path configs/staged_training/stage_200.json --num-episodes 1 --cols 1

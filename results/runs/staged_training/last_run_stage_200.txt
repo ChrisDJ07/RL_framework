@@ -669,3 +669,15 @@ Evaluation over 200 episodes | eps=0.00 MeanReward: 220.72, SuccessRate: 95.00% 
 Evaluation termination reasons | eps=0.00: success:190 (95.0%), step_guard_timeout:10 (5.0%) | eps=0.05: success:199 (99.5%), step_guard_timeout:1 (0.5%)
 Best checkpoint summary | Episode: 17400, PrimaryEval MeanReward: 235.53, SuccessRate: 99.00%
 Run log saved to: results\runs\staged_training\last_run_stage_200.txt
+WARNING: training.resume_training=True overrides use_pretrained_model; resume checkpoint will be used.
+
+=== Resumed Training Session ===
+Run config | config_path=C:\Users\japaullu.tsis\Desktop\projects\RL_framework\configs\staged_training\stage_200.json | seed=40 | num_deliveries=2 | step_cost=0.05 | resume_training=True | resume_checkpoint_path=checkpoints/staged_training/stage_200/last_model.pt | use_pretrained_model=True | pretrained_model_path=checkpoints/staged_training/stage_150_further/best_model.pt | resume_optimizer=True
+Resumed checkpoint: checkpoints\staged_training\stage_200\last_model.pt | start_episode=22000 | epsilon=0.0569 | train_steps=838010 | MissingKeys: 0, UnexpectedKeys: 0
+Resume checkpoint config_path: configs/staged_training/stage_200.json
+Graph stats | Nodes: 200, Edges: 209, AvgBaseTime: 0.3531, AvgHazard: 0.6713, StateDim: 40, ActionDim: 4, Tmax(min): 4171.94, Deliveries: 2, Device: cuda
+Saved last checkpoint: checkpoints\staged_training\stage_200\last_model.pt
+Evaluation over 200 episodes | eps=0.00 MeanReward: 229.21, SuccessRate: 97.50% | eps=0.05 MeanReward: 235.39, SuccessRate: 99.00%
+Evaluation termination reasons | eps=0.00: success:195 (97.5%), step_guard_timeout:5 (2.5%) | eps=0.05: success:198 (99.0%), step_guard_timeout:2 (1.0%)
+Best checkpoint summary | Episode: 17400, PrimaryEval MeanReward: 235.53, SuccessRate: 99.00%
+Run log saved to: results\runs\staged_training\last_run_stage_200.txt

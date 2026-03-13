@@ -1,0 +1,257 @@
+Run config | config_path=C:\Users\japaullu.tsis\Desktop\projects\RL_framework\configs\hazard_training\stage_200_RI1n2.json | seed=40 | num_deliveries=2 | step_cost=0.05 | resume_training=False | resume_checkpoint_path=checkpoints\hazard_training\stage_200_RI1n2\last_model.pt | use_pretrained_model=True | pretrained_model_path=checkpoints/staged_training/stage_200/best_model.pt | resume_optimizer=False
+Loaded pretrained model: checkpoints\staged_training\stage_200\best_model.pt | MissingKeys: 0, UnexpectedKeys: 0
+Pretrained checkpoint config_path: configs/staged_training/stage_200.json
+WARNING: current run config_path differs from checkpoint config_path. This is valid for transfer/fine-tuning, but verify this is intentional.
+Graph stats | Nodes: 200, Edges: 209, AvgBaseTime: 0.3531, AvgHazard: 0.6713, StateDim: 40, ActionDim: 4, Tmax(min): 4171.94, Deliveries: 2, Device: cuda
+Episode 50, LastReward: -1385.63, AvgReward(50): -431.06, SuccessRate(50): 32.00%, Epsilon: 0.199
+Episode 100, LastReward: -3.96, AvgReward(50): -357.68, SuccessRate(50): 24.00%, Epsilon: 0.198
+Episode 150, LastReward: -314.38, AvgReward(50): -306.06, SuccessRate(50): 20.00%, Epsilon: 0.197
+Episode 200, LastReward: -262.13, AvgReward(50): -313.33, SuccessRate(50): 22.00%, Epsilon: 0.196
+Episode 250, LastReward: -258.66, AvgReward(50): -306.22, SuccessRate(50): 18.00%, Epsilon: 0.195
+Episode 300, LastReward: -552.48, AvgReward(50): -234.12, SuccessRate(50): 32.00%, Epsilon: 0.194
+[Eval @ Episode 300] eps=0.00 -> MeanReward: -338.81, SuccessRate: 2.50% | eps=0.05 -> MeanReward: -292.40, SuccessRate: 11.00%
+[EvalReasons @ Episode 300] eps=0.00 -> step_guard_timeout:193 (96.5%), success:5 (2.5%), no_valid_action:2 (1.0%) | eps=0.05 -> step_guard_timeout:176 (88.0%), success:22 (11.0%), no_valid_action:2 (1.0%)
+Saved best checkpoint: checkpoints\hazard_training\stage_200_RI1n2\best_model.pt (episode 300, success=2.50%, reward=-338.81)
+Episode 350, LastReward: -66.79, AvgReward(50): -229.28, SuccessRate(50): 30.00%, Epsilon: 0.193
+Episode 400, LastReward: -468.68, AvgReward(50): -248.88, SuccessRate(50): 30.00%, Epsilon: 0.192
+Saved resumable checkpoint: checkpoints\hazard_training\stage_200_RI1n2\last_model.pt (episode 400)
+Episode 450, LastReward: -329.47, AvgReward(50): -310.04, SuccessRate(50): 36.00%, Epsilon: 0.191
+Episode 500, LastReward: -586.05, AvgReward(50): -174.91, SuccessRate(50): 46.00%, Epsilon: 0.190
+Episode 550, LastReward: -542.58, AvgReward(50): -147.15, SuccessRate(50): 54.00%, Epsilon: 0.189
+Episode 600, LastReward: -680.64, AvgReward(50): -78.40, SuccessRate(50): 68.00%, Epsilon: 0.188
+[Eval @ Episode 600] eps=0.00 -> MeanReward: -296.66, SuccessRate: 21.50% | eps=0.05 -> MeanReward: -232.43, SuccessRate: 38.50%
+[EvalReasons @ Episode 600] eps=0.00 -> step_guard_timeout:155 (77.5%), success:43 (21.5%), no_valid_action:2 (1.0%) | eps=0.05 -> step_guard_timeout:122 (61.0%), success:77 (38.5%), no_valid_action:1 (0.5%)
+Saved best checkpoint: checkpoints\hazard_training\stage_200_RI1n2\best_model.pt (episode 600, success=21.50%, reward=-296.66)
+Episode 650, LastReward: 146.52, AvgReward(50): -148.75, SuccessRate(50): 62.00%, Epsilon: 0.187
+Episode 700, LastReward: 160.70, AvgReward(50): -236.23, SuccessRate(50): 58.00%, Epsilon: 0.186
+Episode 750, LastReward: -258.90, AvgReward(50): -222.57, SuccessRate(50): 42.00%, Epsilon: 0.185
+Episode 800, LastReward: -661.52, AvgReward(50): -130.39, SuccessRate(50): 60.00%, Epsilon: 0.184
+Saved resumable checkpoint: checkpoints\hazard_training\stage_200_RI1n2\last_model.pt (episode 800)
+Episode 850, LastReward: -244.49, AvgReward(50): -124.69, SuccessRate(50): 68.00%, Epsilon: 0.183
+Episode 900, LastReward: -586.28, AvgReward(50): -227.95, SuccessRate(50): 50.00%, Epsilon: 0.182
+[Eval @ Episode 900] eps=0.00 -> MeanReward: -336.12, SuccessRate: 17.50% | eps=0.05 -> MeanReward: -228.78, SuccessRate: 47.00%
+[EvalReasons @ Episode 900] eps=0.00 -> step_guard_timeout:162 (81.0%), success:35 (17.5%), no_valid_action:3 (1.5%) | eps=0.05 -> step_guard_timeout:104 (52.0%), success:94 (47.0%), no_valid_action:2 (1.0%)
+Episode 950, LastReward: 117.85, AvgReward(50): -267.57, SuccessRate(50): 56.00%, Epsilon: 0.181
+Episode 1000, LastReward: 159.38, AvgReward(50): -301.71, SuccessRate(50): 50.00%, Epsilon: 0.180
+Episode 1050, LastReward: -574.74, AvgReward(50): -278.62, SuccessRate(50): 48.00%, Epsilon: 0.179
+Episode 1100, LastReward: 173.70, AvgReward(50): -236.91, SuccessRate(50): 50.00%, Epsilon: 0.179
+Episode 1150, LastReward: -805.75, AvgReward(50): -129.84, SuccessRate(50): 64.00%, Epsilon: 0.178
+Episode 1200, LastReward: -707.00, AvgReward(50): -116.45, SuccessRate(50): 60.00%, Epsilon: 0.177
+[Eval @ Episode 1200] eps=0.00 -> MeanReward: -329.97, SuccessRate: 17.00% | eps=0.05 -> MeanReward: -205.45, SuccessRate: 44.50%
+[EvalReasons @ Episode 1200] eps=0.00 -> step_guard_timeout:164 (82.0%), success:34 (17.0%), no_valid_action:2 (1.0%) | eps=0.05 -> step_guard_timeout:107 (53.5%), success:89 (44.5%), no_valid_action:4 (2.0%)
+Saved resumable checkpoint: checkpoints\hazard_training\stage_200_RI1n2\last_model.pt (episode 1200)
+Episode 1250, LastReward: 11.40, AvgReward(50): -187.43, SuccessRate(50): 58.00%, Epsilon: 0.176
+Episode 1300, LastReward: 174.48, AvgReward(50): -170.89, SuccessRate(50): 52.00%, Epsilon: 0.175
+Episode 1350, LastReward: 145.82, AvgReward(50): -141.28, SuccessRate(50): 48.00%, Epsilon: 0.174
+Episode 1400, LastReward: 160.91, AvgReward(50): -195.20, SuccessRate(50): 50.00%, Epsilon: 0.173
+Episode 1450, LastReward: -713.07, AvgReward(50): -98.81, SuccessRate(50): 58.00%, Epsilon: 0.172
+Episode 1500, LastReward: -687.49, AvgReward(50): -243.48, SuccessRate(50): 48.00%, Epsilon: 0.172
+[Eval @ Episode 1500] eps=0.00 -> MeanReward: -293.88, SuccessRate: 23.50% | eps=0.05 -> MeanReward: -191.02, SuccessRate: 45.50%
+[EvalReasons @ Episode 1500] eps=0.00 -> step_guard_timeout:150 (75.0%), success:47 (23.5%), no_valid_action:3 (1.5%) | eps=0.05 -> step_guard_timeout:108 (54.0%), success:91 (45.5%), no_valid_action:1 (0.5%)
+Saved best checkpoint: checkpoints\hazard_training\stage_200_RI1n2\best_model.pt (episode 1500, success=23.50%, reward=-293.88)
+Episode 1550, LastReward: 175.69, AvgReward(50): -230.94, SuccessRate(50): 52.00%, Epsilon: 0.171
+Episode 1600, LastReward: 187.41, AvgReward(50): -124.75, SuccessRate(50): 62.00%, Epsilon: 0.170
+Saved resumable checkpoint: checkpoints\hazard_training\stage_200_RI1n2\last_model.pt (episode 1600)
+Episode 1650, LastReward: -669.98, AvgReward(50): -120.16, SuccessRate(50): 62.00%, Epsilon: 0.169
+Episode 1700, LastReward: 178.24, AvgReward(50): -174.46, SuccessRate(50): 50.00%, Epsilon: 0.168
+Episode 1750, LastReward: 180.40, AvgReward(50): -64.71, SuccessRate(50): 64.00%, Epsilon: 0.167
+Episode 1800, LastReward: -212.52, AvgReward(50): -193.44, SuccessRate(50): 44.00%, Epsilon: 0.167
+[Eval @ Episode 1800] eps=0.00 -> MeanReward: -281.24, SuccessRate: 20.50% | eps=0.05 -> MeanReward: -226.41, SuccessRate: 32.00%
+[EvalReasons @ Episode 1800] eps=0.00 -> step_guard_timeout:157 (78.5%), success:41 (20.5%), no_valid_action:2 (1.0%) | eps=0.05 -> step_guard_timeout:136 (68.0%), success:64 (32.0%)
+Episode 1850, LastReward: -303.42, AvgReward(50): -139.20, SuccessRate(50): 52.00%, Epsilon: 0.166
+Episode 1900, LastReward: -84.69, AvgReward(50): -160.43, SuccessRate(50): 58.00%, Epsilon: 0.165
+Episode 1950, LastReward: 143.75, AvgReward(50): -199.48, SuccessRate(50): 50.00%, Epsilon: 0.164
+Episode 2000, LastReward: -172.93, AvgReward(50): -128.63, SuccessRate(50): 60.00%, Epsilon: 0.163
+Saved resumable checkpoint: checkpoints\hazard_training\stage_200_RI1n2\last_model.pt (episode 2000)
+Episode 2050, LastReward: -829.22, AvgReward(50): -213.88, SuccessRate(50): 48.00%, Epsilon: 0.163
+Episode 2100, LastReward: -259.14, AvgReward(50): -101.13, SuccessRate(50): 70.00%, Epsilon: 0.162
+[Eval @ Episode 2100] eps=0.00 -> MeanReward: -298.26, SuccessRate: 28.00% | eps=0.05 -> MeanReward: -161.38, SuccessRate: 50.50%
+[EvalReasons @ Episode 2100] eps=0.00 -> step_guard_timeout:141 (70.5%), success:56 (28.0%), no_valid_action:3 (1.5%) | eps=0.05 -> success:101 (50.5%), step_guard_timeout:98 (49.0%), no_valid_action:1 (0.5%)
+Saved best checkpoint: checkpoints\hazard_training\stage_200_RI1n2\best_model.pt (episode 2100, success=28.00%, reward=-298.26)
+Episode 2150, LastReward: 181.47, AvgReward(50): -130.33, SuccessRate(50): 62.00%, Epsilon: 0.161
+Episode 2200, LastReward: -212.98, AvgReward(50): -156.87, SuccessRate(50): 52.00%, Epsilon: 0.160
+Episode 2250, LastReward: 163.55, AvgReward(50): -137.33, SuccessRate(50): 60.00%, Epsilon: 0.159
+Episode 2300, LastReward: -163.21, AvgReward(50): -99.41, SuccessRate(50): 54.00%, Epsilon: 0.159
+Episode 2350, LastReward: -500.79, AvgReward(50): -265.25, SuccessRate(50): 42.00%, Epsilon: 0.158
+Episode 2400, LastReward: 193.56, AvgReward(50): -35.76, SuccessRate(50): 68.00%, Epsilon: 0.157
+[Eval @ Episode 2400] eps=0.00 -> MeanReward: -231.44, SuccessRate: 24.50% | eps=0.05 -> MeanReward: -178.13, SuccessRate: 44.50%
+[EvalReasons @ Episode 2400] eps=0.00 -> step_guard_timeout:147 (73.5%), success:49 (24.5%), no_valid_action:4 (2.0%) | eps=0.05 -> step_guard_timeout:110 (55.0%), success:89 (44.5%), no_valid_action:1 (0.5%)
+Saved resumable checkpoint: checkpoints\hazard_training\stage_200_RI1n2\last_model.pt (episode 2400)
+Episode 2450, LastReward: -363.32, AvgReward(50): -33.56, SuccessRate(50): 78.00%, Epsilon: 0.156
+Episode 2500, LastReward: 118.55, AvgReward(50): -196.38, SuccessRate(50): 54.00%, Epsilon: 0.156
+Episode 2550, LastReward: -443.02, AvgReward(50): -175.54, SuccessRate(50): 60.00%, Epsilon: 0.155
+Episode 2600, LastReward: 172.33, AvgReward(50): -158.24, SuccessRate(50): 56.00%, Epsilon: 0.154
+Episode 2650, LastReward: 150.73, AvgReward(50): -97.95, SuccessRate(50): 68.00%, Epsilon: 0.154
+Episode 2700, LastReward: 154.64, AvgReward(50): -95.92, SuccessRate(50): 68.00%, Epsilon: 0.153
+[Eval @ Episode 2700] eps=0.00 -> MeanReward: -291.74, SuccessRate: 30.50% | eps=0.05 -> MeanReward: -139.24, SuccessRate: 49.00%
+[EvalReasons @ Episode 2700] eps=0.00 -> step_guard_timeout:139 (69.5%), success:61 (30.5%) | eps=0.05 -> step_guard_timeout:100 (50.0%), success:98 (49.0%), no_valid_action:2 (1.0%)
+Saved best checkpoint: checkpoints\hazard_training\stage_200_RI1n2\best_model.pt (episode 2700, success=30.50%, reward=-291.74)
+Episode 2750, LastReward: -371.49, AvgReward(50): -177.97, SuccessRate(50): 50.00%, Epsilon: 0.152
+Episode 2800, LastReward: -160.00, AvgReward(50): -106.03, SuccessRate(50): 60.00%, Epsilon: 0.151
+Saved resumable checkpoint: checkpoints\hazard_training\stage_200_RI1n2\last_model.pt (episode 2800)
+Episode 2850, LastReward: 195.00, AvgReward(50): -169.52, SuccessRate(50): 56.00%, Epsilon: 0.151
+Episode 2900, LastReward: 145.95, AvgReward(50): -169.22, SuccessRate(50): 62.00%, Epsilon: 0.150
+Episode 2950, LastReward: 157.60, AvgReward(50): -157.05, SuccessRate(50): 60.00%, Epsilon: 0.149
+Episode 3000, LastReward: -1081.19, AvgReward(50): -161.85, SuccessRate(50): 54.00%, Epsilon: 0.149
+[Eval @ Episode 3000] eps=0.00 -> MeanReward: -271.83, SuccessRate: 22.50% | eps=0.05 -> MeanReward: -189.77, SuccessRate: 39.50%
+[EvalReasons @ Episode 3000] eps=0.00 -> step_guard_timeout:150 (75.0%), success:45 (22.5%), no_valid_action:5 (2.5%) | eps=0.05 -> step_guard_timeout:114 (57.0%), success:79 (39.5%), no_valid_action:7 (3.5%)
+Episode 3050, LastReward: -160.00, AvgReward(50): -159.59, SuccessRate(50): 48.00%, Epsilon: 0.148
+Episode 3100, LastReward: -683.85, AvgReward(50): -228.70, SuccessRate(50): 50.00%, Epsilon: 0.147
+Episode 3150, LastReward: -123.06, AvgReward(50): -127.37, SuccessRate(50): 54.00%, Epsilon: 0.147
+Episode 3200, LastReward: -307.12, AvgReward(50): -109.37, SuccessRate(50): 62.00%, Epsilon: 0.146
+Saved resumable checkpoint: checkpoints\hazard_training\stage_200_RI1n2\last_model.pt (episode 3200)
+Episode 3250, LastReward: 169.10, AvgReward(50): -118.56, SuccessRate(50): 58.00%, Epsilon: 0.145
+Episode 3300, LastReward: 185.06, AvgReward(50): -42.57, SuccessRate(50): 66.00%, Epsilon: 0.145
+[Eval @ Episode 3300] eps=0.00 -> MeanReward: -225.86, SuccessRate: 25.50% | eps=0.05 -> MeanReward: -188.83, SuccessRate: 42.00%
+[EvalReasons @ Episode 3300] eps=0.00 -> step_guard_timeout:148 (74.0%), success:51 (25.5%), no_valid_action:1 (0.5%) | eps=0.05 -> step_guard_timeout:112 (56.0%), success:84 (42.0%), no_valid_action:4 (2.0%)
+Episode 3350, LastReward: 127.02, AvgReward(50): -72.13, SuccessRate(50): 54.00%, Epsilon: 0.144
+Episode 3400, LastReward: 81.95, AvgReward(50): -185.46, SuccessRate(50): 52.00%, Epsilon: 0.143
+Episode 3450, LastReward: 94.62, AvgReward(50): -118.47, SuccessRate(50): 58.00%, Epsilon: 0.143
+Episode 3500, LastReward: -245.38, AvgReward(50): -174.75, SuccessRate(50): 54.00%, Epsilon: 0.142
+Episode 3550, LastReward: 142.91, AvgReward(50): -124.14, SuccessRate(50): 54.00%, Epsilon: 0.141
+Episode 3600, LastReward: -303.21, AvgReward(50): -181.61, SuccessRate(50): 46.00%, Epsilon: 0.141
+[Eval @ Episode 3600] eps=0.00 -> MeanReward: -285.94, SuccessRate: 20.50% | eps=0.05 -> MeanReward: -179.16, SuccessRate: 48.00%
+[EvalReasons @ Episode 3600] eps=0.00 -> step_guard_timeout:155 (77.5%), success:41 (20.5%), no_valid_action:4 (2.0%) | eps=0.05 -> step_guard_timeout:102 (51.0%), success:96 (48.0%), no_valid_action:2 (1.0%)
+Saved resumable checkpoint: checkpoints\hazard_training\stage_200_RI1n2\last_model.pt (episode 3600)
+Episode 3650, LastReward: 157.83, AvgReward(50): -144.06, SuccessRate(50): 58.00%, Epsilon: 0.140
+Episode 3700, LastReward: 182.99, AvgReward(50): -162.33, SuccessRate(50): 56.00%, Epsilon: 0.139
+Episode 3750, LastReward: -156.82, AvgReward(50): -130.35, SuccessRate(50): 64.00%, Epsilon: 0.139
+Episode 3800, LastReward: 105.72, AvgReward(50): -69.11, SuccessRate(50): 66.00%, Epsilon: 0.138
+Episode 3850, LastReward: -606.18, AvgReward(50): -158.96, SuccessRate(50): 60.00%, Epsilon: 0.137
+Episode 3900, LastReward: 202.00, AvgReward(50): -182.78, SuccessRate(50): 60.00%, Epsilon: 0.137
+[Eval @ Episode 3900] eps=0.00 -> MeanReward: -276.62, SuccessRate: 27.00% | eps=0.05 -> MeanReward: -209.24, SuccessRate: 40.00%
+[EvalReasons @ Episode 3900] eps=0.00 -> step_guard_timeout:144 (72.0%), success:54 (27.0%), no_valid_action:2 (1.0%) | eps=0.05 -> step_guard_timeout:116 (58.0%), success:80 (40.0%), no_valid_action:4 (2.0%)
+Episode 3950, LastReward: -186.47, AvgReward(50): -208.21, SuccessRate(50): 50.00%, Epsilon: 0.136
+Episode 4000, LastReward: -569.11, AvgReward(50): -200.45, SuccessRate(50): 44.00%, Epsilon: 0.136
+Saved resumable checkpoint: checkpoints\hazard_training\stage_200_RI1n2\last_model.pt (episode 4000)
+Episode 4050, LastReward: 119.65, AvgReward(50): -99.84, SuccessRate(50): 60.00%, Epsilon: 0.135
+Episode 4100, LastReward: 118.94, AvgReward(50): -112.18, SuccessRate(50): 58.00%, Epsilon: 0.134
+Episode 4150, LastReward: -42.34, AvgReward(50): -176.32, SuccessRate(50): 54.00%, Epsilon: 0.134
+Episode 4200, LastReward: 133.87, AvgReward(50): -207.18, SuccessRate(50): 44.00%, Epsilon: 0.133
+[Eval @ Episode 4200] eps=0.00 -> MeanReward: -263.99, SuccessRate: 24.00% | eps=0.05 -> MeanReward: -182.91, SuccessRate: 42.50%
+[EvalReasons @ Episode 4200] eps=0.00 -> step_guard_timeout:150 (75.0%), success:48 (24.0%), no_valid_action:2 (1.0%) | eps=0.05 -> step_guard_timeout:112 (56.0%), success:85 (42.5%), no_valid_action:3 (1.5%)
+Episode 4250, LastReward: 220.32, AvgReward(50): -65.69, SuccessRate(50): 66.00%, Epsilon: 0.133
+Episode 4300, LastReward: -396.94, AvgReward(50): -66.16, SuccessRate(50): 70.00%, Epsilon: 0.132
+Episode 4350, LastReward: 173.19, AvgReward(50): -134.44, SuccessRate(50): 58.00%, Epsilon: 0.132
+Episode 4400, LastReward: -223.76, AvgReward(50): -96.80, SuccessRate(50): 58.00%, Epsilon: 0.131
+Saved resumable checkpoint: checkpoints\hazard_training\stage_200_RI1n2\last_model.pt (episode 4400)
+Episode 4450, LastReward: 129.08, AvgReward(50): -90.81, SuccessRate(50): 66.00%, Epsilon: 0.130
+Episode 4500, LastReward: 116.50, AvgReward(50): -53.49, SuccessRate(50): 66.00%, Epsilon: 0.130
+[Eval @ Episode 4500] eps=0.00 -> MeanReward: -209.46, SuccessRate: 25.50% | eps=0.05 -> MeanReward: -159.32, SuccessRate: 45.00%
+[EvalReasons @ Episode 4500] eps=0.00 -> step_guard_timeout:146 (73.0%), success:51 (25.5%), no_valid_action:3 (1.5%) | eps=0.05 -> step_guard_timeout:110 (55.0%), success:90 (45.0%)
+Episode 4550, LastReward: 112.85, AvgReward(50): -127.50, SuccessRate(50): 54.00%, Epsilon: 0.129
+Episode 4600, LastReward: 176.16, AvgReward(50): -221.02, SuccessRate(50): 46.00%, Epsilon: 0.129
+Episode 4650, LastReward: 153.56, AvgReward(50): -86.62, SuccessRate(50): 62.00%, Epsilon: 0.128
+Episode 4700, LastReward: -481.06, AvgReward(50): -172.37, SuccessRate(50): 46.00%, Epsilon: 0.128
+Episode 4750, LastReward: -240.62, AvgReward(50): -158.25, SuccessRate(50): 44.00%, Epsilon: 0.127
+Episode 4800, LastReward: -316.63, AvgReward(50): -155.36, SuccessRate(50): 54.00%, Epsilon: 0.127
+[Eval @ Episode 4800] eps=0.00 -> MeanReward: -295.04, SuccessRate: 18.50% | eps=0.05 -> MeanReward: -220.50, SuccessRate: 37.00%
+[EvalReasons @ Episode 4800] eps=0.00 -> step_guard_timeout:161 (80.5%), success:37 (18.5%), no_valid_action:2 (1.0%) | eps=0.05 -> step_guard_timeout:125 (62.5%), success:74 (37.0%), no_valid_action:1 (0.5%)
+Saved resumable checkpoint: checkpoints\hazard_training\stage_200_RI1n2\last_model.pt (episode 4800)
+Episode 4850, LastReward: -1018.01, AvgReward(50): -80.53, SuccessRate(50): 64.00%, Epsilon: 0.126
+Episode 4900, LastReward: 171.04, AvgReward(50): -79.73, SuccessRate(50): 62.00%, Epsilon: 0.126
+Episode 4950, LastReward: 114.70, AvgReward(50): -95.79, SuccessRate(50): 58.00%, Epsilon: 0.125
+Episode 5000, LastReward: -202.32, AvgReward(50): -82.98, SuccessRate(50): 62.00%, Epsilon: 0.124
+Episode 5050, LastReward: -408.27, AvgReward(50): -215.52, SuccessRate(50): 48.00%, Epsilon: 0.124
+Episode 5100, LastReward: -647.43, AvgReward(50): -59.39, SuccessRate(50): 62.00%, Epsilon: 0.123
+[Eval @ Episode 5100] eps=0.00 -> MeanReward: -181.80, SuccessRate: 33.50% | eps=0.05 -> MeanReward: -213.19, SuccessRate: 39.50%
+[EvalReasons @ Episode 5100] eps=0.00 -> step_guard_timeout:132 (66.0%), success:67 (33.5%), no_valid_action:1 (0.5%) | eps=0.05 -> step_guard_timeout:120 (60.0%), success:79 (39.5%), no_valid_action:1 (0.5%)
+Saved best checkpoint: checkpoints\hazard_training\stage_200_RI1n2\best_model.pt (episode 5100, success=33.50%, reward=-181.80)
+Episode 5150, LastReward: -385.10, AvgReward(50): -55.54, SuccessRate(50): 60.00%, Epsilon: 0.123
+Episode 5200, LastReward: -243.09, AvgReward(50): -155.30, SuccessRate(50): 52.00%, Epsilon: 0.122
+Saved resumable checkpoint: checkpoints\hazard_training\stage_200_RI1n2\last_model.pt (episode 5200)
+Episode 5250, LastReward: -827.56, AvgReward(50): -164.11, SuccessRate(50): 50.00%, Epsilon: 0.122
+Episode 5300, LastReward: 198.14, AvgReward(50): -135.38, SuccessRate(50): 56.00%, Epsilon: 0.121
+Episode 5350, LastReward: -1112.80, AvgReward(50): -146.64, SuccessRate(50): 54.00%, Epsilon: 0.121
+Episode 5400, LastReward: 124.39, AvgReward(50): -81.63, SuccessRate(50): 60.00%, Epsilon: 0.120
+[Eval @ Episode 5400] eps=0.00 -> MeanReward: -166.67, SuccessRate: 32.50% | eps=0.05 -> MeanReward: -164.93, SuccessRate: 44.00%
+[EvalReasons @ Episode 5400] eps=0.00 -> step_guard_timeout:135 (67.5%), success:65 (32.5%) | eps=0.05 -> step_guard_timeout:112 (56.0%), success:88 (44.0%)
+Episode 5450, LastReward: 179.97, AvgReward(50): -111.29, SuccessRate(50): 54.00%, Epsilon: 0.120
+Episode 5500, LastReward: -216.54, AvgReward(50): -80.75, SuccessRate(50): 54.00%, Epsilon: 0.119
+Episode 5550, LastReward: -148.16, AvgReward(50): -152.38, SuccessRate(50): 44.00%, Epsilon: 0.119
+Episode 5600, LastReward: -375.37, AvgReward(50): -173.62, SuccessRate(50): 54.00%, Epsilon: 0.118
+Saved resumable checkpoint: checkpoints\hazard_training\stage_200_RI1n2\last_model.pt (episode 5600)
+Episode 5650, LastReward: 174.55, AvgReward(50): -113.52, SuccessRate(50): 56.00%, Epsilon: 0.118
+Episode 5700, LastReward: 228.40, AvgReward(50): -157.99, SuccessRate(50): 52.00%, Epsilon: 0.118
+[Eval @ Episode 5700] eps=0.00 -> MeanReward: -213.17, SuccessRate: 22.00% | eps=0.05 -> MeanReward: -124.57, SuccessRate: 46.50%
+[EvalReasons @ Episode 5700] eps=0.00 -> step_guard_timeout:153 (76.5%), success:44 (22.0%), no_valid_action:3 (1.5%) | eps=0.05 -> step_guard_timeout:106 (53.0%), success:93 (46.5%), no_valid_action:1 (0.5%)
+Episode 5750, LastReward: -591.04, AvgReward(50): -188.17, SuccessRate(50): 50.00%, Epsilon: 0.117
+Episode 5800, LastReward: 169.19, AvgReward(50): -171.31, SuccessRate(50): 40.00%, Epsilon: 0.117
+Episode 5850, LastReward: -431.35, AvgReward(50): -122.38, SuccessRate(50): 46.00%, Epsilon: 0.116
+Episode 5900, LastReward: 126.49, AvgReward(50): -105.51, SuccessRate(50): 54.00%, Epsilon: 0.116
+Episode 5950, LastReward: -522.85, AvgReward(50): -113.34, SuccessRate(50): 56.00%, Epsilon: 0.115
+Episode 6000, LastReward: -200.49, AvgReward(50): -77.21, SuccessRate(50): 66.00%, Epsilon: 0.115
+[Eval @ Episode 6000] eps=0.00 -> MeanReward: -262.47, SuccessRate: 22.00% | eps=0.05 -> MeanReward: -196.21, SuccessRate: 44.00%
+[EvalReasons @ Episode 6000] eps=0.00 -> step_guard_timeout:153 (76.5%), success:44 (22.0%), no_valid_action:3 (1.5%) | eps=0.05 -> step_guard_timeout:109 (54.5%), success:88 (44.0%), no_valid_action:3 (1.5%)
+Saved resumable checkpoint: checkpoints\hazard_training\stage_200_RI1n2\last_model.pt (episode 6000)
+Episode 6050, LastReward: -379.47, AvgReward(50): -178.09, SuccessRate(50): 50.00%, Epsilon: 0.114
+Episode 6100, LastReward: -152.30, AvgReward(50): -266.31, SuccessRate(50): 34.00%, Epsilon: 0.114
+Episode 6150, LastReward: -525.00, AvgReward(50): -78.01, SuccessRate(50): 60.00%, Epsilon: 0.113
+Episode 6200, LastReward: 143.32, AvgReward(50): -130.88, SuccessRate(50): 52.00%, Epsilon: 0.113
+Episode 6250, LastReward: 136.06, AvgReward(50): -96.94, SuccessRate(50): 64.00%, Epsilon: 0.113
+Episode 6300, LastReward: 187.91, AvgReward(50): -130.42, SuccessRate(50): 58.00%, Epsilon: 0.112
+[Eval @ Episode 6300] eps=0.00 -> MeanReward: -260.90, SuccessRate: 21.00% | eps=0.05 -> MeanReward: -152.95, SuccessRate: 51.00%
+[EvalReasons @ Episode 6300] eps=0.00 -> step_guard_timeout:157 (78.5%), success:42 (21.0%), no_valid_action:1 (0.5%) | eps=0.05 -> success:102 (51.0%), step_guard_timeout:97 (48.5%), no_valid_action:1 (0.5%)
+Episode 6350, LastReward: 218.76, AvgReward(50): -121.86, SuccessRate(50): 54.00%, Epsilon: 0.112
+Episode 6400, LastReward: -192.69, AvgReward(50): -99.01, SuccessRate(50): 58.00%, Epsilon: 0.111
+Saved resumable checkpoint: checkpoints\hazard_training\stage_200_RI1n2\last_model.pt (episode 6400)
+Episode 6450, LastReward: 200.32, AvgReward(50): -107.84, SuccessRate(50): 52.00%, Epsilon: 0.111
+Episode 6500, LastReward: 111.86, AvgReward(50): -91.67, SuccessRate(50): 56.00%, Epsilon: 0.110
+Episode 6550, LastReward: 176.06, AvgReward(50): -165.11, SuccessRate(50): 52.00%, Epsilon: 0.110
+Episode 6600, LastReward: -252.06, AvgReward(50): -83.25, SuccessRate(50): 58.00%, Epsilon: 0.110
+[Eval @ Episode 6600] eps=0.00 -> MeanReward: -238.57, SuccessRate: 31.50% | eps=0.05 -> MeanReward: -196.76, SuccessRate: 39.00%
+[EvalReasons @ Episode 6600] eps=0.00 -> step_guard_timeout:137 (68.5%), success:63 (31.5%) | eps=0.05 -> step_guard_timeout:120 (60.0%), success:78 (39.0%), no_valid_action:2 (1.0%)
+Episode 6650, LastReward: 156.79, AvgReward(50): -160.28, SuccessRate(50): 50.00%, Epsilon: 0.109
+Episode 6700, LastReward: -359.78, AvgReward(50): -111.96, SuccessRate(50): 56.00%, Epsilon: 0.109
+Episode 6750, LastReward: 170.90, AvgReward(50): -119.86, SuccessRate(50): 50.00%, Epsilon: 0.108
+Episode 6800, LastReward: 197.53, AvgReward(50): -122.41, SuccessRate(50): 50.00%, Epsilon: 0.108
+Saved resumable checkpoint: checkpoints\hazard_training\stage_200_RI1n2\last_model.pt (episode 6800)
+Episode 6850, LastReward: 166.91, AvgReward(50): -111.27, SuccessRate(50): 58.00%, Epsilon: 0.107
+Episode 6900, LastReward: -692.65, AvgReward(50): -108.40, SuccessRate(50): 62.00%, Epsilon: 0.107
+[Eval @ Episode 6900] eps=0.00 -> MeanReward: -193.59, SuccessRate: 29.50% | eps=0.05 -> MeanReward: -145.48, SuccessRate: 52.00%
+[EvalReasons @ Episode 6900] eps=0.00 -> step_guard_timeout:138 (69.0%), success:59 (29.5%), no_valid_action:3 (1.5%) | eps=0.05 -> success:104 (52.0%), step_guard_timeout:94 (47.0%), no_valid_action:2 (1.0%)
+Episode 6950, LastReward: 182.05, AvgReward(50): -70.95, SuccessRate(50): 70.00%, Epsilon: 0.107
+Episode 7000, LastReward: -633.04, AvgReward(50): -125.44, SuccessRate(50): 54.00%, Epsilon: 0.106
+Episode 7050, LastReward: 191.89, AvgReward(50): -79.82, SuccessRate(50): 62.00%, Epsilon: 0.106
+Episode 7100, LastReward: -161.77, AvgReward(50): -121.25, SuccessRate(50): 54.00%, Epsilon: 0.106
+Episode 7150, LastReward: -130.88, AvgReward(50): -139.51, SuccessRate(50): 54.00%, Epsilon: 0.105
+Episode 7200, LastReward: 162.67, AvgReward(50): -137.32, SuccessRate(50): 50.00%, Epsilon: 0.105
+[Eval @ Episode 7200] eps=0.00 -> MeanReward: -284.92, SuccessRate: 25.50% | eps=0.05 -> MeanReward: -188.03, SuccessRate: 42.00%
+[EvalReasons @ Episode 7200] eps=0.00 -> step_guard_timeout:147 (73.5%), success:51 (25.5%), no_valid_action:2 (1.0%) | eps=0.05 -> step_guard_timeout:112 (56.0%), success:84 (42.0%), no_valid_action:4 (2.0%)
+Saved resumable checkpoint: checkpoints\hazard_training\stage_200_RI1n2\last_model.pt (episode 7200)
+Episode 7250, LastReward: 179.39, AvgReward(50): -186.68, SuccessRate(50): 44.00%, Epsilon: 0.104
+Episode 7300, LastReward: -253.37, AvgReward(50): -111.04, SuccessRate(50): 50.00%, Epsilon: 0.104
+Episode 7350, LastReward: 167.37, AvgReward(50): -127.22, SuccessRate(50): 50.00%, Epsilon: 0.104
+Episode 7400, LastReward: -183.17, AvgReward(50): -91.12, SuccessRate(50): 54.00%, Epsilon: 0.103
+Episode 7450, LastReward: -324.63, AvgReward(50): -182.02, SuccessRate(50): 56.00%, Epsilon: 0.103
+Episode 7500, LastReward: -446.76, AvgReward(50): -175.82, SuccessRate(50): 46.00%, Epsilon: 0.102
+[Eval @ Episode 7500] eps=0.00 -> MeanReward: -297.12, SuccessRate: 22.50% | eps=0.05 -> MeanReward: -154.54, SuccessRate: 40.50%
+[EvalReasons @ Episode 7500] eps=0.00 -> step_guard_timeout:153 (76.5%), success:45 (22.5%), no_valid_action:2 (1.0%) | eps=0.05 -> step_guard_timeout:116 (58.0%), success:81 (40.5%), no_valid_action:3 (1.5%)
+Episode 7550, LastReward: -193.69, AvgReward(50): -112.25, SuccessRate(50): 48.00%, Epsilon: 0.102
+Episode 7600, LastReward: 213.89, AvgReward(50): -66.07, SuccessRate(50): 54.00%, Epsilon: 0.102
+Saved resumable checkpoint: checkpoints\hazard_training\stage_200_RI1n2\last_model.pt (episode 7600)
+Episode 7650, LastReward: 113.80, AvgReward(50): -224.09, SuccessRate(50): 40.00%, Epsilon: 0.101
+Episode 7700, LastReward: -195.38, AvgReward(50): -161.20, SuccessRate(50): 40.00%, Epsilon: 0.101
+Episode 7750, LastReward: -601.32, AvgReward(50): -180.75, SuccessRate(50): 50.00%, Epsilon: 0.101
+Episode 7800, LastReward: 198.61, AvgReward(50): -153.80, SuccessRate(50): 48.00%, Epsilon: 0.100
+[Eval @ Episode 7800] eps=0.00 -> MeanReward: -222.95, SuccessRate: 24.00% | eps=0.05 -> MeanReward: -162.34, SuccessRate: 38.00%
+[EvalReasons @ Episode 7800] eps=0.00 -> step_guard_timeout:151 (75.5%), success:48 (24.0%), no_valid_action:1 (0.5%) | eps=0.05 -> step_guard_timeout:123 (61.5%), success:76 (38.0%), no_valid_action:1 (0.5%)
+Episode 7850, LastReward: -305.19, AvgReward(50): -63.73, SuccessRate(50): 62.00%, Epsilon: 0.100
+Episode 7900, LastReward: 156.02, AvgReward(50): -136.97, SuccessRate(50): 48.00%, Epsilon: 0.100
+Episode 7950, LastReward: -294.91, AvgReward(50): -124.66, SuccessRate(50): 56.00%, Epsilon: 0.099
+Episode 8000, LastReward: 7.73, AvgReward(50): -75.37, SuccessRate(50): 54.00%, Epsilon: 0.099
+Saved resumable checkpoint: checkpoints\hazard_training\stage_200_RI1n2\last_model.pt (episode 8000)
+Episode 8050, LastReward: -184.69, AvgReward(50): -76.20, SuccessRate(50): 66.00%, Epsilon: 0.099
+Episode 8100, LastReward: -211.27, AvgReward(50): -133.62, SuccessRate(50): 56.00%, Epsilon: 0.098
+[Eval @ Episode 8100] eps=0.00 -> MeanReward: -178.96, SuccessRate: 34.00% | eps=0.05 -> MeanReward: -167.19, SuccessRate: 42.50%
+[EvalReasons @ Episode 8100] eps=0.00 -> step_guard_timeout:129 (64.5%), success:68 (34.0%), no_valid_action:3 (1.5%) | eps=0.05 -> step_guard_timeout:113 (56.5%), success:85 (42.5%), no_valid_action:2 (1.0%)
+Saved best checkpoint: checkpoints\hazard_training\stage_200_RI1n2\best_model.pt (episode 8100, success=34.00%, reward=-178.96)
+Episode 8150, LastReward: 182.76, AvgReward(50): -99.59, SuccessRate(50): 54.00%, Epsilon: 0.098
+Episode 8200, LastReward: -188.49, AvgReward(50): -182.04, SuccessRate(50): 40.00%, Epsilon: 0.098
+Episode 8250, LastReward: -983.50, AvgReward(50): -187.59, SuccessRate(50): 46.00%, Epsilon: 0.097
+Episode 8300, LastReward: 187.40, AvgReward(50): -121.78, SuccessRate(50): 52.00%, Epsilon: 0.097
+Episode 8350, LastReward: -438.42, AvgReward(50): -161.66, SuccessRate(50): 54.00%, Epsilon: 0.097
+Episode 8400, LastReward: -638.86, AvgReward(50): -153.65, SuccessRate(50): 48.00%, Epsilon: 0.096
+Training interrupted by user. Saving resumable checkpoint...
+Saved resumable checkpoint: checkpoints\hazard_training\stage_200_RI1n2\last_model.pt (episode 8400, epsilon=0.096).
+Resume by setting training.resume_training=true.
