@@ -247,7 +247,6 @@
       "hazardScore": 0.6
     }
   ],
-  "blockedEdges": [],
   "depot": {
     "lat": 16.4885651,
     "lng": 120.5945807
@@ -306,7 +305,6 @@
     ],
     "completedDeliveries": 2,
     "requiredDeliveries": 2,
-    "totalReward": 239.6592741250434,
-    "blockedEdgeCount": 0
+    "totalReward": 239.6592741250434
   }
 }
