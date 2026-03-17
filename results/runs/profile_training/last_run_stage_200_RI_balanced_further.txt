@@ -369,3 +369,243 @@ Episode 12200, LastReward: 180.46, AvgReward(50): 100.22, SuccessRate(50): 94.00
 Training interrupted by user. Saving resumable checkpoint...
 Saved resumable checkpoint: checkpoints\profile_training\stage_200_RI_balanced_further\last_model.pt (episode 12223, epsilon=0.121).
 Resume by setting training.resume_training=true.
+WARNING: training.resume_training=True overrides use_pretrained_model; resume checkpoint will be used.
+
+=== Resumed Training Session ===
+Run config | config_path=C:\Users\japaullu.tsis\Desktop\projects\RL_framework\configs\profile_training\stage_200_RI_balanced_further.json | seed=40 | num_deliveries=2 | step_cost=0.05 | resume_training=True | resume_checkpoint_path=checkpoints/profile_training/stage_200_RI_balanced_further/last_model.pt | use_pretrained_model=True | pretrained_model_path=checkpoints/profile_training/stage_200_RI_balanced/best_model.pt | resume_optimizer=True
+Resumed checkpoint: checkpoints\profile_training\stage_200_RI_balanced_further\last_model.pt | start_episode=12223 | epsilon=0.1214 | train_steps=631217 | MissingKeys: 0, UnexpectedKeys: 0
+Resume checkpoint config_path: configs/profile_training/stage_200_RI_balanced_further.json
+Graph stats | Nodes: 200, Edges: 209, AvgBaseTime: 0.3531, AvgHazard: 0.6713, StateDim: 40, ActionDim: 4, Tmax(min): 4171.94, Deliveries: 2, Device: cuda
+Episode 12250, LastReward: -248.79, AvgReward(50): 17.60, SuccessRate(50): 76.00%, Epsilon: 0.121
+Episode 12300, LastReward: 34.76, AvgReward(50): 25.53, SuccessRate(50): 74.00%, Epsilon: 0.121
+[Eval @ Episode 12300] eps=0.00 -> MeanReward: -259.72, SuccessRate: 26.50% | eps=0.05 -> MeanReward: -139.31, SuccessRate: 49.00%
+[EvalReasons @ Episode 12300] eps=0.00 -> step_guard_timeout:146 (73.0%), success:53 (26.5%), no_valid_action:1 (0.5%) | eps=0.05 -> step_guard_timeout:100 (50.0%), success:98 (49.0%), no_valid_action:2 (1.0%)
+Episode 12350, LastReward: 118.02, AvgReward(50): -59.86, SuccessRate(50): 68.00%, Epsilon: 0.120
+Episode 12400, LastReward: 42.12, AvgReward(50): -21.44, SuccessRate(50): 76.00%, Epsilon: 0.120
+Saved resumable checkpoint: checkpoints\profile_training\stage_200_RI_balanced_further\last_model.pt (episode 12400)
+Episode 12450, LastReward: -206.75, AvgReward(50): 1.60, SuccessRate(50): 70.00%, Epsilon: 0.119
+Episode 12500, LastReward: 184.47, AvgReward(50): 28.47, SuccessRate(50): 80.00%, Epsilon: 0.119
+Episode 12550, LastReward: 175.15, AvgReward(50): 61.15, SuccessRate(50): 86.00%, Epsilon: 0.118
+Episode 12600, LastReward: -252.93, AvgReward(50): -19.49, SuccessRate(50): 78.00%, Epsilon: 0.118
+[Eval @ Episode 12600] eps=0.00 -> MeanReward: -46.66, SuccessRate: 57.50% | eps=0.05 -> MeanReward: 29.03, SuccessRate: 78.50%
+[EvalReasons @ Episode 12600] eps=0.00 -> success:115 (57.5%), step_guard_timeout:85 (42.5%) | eps=0.05 -> success:157 (78.5%), step_guard_timeout:42 (21.0%), no_valid_action:1 (0.5%)
+Episode 12650, LastReward: -269.13, AvgReward(50): 72.92, SuccessRate(50): 84.00%, Epsilon: 0.118
+Episode 12700, LastReward: 159.18, AvgReward(50): 89.87, SuccessRate(50): 92.00%, Epsilon: 0.117
+Episode 12750, LastReward: 187.42, AvgReward(50): 68.18, SuccessRate(50): 84.00%, Epsilon: 0.117
+Episode 12800, LastReward: 151.92, AvgReward(50): 120.54, SuccessRate(50): 98.00%, Epsilon: 0.116
+Saved resumable checkpoint: checkpoints\profile_training\stage_200_RI_balanced_further\last_model.pt (episode 12800)
+Episode 12850, LastReward: 118.63, AvgReward(50): 23.32, SuccessRate(50): 78.00%, Epsilon: 0.116
+Episode 12900, LastReward: 180.66, AvgReward(50): 105.53, SuccessRate(50): 90.00%, Epsilon: 0.115
+[Eval @ Episode 12900] eps=0.00 -> MeanReward: 10.12, SuccessRate: 71.50% | eps=0.05 -> MeanReward: 94.70, SuccessRate: 89.50%
+[EvalReasons @ Episode 12900] eps=0.00 -> success:143 (71.5%), step_guard_timeout:57 (28.5%) | eps=0.05 -> success:179 (89.5%), step_guard_timeout:21 (10.5%)
+Episode 12950, LastReward: 143.06, AvgReward(50): 115.88, SuccessRate(50): 94.00%, Epsilon: 0.115
+Episode 13000, LastReward: 187.87, AvgReward(50): 101.27, SuccessRate(50): 92.00%, Epsilon: 0.115
+Episode 13050, LastReward: 97.72, AvgReward(50): 74.22, SuccessRate(50): 90.00%, Epsilon: 0.114
+Episode 13100, LastReward: 58.67, AvgReward(50): 65.66, SuccessRate(50): 88.00%, Epsilon: 0.114
+Episode 13150, LastReward: 210.84, AvgReward(50): 61.38, SuccessRate(50): 86.00%, Epsilon: 0.113
+Episode 13200, LastReward: 106.87, AvgReward(50): 124.62, SuccessRate(50): 94.00%, Epsilon: 0.113
+[Eval @ Episode 13200] eps=0.00 -> MeanReward: 39.47, SuccessRate: 73.00% | eps=0.05 -> MeanReward: 63.05, SuccessRate: 83.50%
+[EvalReasons @ Episode 13200] eps=0.00 -> success:146 (73.0%), step_guard_timeout:54 (27.0%) | eps=0.05 -> success:167 (83.5%), step_guard_timeout:32 (16.0%), no_valid_action:1 (0.5%)
+Saved resumable checkpoint: checkpoints\profile_training\stage_200_RI_balanced_further\last_model.pt (episode 13200)
+Episode 13250, LastReward: -361.57, AvgReward(50): 93.53, SuccessRate(50): 88.00%, Epsilon: 0.113
+Episode 13300, LastReward: -186.37, AvgReward(50): 117.10, SuccessRate(50): 92.00%, Epsilon: 0.112
+Episode 13350, LastReward: 164.17, AvgReward(50): 111.87, SuccessRate(50): 90.00%, Epsilon: 0.112
+Episode 13400, LastReward: 152.89, AvgReward(50): 91.52, SuccessRate(50): 90.00%, Epsilon: 0.111
+Episode 13450, LastReward: 132.25, AvgReward(50): 110.92, SuccessRate(50): 96.00%, Epsilon: 0.111
+Episode 13500, LastReward: 212.74, AvgReward(50): 140.87, SuccessRate(50): 96.00%, Epsilon: 0.111
+[Eval @ Episode 13500] eps=0.00 -> MeanReward: 62.93, SuccessRate: 80.00% | eps=0.05 -> MeanReward: 88.06, SuccessRate: 85.50%
+[EvalReasons @ Episode 13500] eps=0.00 -> success:160 (80.0%), step_guard_timeout:39 (19.5%), no_valid_action:1 (0.5%) | eps=0.05 -> success:171 (85.5%), step_guard_timeout:29 (14.5%)
+Episode 13550, LastReward: 166.75, AvgReward(50): 104.91, SuccessRate(50): 94.00%, Epsilon: 0.110
+Episode 13600, LastReward: 86.89, AvgReward(50): 121.99, SuccessRate(50): 94.00%, Epsilon: 0.110
+Saved resumable checkpoint: checkpoints\profile_training\stage_200_RI_balanced_further\last_model.pt (episode 13600)
+Episode 13650, LastReward: 187.94, AvgReward(50): 71.32, SuccessRate(50): 88.00%, Epsilon: 0.109
+Episode 13700, LastReward: 165.21, AvgReward(50): 143.46, SuccessRate(50): 96.00%, Epsilon: 0.109
+Episode 13750, LastReward: 121.83, AvgReward(50): 90.95, SuccessRate(50): 88.00%, Epsilon: 0.109
+Episode 13800, LastReward: 133.33, AvgReward(50): 76.66, SuccessRate(50): 86.00%, Epsilon: 0.108
+[Eval @ Episode 13800] eps=0.00 -> MeanReward: 68.19, SuccessRate: 79.00% | eps=0.05 -> MeanReward: 103.95, SuccessRate: 89.50%
+[EvalReasons @ Episode 13800] eps=0.00 -> success:158 (79.0%), step_guard_timeout:41 (20.5%), no_valid_action:1 (0.5%) | eps=0.05 -> success:179 (89.5%), step_guard_timeout:21 (10.5%)
+Episode 13850, LastReward: 147.93, AvgReward(50): 138.22, SuccessRate(50): 96.00%, Epsilon: 0.108
+Episode 13900, LastReward: -240.13, AvgReward(50): 122.56, SuccessRate(50): 96.00%, Epsilon: 0.107
+Episode 13950, LastReward: 179.56, AvgReward(50): 140.40, SuccessRate(50): 96.00%, Epsilon: 0.107
+Episode 14000, LastReward: -251.22, AvgReward(50): 67.51, SuccessRate(50): 90.00%, Epsilon: 0.107
+Saved resumable checkpoint: checkpoints\profile_training\stage_200_RI_balanced_further\last_model.pt (episode 14000)
+Episode 14050, LastReward: 85.83, AvgReward(50): 100.04, SuccessRate(50): 90.00%, Epsilon: 0.106
+Episode 14100, LastReward: 177.64, AvgReward(50): 118.04, SuccessRate(50): 94.00%, Epsilon: 0.106
+[Eval @ Episode 14100] eps=0.00 -> MeanReward: 45.41, SuccessRate: 78.00% | eps=0.05 -> MeanReward: 65.96, SuccessRate: 85.50%
+[EvalReasons @ Episode 14100] eps=0.00 -> success:156 (78.0%), step_guard_timeout:42 (21.0%), no_valid_action:2 (1.0%) | eps=0.05 -> success:171 (85.5%), step_guard_timeout:29 (14.5%)
+Episode 14150, LastReward: -172.29, AvgReward(50): 91.16, SuccessRate(50): 88.00%, Epsilon: 0.106
+Episode 14200, LastReward: 90.84, AvgReward(50): 98.31, SuccessRate(50): 90.00%, Epsilon: 0.105
+Episode 14250, LastReward: 1.90, AvgReward(50): 83.17, SuccessRate(50): 86.00%, Epsilon: 0.105
+Episode 14300, LastReward: -380.79, AvgReward(50): 114.22, SuccessRate(50): 90.00%, Epsilon: 0.105
+Episode 14350, LastReward: 134.74, AvgReward(50): 101.66, SuccessRate(50): 96.00%, Epsilon: 0.104
+Episode 14400, LastReward: 140.12, AvgReward(50): 93.11, SuccessRate(50): 90.00%, Epsilon: 0.104
+[Eval @ Episode 14400] eps=0.00 -> MeanReward: 30.06, SuccessRate: 80.00% | eps=0.05 -> MeanReward: 92.08, SuccessRate: 89.50%
+[EvalReasons @ Episode 14400] eps=0.00 -> success:160 (80.0%), step_guard_timeout:40 (20.0%) | eps=0.05 -> success:179 (89.5%), step_guard_timeout:21 (10.5%)
+Saved resumable checkpoint: checkpoints\profile_training\stage_200_RI_balanced_further\last_model.pt (episode 14400)
+Episode 14450, LastReward: 137.80, AvgReward(50): 131.68, SuccessRate(50): 94.00%, Epsilon: 0.103
+Episode 14500, LastReward: 175.64, AvgReward(50): 94.55, SuccessRate(50): 92.00%, Epsilon: 0.103
+Episode 14550, LastReward: 69.11, AvgReward(50): 122.48, SuccessRate(50): 92.00%, Epsilon: 0.103
+Episode 14600, LastReward: 189.39, AvgReward(50): 69.68, SuccessRate(50): 90.00%, Epsilon: 0.102
+Episode 14650, LastReward: 154.24, AvgReward(50): 141.60, SuccessRate(50): 98.00%, Epsilon: 0.102
+Episode 14700, LastReward: 188.67, AvgReward(50): 90.54, SuccessRate(50): 90.00%, Epsilon: 0.102
+[Eval @ Episode 14700] eps=0.00 -> MeanReward: 25.35, SuccessRate: 76.00% | eps=0.05 -> MeanReward: 103.96, SuccessRate: 91.00%
+[EvalReasons @ Episode 14700] eps=0.00 -> success:152 (76.0%), step_guard_timeout:48 (24.0%) | eps=0.05 -> success:182 (91.0%), step_guard_timeout:18 (9.0%)
+Episode 14750, LastReward: 176.23, AvgReward(50): 91.61, SuccessRate(50): 90.00%, Epsilon: 0.101
+Episode 14800, LastReward: 146.57, AvgReward(50): 152.05, SuccessRate(50): 96.00%, Epsilon: 0.101
+Saved resumable checkpoint: checkpoints\profile_training\stage_200_RI_balanced_further\last_model.pt (episode 14800)
+Episode 14850, LastReward: -211.85, AvgReward(50): 120.88, SuccessRate(50): 94.00%, Epsilon: 0.101
+Episode 14900, LastReward: 159.81, AvgReward(50): 111.19, SuccessRate(50): 94.00%, Epsilon: 0.100
+Episode 14950, LastReward: 167.50, AvgReward(50): 107.41, SuccessRate(50): 92.00%, Epsilon: 0.100
+Episode 15000, LastReward: 114.18, AvgReward(50): 132.26, SuccessRate(50): 94.00%, Epsilon: 0.100
+[Eval @ Episode 15000] eps=0.00 -> MeanReward: 45.80, SuccessRate: 76.00% | eps=0.05 -> MeanReward: 70.84, SuccessRate: 87.50%
+[EvalReasons @ Episode 15000] eps=0.00 -> success:152 (76.0%), step_guard_timeout:48 (24.0%) | eps=0.05 -> success:175 (87.5%), step_guard_timeout:25 (12.5%)
+Episode 15050, LastReward: 175.55, AvgReward(50): 88.03, SuccessRate(50): 90.00%, Epsilon: 0.099
+Episode 15100, LastReward: 168.43, AvgReward(50): 93.02, SuccessRate(50): 88.00%, Epsilon: 0.099
+Episode 15150, LastReward: 117.95, AvgReward(50): 115.34, SuccessRate(50): 94.00%, Epsilon: 0.099
+Episode 15200, LastReward: 149.18, AvgReward(50): 84.88, SuccessRate(50): 88.00%, Epsilon: 0.099
+Saved resumable checkpoint: checkpoints\profile_training\stage_200_RI_balanced_further\last_model.pt (episode 15200)
+Episode 15250, LastReward: 125.76, AvgReward(50): 82.46, SuccessRate(50): 88.00%, Epsilon: 0.098
+Episode 15300, LastReward: 38.04, AvgReward(50): 97.06, SuccessRate(50): 94.00%, Epsilon: 0.098
+[Eval @ Episode 15300] eps=0.00 -> MeanReward: 11.55, SuccessRate: 70.00% | eps=0.05 -> MeanReward: 80.37, SuccessRate: 87.00%
+[EvalReasons @ Episode 15300] eps=0.00 -> success:140 (70.0%), step_guard_timeout:60 (30.0%) | eps=0.05 -> success:174 (87.0%), step_guard_timeout:26 (13.0%)
+Episode 15350, LastReward: 141.54, AvgReward(50): 90.55, SuccessRate(50): 92.00%, Epsilon: 0.098
+Episode 15400, LastReward: 158.06, AvgReward(50): 47.24, SuccessRate(50): 82.00%, Epsilon: 0.097
+Episode 15450, LastReward: 157.35, AvgReward(50): 114.12, SuccessRate(50): 94.00%, Epsilon: 0.097
+Episode 15500, LastReward: 194.39, AvgReward(50): 130.56, SuccessRate(50): 96.00%, Epsilon: 0.097
+Episode 15550, LastReward: 199.47, AvgReward(50): 128.47, SuccessRate(50): 96.00%, Epsilon: 0.096
+Episode 15600, LastReward: 159.45, AvgReward(50): 138.91, SuccessRate(50): 100.00%, Epsilon: 0.096
+[Eval @ Episode 15600] eps=0.00 -> MeanReward: 69.92, SuccessRate: 80.50% | eps=0.05 -> MeanReward: 81.38, SuccessRate: 86.50%
+[EvalReasons @ Episode 15600] eps=0.00 -> success:161 (80.5%), step_guard_timeout:39 (19.5%) | eps=0.05 -> success:173 (86.5%), step_guard_timeout:27 (13.5%)
+Saved resumable checkpoint: checkpoints\profile_training\stage_200_RI_balanced_further\last_model.pt (episode 15600)
+Episode 15650, LastReward: 149.56, AvgReward(50): 125.56, SuccessRate(50): 90.00%, Epsilon: 0.096
+Episode 15700, LastReward: 147.47, AvgReward(50): 99.89, SuccessRate(50): 90.00%, Epsilon: 0.095
+Episode 15750, LastReward: 180.81, AvgReward(50): 95.60, SuccessRate(50): 90.00%, Epsilon: 0.095
+Episode 15800, LastReward: 139.92, AvgReward(50): 127.88, SuccessRate(50): 94.00%, Epsilon: 0.095
+Episode 15850, LastReward: 197.51, AvgReward(50): 130.84, SuccessRate(50): 96.00%, Epsilon: 0.095
+Episode 15900, LastReward: 204.30, AvgReward(50): 77.34, SuccessRate(50): 86.00%, Epsilon: 0.094
+[Eval @ Episode 15900] eps=0.00 -> MeanReward: 42.69, SuccessRate: 75.00% | eps=0.05 -> MeanReward: 79.45, SuccessRate: 85.50%
+[EvalReasons @ Episode 15900] eps=0.00 -> success:150 (75.0%), step_guard_timeout:50 (25.0%) | eps=0.05 -> success:171 (85.5%), step_guard_timeout:28 (14.0%), no_valid_action:1 (0.5%)
+Episode 15950, LastReward: 153.79, AvgReward(50): 105.86, SuccessRate(50): 92.00%, Epsilon: 0.094
+Episode 16000, LastReward: 175.68, AvgReward(50): 141.28, SuccessRate(50): 98.00%, Epsilon: 0.094
+Saved resumable checkpoint: checkpoints\profile_training\stage_200_RI_balanced_further\last_model.pt (episode 16000)
+Episode 16050, LastReward: 139.05, AvgReward(50): 101.38, SuccessRate(50): 90.00%, Epsilon: 0.093
+Episode 16100, LastReward: 137.67, AvgReward(50): 145.49, SuccessRate(50): 100.00%, Epsilon: 0.093
+Episode 16150, LastReward: 122.38, AvgReward(50): 94.36, SuccessRate(50): 86.00%, Epsilon: 0.093
+Episode 16200, LastReward: 164.00, AvgReward(50): 122.30, SuccessRate(50): 94.00%, Epsilon: 0.093
+[Eval @ Episode 16200] eps=0.00 -> MeanReward: 53.33, SuccessRate: 79.00% | eps=0.05 -> MeanReward: 86.93, SuccessRate: 86.50%
+[EvalReasons @ Episode 16200] eps=0.00 -> success:158 (79.0%), step_guard_timeout:42 (21.0%) | eps=0.05 -> success:173 (86.5%), step_guard_timeout:27 (13.5%)
+Episode 16250, LastReward: 138.15, AvgReward(50): 82.48, SuccessRate(50): 84.00%, Epsilon: 0.092
+Episode 16300, LastReward: 192.45, AvgReward(50): 84.34, SuccessRate(50): 88.00%, Epsilon: 0.092
+Episode 16350, LastReward: 170.44, AvgReward(50): 126.82, SuccessRate(50): 94.00%, Epsilon: 0.092
+Episode 16400, LastReward: 133.96, AvgReward(50): 84.74, SuccessRate(50): 90.00%, Epsilon: 0.092
+Saved resumable checkpoint: checkpoints\profile_training\stage_200_RI_balanced_further\last_model.pt (episode 16400)
+Episode 16450, LastReward: 116.72, AvgReward(50): 89.55, SuccessRate(50): 86.00%, Epsilon: 0.091
+Episode 16500, LastReward: 204.10, AvgReward(50): 94.11, SuccessRate(50): 88.00%, Epsilon: 0.091
+[Eval @ Episode 16500] eps=0.00 -> MeanReward: 63.14, SuccessRate: 78.00% | eps=0.05 -> MeanReward: 62.70, SuccessRate: 86.00%
+[EvalReasons @ Episode 16500] eps=0.00 -> success:156 (78.0%), step_guard_timeout:43 (21.5%), no_valid_action:1 (0.5%) | eps=0.05 -> success:172 (86.0%), step_guard_timeout:27 (13.5%), no_valid_action:1 (0.5%)
+Episode 16550, LastReward: 54.18, AvgReward(50): 87.05, SuccessRate(50): 86.00%, Epsilon: 0.091
+Episode 16600, LastReward: 146.32, AvgReward(50): 112.17, SuccessRate(50): 90.00%, Epsilon: 0.090
+Episode 16650, LastReward: 159.56, AvgReward(50): 81.14, SuccessRate(50): 86.00%, Epsilon: 0.090
+Episode 16700, LastReward: 146.05, AvgReward(50): 129.22, SuccessRate(50): 96.00%, Epsilon: 0.090
+Episode 16750, LastReward: 161.05, AvgReward(50): 94.21, SuccessRate(50): 92.00%, Epsilon: 0.090
+Episode 16800, LastReward: 177.69, AvgReward(50): 141.74, SuccessRate(50): 96.00%, Epsilon: 0.089
+[Eval @ Episode 16800] eps=0.00 -> MeanReward: 48.57, SuccessRate: 77.00% | eps=0.05 -> MeanReward: 102.69, SuccessRate: 88.50%
+[EvalReasons @ Episode 16800] eps=0.00 -> success:154 (77.0%), step_guard_timeout:46 (23.0%) | eps=0.05 -> success:177 (88.5%), step_guard_timeout:21 (10.5%), no_valid_action:2 (1.0%)
+Saved resumable checkpoint: checkpoints\profile_training\stage_200_RI_balanced_further\last_model.pt (episode 16800)
+Episode 16850, LastReward: 151.95, AvgReward(50): 128.69, SuccessRate(50): 96.00%, Epsilon: 0.089
+Episode 16900, LastReward: 181.63, AvgReward(50): 89.13, SuccessRate(50): 88.00%, Epsilon: 0.089
+Episode 16950, LastReward: 171.83, AvgReward(50): 104.95, SuccessRate(50): 88.00%, Epsilon: 0.089
+Episode 17000, LastReward: 148.85, AvgReward(50): 130.37, SuccessRate(50): 96.00%, Epsilon: 0.088
+Episode 17050, LastReward: 139.03, AvgReward(50): 78.16, SuccessRate(50): 92.00%, Epsilon: 0.088
+Episode 17100, LastReward: 105.67, AvgReward(50): 92.23, SuccessRate(50): 90.00%, Epsilon: 0.088
+[Eval @ Episode 17100] eps=0.00 -> MeanReward: 51.79, SuccessRate: 77.00% | eps=0.05 -> MeanReward: 114.81, SuccessRate: 91.00%
+[EvalReasons @ Episode 17100] eps=0.00 -> success:154 (77.0%), step_guard_timeout:46 (23.0%) | eps=0.05 -> success:182 (91.0%), step_guard_timeout:17 (8.5%), no_valid_action:1 (0.5%)
+Episode 17150, LastReward: 178.88, AvgReward(50): 110.61, SuccessRate(50): 90.00%, Epsilon: 0.088
+Episode 17200, LastReward: 165.42, AvgReward(50): 111.47, SuccessRate(50): 92.00%, Epsilon: 0.087
+Saved resumable checkpoint: checkpoints\profile_training\stage_200_RI_balanced_further\last_model.pt (episode 17200)
+Episode 17250, LastReward: 148.19, AvgReward(50): 126.05, SuccessRate(50): 96.00%, Epsilon: 0.087
+Episode 17300, LastReward: 135.54, AvgReward(50): 90.06, SuccessRate(50): 88.00%, Epsilon: 0.087
+Episode 17350, LastReward: 178.24, AvgReward(50): 98.06, SuccessRate(50): 86.00%, Epsilon: 0.087
+Episode 17400, LastReward: 130.68, AvgReward(50): 75.03, SuccessRate(50): 86.00%, Epsilon: 0.086
+[Eval @ Episode 17400] eps=0.00 -> MeanReward: 44.02, SuccessRate: 76.00% | eps=0.05 -> MeanReward: 91.91, SuccessRate: 87.50%
+[EvalReasons @ Episode 17400] eps=0.00 -> success:152 (76.0%), step_guard_timeout:47 (23.5%), no_valid_action:1 (0.5%) | eps=0.05 -> success:175 (87.5%), step_guard_timeout:25 (12.5%)
+Episode 17450, LastReward: 188.35, AvgReward(50): 100.75, SuccessRate(50): 92.00%, Epsilon: 0.086
+Episode 17500, LastReward: 154.21, AvgReward(50): 82.47, SuccessRate(50): 84.00%, Epsilon: 0.086
+Episode 17550, LastReward: 124.53, AvgReward(50): 122.39, SuccessRate(50): 96.00%, Epsilon: 0.086
+Episode 17600, LastReward: 158.22, AvgReward(50): 133.85, SuccessRate(50): 96.00%, Epsilon: 0.086
+Saved resumable checkpoint: checkpoints\profile_training\stage_200_RI_balanced_further\last_model.pt (episode 17600)
+Episode 17650, LastReward: -149.09, AvgReward(50): 122.69, SuccessRate(50): 94.00%, Epsilon: 0.085
+Episode 17700, LastReward: -365.81, AvgReward(50): 120.06, SuccessRate(50): 94.00%, Epsilon: 0.085
+[Eval @ Episode 17700] eps=0.00 -> MeanReward: 38.12, SuccessRate: 73.00% | eps=0.05 -> MeanReward: 106.72, SuccessRate: 89.00%
+[EvalReasons @ Episode 17700] eps=0.00 -> success:146 (73.0%), step_guard_timeout:54 (27.0%) | eps=0.05 -> success:178 (89.0%), step_guard_timeout:21 (10.5%), no_valid_action:1 (0.5%)
+Episode 17750, LastReward: 222.46, AvgReward(50): 117.65, SuccessRate(50): 94.00%, Epsilon: 0.085
+Episode 17800, LastReward: 137.54, AvgReward(50): 96.82, SuccessRate(50): 88.00%, Epsilon: 0.085
+Episode 17850, LastReward: 138.70, AvgReward(50): 103.24, SuccessRate(50): 94.00%, Epsilon: 0.084
+Episode 17900, LastReward: 189.25, AvgReward(50): 109.63, SuccessRate(50): 92.00%, Epsilon: 0.084
+Episode 17950, LastReward: 85.54, AvgReward(50): 72.24, SuccessRate(50): 88.00%, Epsilon: 0.084
+Episode 18000, LastReward: 89.92, AvgReward(50): 138.45, SuccessRate(50): 96.00%, Epsilon: 0.084
+[Eval @ Episode 18000] eps=0.00 -> MeanReward: 88.66, SuccessRate: 82.00% | eps=0.05 -> MeanReward: 120.26, SuccessRate: 93.50%
+[EvalReasons @ Episode 18000] eps=0.00 -> success:164 (82.0%), step_guard_timeout:36 (18.0%) | eps=0.05 -> success:187 (93.5%), step_guard_timeout:13 (6.5%)
+Saved resumable checkpoint: checkpoints\profile_training\stage_200_RI_balanced_further\last_model.pt (episode 18000)
+Episode 18050, LastReward: 57.55, AvgReward(50): 125.46, SuccessRate(50): 92.00%, Epsilon: 0.083
+Episode 18100, LastReward: 144.33, AvgReward(50): 70.51, SuccessRate(50): 88.00%, Epsilon: 0.083
+Episode 18150, LastReward: 178.01, AvgReward(50): 92.85, SuccessRate(50): 88.00%, Epsilon: 0.083
+Episode 18200, LastReward: 127.20, AvgReward(50): 82.37, SuccessRate(50): 84.00%, Epsilon: 0.083
+Episode 18250, LastReward: 121.30, AvgReward(50): 108.44, SuccessRate(50): 90.00%, Epsilon: 0.083
+Episode 18300, LastReward: 160.47, AvgReward(50): 108.51, SuccessRate(50): 92.00%, Epsilon: 0.082
+[Eval @ Episode 18300] eps=0.00 -> MeanReward: 68.94, SuccessRate: 79.50% | eps=0.05 -> MeanReward: 85.82, SuccessRate: 87.00%
+[EvalReasons @ Episode 18300] eps=0.00 -> success:159 (79.5%), step_guard_timeout:41 (20.5%) | eps=0.05 -> success:174 (87.0%), step_guard_timeout:24 (12.0%), no_valid_action:2 (1.0%)
+Episode 18350, LastReward: 144.15, AvgReward(50): 76.65, SuccessRate(50): 84.00%, Epsilon: 0.082
+Episode 18400, LastReward: 187.60, AvgReward(50): 103.95, SuccessRate(50): 88.00%, Epsilon: 0.082
+Saved resumable checkpoint: checkpoints\profile_training\stage_200_RI_balanced_further\last_model.pt (episode 18400)
+Episode 18450, LastReward: 156.78, AvgReward(50): 120.75, SuccessRate(50): 92.00%, Epsilon: 0.082
+Episode 18500, LastReward: 196.84, AvgReward(50): 136.65, SuccessRate(50): 94.00%, Epsilon: 0.082
+Episode 18550, LastReward: -212.75, AvgReward(50): 124.64, SuccessRate(50): 92.00%, Epsilon: 0.081
+Episode 18600, LastReward: 104.78, AvgReward(50): 112.61, SuccessRate(50): 92.00%, Epsilon: 0.081
+[Eval @ Episode 18600] eps=0.00 -> MeanReward: 42.70, SuccessRate: 75.00% | eps=0.05 -> MeanReward: 93.86, SuccessRate: 88.50%
+[EvalReasons @ Episode 18600] eps=0.00 -> success:150 (75.0%), step_guard_timeout:49 (24.5%), no_valid_action:1 (0.5%) | eps=0.05 -> success:177 (88.5%), step_guard_timeout:23 (11.5%)
+Episode 18650, LastReward: -199.61, AvgReward(50): 23.50, SuccessRate(50): 80.00%, Epsilon: 0.081
+Episode 18700, LastReward: 158.71, AvgReward(50): 118.73, SuccessRate(50): 92.00%, Epsilon: 0.081
+Episode 18750, LastReward: 17.45, AvgReward(50): 113.67, SuccessRate(50): 90.00%, Epsilon: 0.081
+Episode 18800, LastReward: 133.33, AvgReward(50): 117.36, SuccessRate(50): 92.00%, Epsilon: 0.080
+Saved resumable checkpoint: checkpoints\profile_training\stage_200_RI_balanced_further\last_model.pt (episode 18800)
+Episode 18850, LastReward: 188.78, AvgReward(50): 108.47, SuccessRate(50): 88.00%, Epsilon: 0.080
+Episode 18900, LastReward: 176.23, AvgReward(50): 93.54, SuccessRate(50): 88.00%, Epsilon: 0.080
+[Eval @ Episode 18900] eps=0.00 -> MeanReward: 70.08, SuccessRate: 83.00% | eps=0.05 -> MeanReward: 90.04, SuccessRate: 86.00%
+[EvalReasons @ Episode 18900] eps=0.00 -> success:166 (83.0%), step_guard_timeout:33 (16.5%), no_valid_action:1 (0.5%) | eps=0.05 -> success:172 (86.0%), step_guard_timeout:28 (14.0%)
+Episode 18950, LastReward: 130.98, AvgReward(50): 128.44, SuccessRate(50): 96.00%, Epsilon: 0.080
+Episode 19000, LastReward: 145.01, AvgReward(50): 108.28, SuccessRate(50): 90.00%, Epsilon: 0.080
+Episode 19050, LastReward: 149.92, AvgReward(50): 60.20, SuccessRate(50): 86.00%, Epsilon: 0.079
+Episode 19100, LastReward: 155.45, AvgReward(50): 92.76, SuccessRate(50): 88.00%, Epsilon: 0.079
+Episode 19150, LastReward: 153.60, AvgReward(50): 116.89, SuccessRate(50): 94.00%, Epsilon: 0.079
+Episode 19200, LastReward: 104.16, AvgReward(50): 125.69, SuccessRate(50): 94.00%, Epsilon: 0.079
+[Eval @ Episode 19200] eps=0.00 -> MeanReward: 39.38, SuccessRate: 76.00% | eps=0.05 -> MeanReward: 82.70, SuccessRate: 86.50%
+[EvalReasons @ Episode 19200] eps=0.00 -> success:152 (76.0%), step_guard_timeout:48 (24.0%) | eps=0.05 -> success:173 (86.5%), step_guard_timeout:26 (13.0%), no_valid_action:1 (0.5%)
+Saved resumable checkpoint: checkpoints\profile_training\stage_200_RI_balanced_further\last_model.pt (episode 19200)
+Episode 19250, LastReward: 167.70, AvgReward(50): 91.26, SuccessRate(50): 90.00%, Epsilon: 0.079
+Episode 19300, LastReward: 113.34, AvgReward(50): 122.52, SuccessRate(50): 92.00%, Epsilon: 0.078
+Episode 19350, LastReward: 115.71, AvgReward(50): 109.54, SuccessRate(50): 90.00%, Epsilon: 0.078
+Episode 19400, LastReward: 167.59, AvgReward(50): 128.39, SuccessRate(50): 96.00%, Epsilon: 0.078
+Episode 19450, LastReward: 182.71, AvgReward(50): 100.04, SuccessRate(50): 90.00%, Epsilon: 0.078
+Episode 19500, LastReward: 226.61, AvgReward(50): 98.05, SuccessRate(50): 90.00%, Epsilon: 0.078
+[Eval @ Episode 19500] eps=0.00 -> MeanReward: 89.48, SuccessRate: 83.00% | eps=0.05 -> MeanReward: 117.83, SuccessRate: 91.50%
+[EvalReasons @ Episode 19500] eps=0.00 -> success:166 (83.0%), step_guard_timeout:34 (17.0%) | eps=0.05 -> success:183 (91.5%), step_guard_timeout:16 (8.0%), no_valid_action:1 (0.5%)
+Episode 19550, LastReward: 168.57, AvgReward(50): 56.58, SuccessRate(50): 86.00%, Epsilon: 0.078
+Episode 19600, LastReward: 155.16, AvgReward(50): 110.73, SuccessRate(50): 94.00%, Epsilon: 0.077
+Saved resumable checkpoint: checkpoints\profile_training\stage_200_RI_balanced_further\last_model.pt (episode 19600)
+Episode 19650, LastReward: 149.29, AvgReward(50): 96.02, SuccessRate(50): 90.00%, Epsilon: 0.077
+Episode 19700, LastReward: 170.48, AvgReward(50): 87.70, SuccessRate(50): 90.00%, Epsilon: 0.077
+Episode 19750, LastReward: 160.98, AvgReward(50): 80.65, SuccessRate(50): 86.00%, Epsilon: 0.077
+Episode 19800, LastReward: -221.76, AvgReward(50): 79.15, SuccessRate(50): 84.00%, Epsilon: 0.077
+[Eval @ Episode 19800] eps=0.00 -> MeanReward: 79.62, SuccessRate: 82.00% | eps=0.05 -> MeanReward: 73.28, SuccessRate: 87.50%
+[EvalReasons @ Episode 19800] eps=0.00 -> success:164 (82.0%), step_guard_timeout:36 (18.0%) | eps=0.05 -> success:175 (87.5%), step_guard_timeout:24 (12.0%), no_valid_action:1 (0.5%)
+Episode 19850, LastReward: 108.46, AvgReward(50): 61.30, SuccessRate(50): 86.00%, Epsilon: 0.077
+Episode 19900, LastReward: 200.94, AvgReward(50): 79.17, SuccessRate(50): 90.00%, Epsilon: 0.076
+Episode 19950, LastReward: 203.35, AvgReward(50): 115.79, SuccessRate(50): 92.00%, Epsilon: 0.076
+Episode 20000, LastReward: 78.68, AvgReward(50): 109.94, SuccessRate(50): 92.00%, Epsilon: 0.076
+Saved resumable checkpoint: checkpoints\profile_training\stage_200_RI_balanced_further\last_model.pt (episode 20000)
+Saved last checkpoint: checkpoints\profile_training\stage_200_RI_balanced_further\last_model.pt
+Evaluation over 200 episodes | eps=0.00 MeanReward: 44.33, SuccessRate: 74.50% | eps=0.05 MeanReward: 107.04, SuccessRate: 89.50%
+Evaluation termination reasons | eps=0.00: success:149 (74.5%), step_guard_timeout:49 (24.5%), no_valid_action:2 (1.0%) | eps=0.05: success:179 (89.5%), step_guard_timeout:21 (10.5%)
+Best checkpoint summary | Episode: 9600, PrimaryEval MeanReward: 88.10, SuccessRate: 85.00%
+Run log saved to: results\runs\profile_training\last_run_stage_200_RI_balanced_further.txt
