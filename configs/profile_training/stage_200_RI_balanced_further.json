@@ -105,8 +105,8 @@
     "pretrained_model_path": "checkpoints/profile_training/stage_200_RI_balanced/best_model.pt",
     "resume_optimizer": true,
 
-    "resume_training": false,
-    "resume_checkpoint_path": "checkpoints/profile_training/stage_200_RI_balanced/last_model.pt",
+    "resume_training": true,
+    "resume_checkpoint_path": "checkpoints/profile_training/stage_200_RI_balanced_further/last_model.pt",
     "save_last_every_episodes": 400
   },
   "evaluation": {
