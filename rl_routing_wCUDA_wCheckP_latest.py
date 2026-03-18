@@ -11,6 +11,7 @@ import random
 import argparse
 from collections import deque
 from copy import deepcopy
+from datetime import datetime
 from pathlib import Path
 
 import networkx as nx
@@ -1328,6 +1329,7 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
                     )
 
                 if (episode + 1) % eval_every == 0:
+                    eval_clock = datetime.now().strftime("%H:%M:%S")
                     eval_reward_eps0, eval_success_eps0, eval_reasons_eps0, eval_metrics_eps0 = evaluate_policy(
                         online,
                         env,
@@ -1345,17 +1347,17 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
                         return_metrics=True,
                     )
                     log(
-                        f"[Eval @ Episode {episode + 1}] "
+                        f"[Eval @ Episode {episode + 1} | {eval_clock}] "
                         f"eps={eval_eps0:.2f} -> MeanReward: {eval_reward_eps0:.2f}, SuccessRate: {eval_success_eps0:.2%} | "
                         f"eps={eval_eps_noise:.2f} -> MeanReward: {eval_reward_epsn:.2f}, SuccessRate: {eval_success_epsn:.2%}"
                     )
                     log(
-                        f"[EvalReasons @ Episode {episode + 1}] "
+                        f"[EvalReasons @ Episode {episode + 1} | {eval_clock}] "
                         f"eps={eval_eps0:.2f} -> {format_reason_counts(eval_reasons_eps0, eval_episodes)} | "
                         f"eps={eval_eps_noise:.2f} -> {format_reason_counts(eval_reasons_epsn, eval_episodes)}"
                     )
                     log(
-                        f"[EvalStats @ Episode {episode + 1}] "
+                        f"[EvalStats @ Episode {episode + 1} | {eval_clock}] "
                         f"eps={eval_eps0:.2f} -> {format_eval_metrics(eval_metrics_eps0)} | "
                         f"eps={eval_eps_noise:.2f} -> {format_eval_metrics(eval_metrics_epsn)}"
                     )
@@ -1408,8 +1410,9 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
             return_reason_counts=True,
             return_metrics=True,
         )
+        final_eval_clock = datetime.now().strftime("%H:%M:%S")
         log(
-            f"Evaluation over {eval_episodes} episodes | "
+            f"Evaluation over {eval_episodes} episodes | {final_eval_clock} | "
             f"eps={eval_eps0:.2f} MeanReward: {final_reward_eps0:.2f}, SuccessRate: {final_success_eps0:.2%} | "
             f"eps={eval_eps_noise:.2f} MeanReward: {final_reward_epsn:.2f}, SuccessRate: {final_success_epsn:.2%}"
         )
