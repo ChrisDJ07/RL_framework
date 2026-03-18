@@ -374,4 +374,7 @@ if __name__ == "__main__":
 # python utils/visualize_routes.py --checkpoint-path checkpoints/staged_training/stage_200/best_model.pt --save-path results/visualization_runs/my_routes_stage_200_temp.png --config-path configs/staged_training/stage_200.json --num-episodes 1 --cols 1
 
 # Nodes: stage 200 with RI1
-# python utils/visualize_routes.py --checkpoint-path checkpoints/hazard_training/stage_200_RI1/best_model.pt --save-path results/visualization_runs/my_routes_stage_200_RI1_temp.png --config-path configs/hazard_training/stage_200_RI1.json --num-episodes 6 --cols 3`
+# python utils/visualize_routes.py --checkpoint-path checkpoints/hazard_training/stage_200_RI1/best_model.pt --save-path results/visualization_runs/my_routes_stage_200_RI1_temp.png --config-path configs/hazard_training/stage_200_RI1.json --num-episodes 6 --cols 3
+
+# Nodes: stage 100 with RI1
+# python utils/visualize_routes.py --checkpoint-path checkpoints/staged_training_new/stage_100_balanced_hard/best_model.pt --save-path results/visualization_runs/staged_training_new/stage_100_balanced_hard_RI1_temp.png --config-path configs/profile_training_new/stage_100_balanced_hard.json --num-episodes 9 --cols 3
