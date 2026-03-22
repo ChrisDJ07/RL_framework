@@ -5,7 +5,7 @@
     "min_nodes": 100,
     "max_nodes": 100,
     "force_download": false,
-    "prebuilt_graphml_path": "data/staged_subgraphs/selected_subgraph_n200.graphml",
+    "prebuilt_graphml_path": "data/staged_subgraphs/selected_subgraph_n100.graphml",
     "use_existing_hazards": true,
     "flood_attr": "flood_hazard",
     "landslide_attr": "landslide_hazard",
@@ -91,7 +91,7 @@
     "capacity": 20000
   },
   "training": {
-    "num_episodes": 35000,
+    "num_episodes": 30000,
     "gamma": 0.99,
     "lr": 0.0003,
     "batch_size": 128,

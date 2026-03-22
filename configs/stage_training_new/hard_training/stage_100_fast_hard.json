@@ -5,7 +5,7 @@
     "min_nodes": 100,
     "max_nodes": 100,
     "force_download": false,
-    "prebuilt_graphml_path": "data/staged_subgraphs/selected_subgraph_n200.graphml",
+    "prebuilt_graphml_path": "data/staged_subgraphs/selected_subgraph_n100.graphml",
     "use_existing_hazards": true,
     "flood_attr": "flood_hazard",
     "landslide_attr": "landslide_hazard",
@@ -91,7 +91,7 @@
     "capacity": 20000
   },
   "training": {
-    "num_episodes": 35000,
+    "num_episodes": 30000,
     "gamma": 0.99,
     "lr": 0.0003,
     "batch_size": 128,
@@ -109,7 +109,7 @@
     "resume_optimizer": false,
 
     "resume_training": true,
-    "resume_checkpoint_path": "checkpoints/staged_training_new/stage_100_balanced_hard/last_model.pt",
+    "resume_checkpoint_path": "checkpoints/staged_training_new/stage_100_fast_hard/last_model.pt",
     "save_last_every_episodes": 400
   },
   "evaluation": {
@@ -120,8 +120,8 @@
     "epsilon_noisy": 0.05
   },
   "paths": {
-    "checkpoints_dir": "checkpoints/staged_training_new/stage_100_balanced_hard",
+    "checkpoints_dir": "checkpoints/staged_training_new/stage_100_fast_hard",
     "runs_dir": "results/runs/staged_training_new",
-    "run_log_file": "last_run_stage_100_balanced_hard.txt"
+    "run_log_file": "last_run_stage_100_fast_hard.txt"
   }
 }

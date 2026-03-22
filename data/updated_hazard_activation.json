@@ -1,0 +1,39 @@
+{
+  "rain_levels": {
+    "RI1": {
+      "speed_mult": 0.94,
+      "flood_block_threshold": 1.0,
+      "flood_block_prob": 0.0,
+      "landslide_block_threshold": 1.1,
+      "landslide_block_prob": 0.0
+    },
+    "RI2": {
+      "speed_mult": 0.90,
+      "flood_block_threshold": 1.0,
+      "flood_block_prob": 1.0,
+      "landslide_block_threshold": 1.1,
+      "landslide_block_prob": 0.0
+    },
+    "RI3": {
+      "speed_mult": 0.85,
+      "flood_block_threshold": 0.6,
+      "flood_block_prob": 1.0,
+      "landslide_block_threshold": 1.1,
+      "landslide_block_prob": 0.0
+    },
+    "RI4": {
+      "speed_mult": 0.40,
+      "flood_block_threshold": 0.6,
+      "flood_block_prob": 1.0,
+      "landslide_block_threshold": 1.0,
+      "landslide_block_prob": 1.0
+    },
+    "RI5": {
+      "speed_mult": 0.20,
+      "flood_block_threshold": 0.6,
+      "flood_block_prob": 1.0,
+      "landslide_block_threshold": 0.6,
+      "landslide_block_prob": 1.0
+    }
+  }
+}

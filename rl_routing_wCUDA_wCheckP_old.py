@@ -132,8 +132,6 @@ DEFAULT_CONFIG = {
         "use_pretrained_model": False,
         "pretrained_model_path": "",
         "resume_optimizer": False,
-        "reroll_infeasible_episodes": False,
-        "max_feasibility_resamples": 20,
         "resume_training": False,
         "resume_checkpoint_path": "",
         "save_last_every_episodes": 200,
@@ -142,7 +140,6 @@ DEFAULT_CONFIG = {
         "episodes": 300,
         "epsilon_greedy": 0.0,
         "epsilon_noisy": 0.05,
-        "skip_infeasible_at_reset": False,
     },
     "paths": {
         "checkpoints_dir": "checkpoints",
@@ -419,28 +416,6 @@ class HazardRoutingEnv:
     def failure_penalty(self, reason):
         base = self.penalty_blockage if reason == "blockage" else self.penalty_timeout
         return base + self._incomplete_penalty()
-
-    def is_current_episode_feasible(self):
-        """Check whether every delivery is reachable from the current node on passable edges."""
-        if not self.delivery_nodes:
-            return True
-        if self.current_node not in self.G:
-            return False
-
-        reachable = set()
-        stack = [self.current_node]
-        while stack:
-            node = stack.pop()
-            if node in reachable:
-                continue
-            reachable.add(node)
-            for nbr in self.G.neighbors(node):
-                if self.G[node][nbr].get("blocked", False):
-                    continue
-                if nbr not in reachable:
-                    stack.append(nbr)
-
-        return all(node in reachable for node in self.delivery_nodes)
 
     def reset(self):
         rain_key = random.choice(ACTIVE_RAIN_KEYS)
@@ -760,7 +735,6 @@ def evaluate_policy(
     env,
     num_episodes=100,
     epsilon=0.0,
-    skip_infeasible_at_reset=False,
     return_reason_counts=False,
     return_metrics=False,
 ):
@@ -777,15 +751,6 @@ def evaluate_policy(
 
     for _ in range(num_episodes):
         state = env.reset()
-        if skip_infeasible_at_reset and not env.is_current_episode_feasible():
-            total_reward = env.failure_penalty("blockage")
-            rewards.append(total_reward)
-            episode_steps.append(float(env.steps))
-            episode_times.append(float(env.total_time))
-            episode_hazards.append(float(env.total_hazard))
-            reason_counts["infeasible_at_reset"] = reason_counts.get("infeasible_at_reset", 0) + 1
-            continue
-
         done = False
         total_reward = 0.0
         reason = None
@@ -863,19 +828,6 @@ def format_eval_metrics(metrics):
         f"SuccTime:{_fmt(metrics.get('mean_time_success'))}, "
         f"SuccHazard:{_fmt(metrics.get('mean_hazard_success'))}"
     )
-
-
-def reset_episode_with_feasibility(env, reroll_infeasible=False, max_resamples=20):
-    """Reset the environment, optionally resampling until the episode is feasible."""
-    attempts = 0
-    while True:
-        state = env.reset()
-        feasible = env.is_current_episode_feasible()
-        if feasible or not reroll_infeasible:
-            return state, feasible, attempts
-        attempts += 1
-        if attempts >= max_resamples:
-            return state, feasible, attempts
 
 
 # =========================
@@ -989,13 +941,9 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
         use_pretrained = bool(train_cfg.get("use_pretrained_model", False))
         pretrained_model_path = str(train_cfg.get("pretrained_model_path", "") or "").strip()
         resume_optimizer = bool(train_cfg.get("resume_optimizer", False))
-        reroll_infeasible_episodes = bool(train_cfg.get("reroll_infeasible_episodes", False))
-        max_feasibility_resamples = max(0, int(train_cfg.get("max_feasibility_resamples", 20)))
         save_last_every = int(train_cfg.get("save_last_every_episodes", 200))
         if save_last_every < 0:
             raise ValueError("training.save_last_every_episodes must be >= 0")
-
-        skip_infeasible_at_reset_eval = bool(eval_cfg.get("skip_infeasible_at_reset", False))
 
         if resume_training and use_pretrained:
             log("WARNING: training.resume_training=True overrides use_pretrained_model; resume checkpoint will be used.")
@@ -1011,9 +959,6 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
             f"step_cost={configured_step_cost} | "
             f"revisit_penalty={configured_revisit_penalty} | "
             f"backtrack_penalty={configured_backtrack_penalty} | "
-            f"reroll_infeasible_episodes={reroll_infeasible_episodes} | "
-            f"max_feasibility_resamples={max_feasibility_resamples} | "
-            f"skip_infeasible_at_reset_eval={skip_infeasible_at_reset_eval} | "
             f"resume_training={resume_training} | "
             f"resume_checkpoint_path={resume_checkpoint_path if resume_checkpoint_path else str(last_model_path)} | "
             f"use_pretrained_model={use_pretrained} | "
@@ -1265,15 +1210,9 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
             f"Deliveries: {env.num_deliveries}, Device: {device}"
         )
         interrupted = False
-        infeasible_rerolls_total = 0
         try:
             for episode in range(start_episode, num_episodes):
-                state, _, infeasible_resamples = reset_episode_with_feasibility(
-                    env,
-                    reroll_infeasible=reroll_infeasible_episodes,
-                    max_resamples=max_feasibility_resamples,
-                )
-                infeasible_rerolls_total += infeasible_resamples
+                state = env.reset()
                 done = False
                 total_reward = 0.0
 
@@ -1386,8 +1325,7 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
                         f"LastReward: {total_reward:.2f}, "
                         f"AvgReward({log_every}): {avg_reward:.2f}, "
                         f"SuccessRate({log_every}): {success_rate:.2%}, "
-                        f"Epsilon: {epsilon:.3f}, "
-                        f"InfeasibleRerolls(total): {infeasible_rerolls_total}"
+                        f"Epsilon: {epsilon:.3f}"
                     )
 
                 if (episode + 1) % eval_every == 0:
@@ -1397,7 +1335,6 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
                         env,
                         num_episodes=eval_episodes,
                         epsilon=eval_eps0,
-                        skip_infeasible_at_reset=skip_infeasible_at_reset_eval,
                         return_reason_counts=True,
                         return_metrics=True,
                     )
@@ -1406,7 +1343,6 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
                         env,
                         num_episodes=eval_episodes,
                         epsilon=eval_eps_noise,
-                        skip_infeasible_at_reset=skip_infeasible_at_reset_eval,
                         return_reason_counts=True,
                         return_metrics=True,
                     )
@@ -1463,7 +1399,6 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
             env,
             num_episodes=eval_episodes,
             epsilon=eval_eps0,
-            skip_infeasible_at_reset=skip_infeasible_at_reset_eval,
             return_reason_counts=True,
             return_metrics=True,
         )
@@ -1472,7 +1407,6 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
             env,
             num_episodes=eval_episodes,
             epsilon=eval_eps_noise,
-            skip_infeasible_at_reset=skip_infeasible_at_reset_eval,
             return_reason_counts=True,
             return_metrics=True,
         )

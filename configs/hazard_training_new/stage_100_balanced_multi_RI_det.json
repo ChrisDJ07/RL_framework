@@ -21,44 +21,45 @@
     "rain_levels": {
       "RI1": {
         "speed_mult": 0.94,
-        "flood_block_threshold": 1.0,
+        "flood_block_threshold": 1.1,
         "flood_block_prob": 0.0,
-        "landslide_block_threshold": 1.0,
+        "landslide_block_threshold": 1.1,
         "landslide_block_prob": 0.0
       },
       "RI2": {
         "speed_mult": 0.9,
         "flood_block_threshold": 1.0,
         "flood_block_prob": 1.0,
-        "landslide_block_threshold": 0.6,
+        "landslide_block_threshold": 1.1,
         "landslide_block_prob": 0.0
       },
       "RI3": {
         "speed_mult": 0.85,
         "flood_block_threshold": 0.6,
         "flood_block_prob": 1.0,
-        "landslide_block_threshold": 1.0,
-        "landslide_block_prob": 1.0
+        "landslide_block_threshold": 1.1,
+        "landslide_block_prob": 0.0
       },
       "RI4": {
         "speed_mult": 0.4,
         "flood_block_threshold": 0.6,
-        "flood_block_prob": 0.9,
-        "landslide_block_threshold": 0.3,
-        "landslide_block_prob": 0.3
+        "flood_block_prob": 1.0,
+        "landslide_block_threshold": 1.0,
+        "landslide_block_prob": 1.0
       },
       "RI5": {
         "speed_mult": 0.2,
-        "flood_block_threshold": 0.2,
+        "flood_block_threshold": 0.6,
         "flood_block_prob": 1.0,
-        "landslide_block_threshold": 0.3,
+        "landslide_block_threshold": 0.6,
         "landslide_block_prob": 1.0
       }
     },
     "active_rain_keys": [
-      "RI1",
       "RI2",
-      "RI3"
+      "RI3",
+      "RI4",
+      "RI5"
     ],
     "flood_time_weight": 0.5,
     "landslide_time_weight": 0.5,
@@ -93,23 +94,24 @@
     "capacity": 20000
   },
   "training": {
-    "num_episodes": 28000,
+    "num_episodes": 12000,
     "gamma": 0.99,
-    "lr": 0.0001,
+    "lr": 0.00005,
     "batch_size": 128,
-    "epsilon_start": 0.4,
+    "epsilon_start": 0.15,
     "epsilon_min": 0.05,
     "epsilon_decay": 0.995,
     "epsilon_schedule": "exp",
-    "epsilon_exp_decay_rate": 0.0002343173,
+    "epsilon_exp_decay_rate": 0.00045,
     "target_update_every_steps": 500,
     "log_every": 50,
     "eval_every": 200,
-
     "use_pretrained_model": true,
     "pretrained_model_path": "checkpoints/staged_training_new/stage_100_balanced_warm/best_model.pt",
     "resume_optimizer": false,
-
+    "reroll_infeasible_episodes": true,
+    "max_feasibility_resamples": 30,
+    "device": "auto",
     "resume_training": false,
     "resume_checkpoint_path": "",
     "save_last_every_episodes": 400
@@ -118,12 +120,13 @@
     "episodes": 200,
     "epsilon_primary": 0.05,
     "run_epsilon_greedy_eval": true,
+    "skip_infeasible_at_reset": true,
     "epsilon_greedy": 0.0,
     "epsilon_noisy": 0.05
   },
   "paths": {
-    "checkpoints_dir": "checkpoints/hazard_training_new/stage_100_balanced_warm_RI1n2n3",
+    "checkpoints_dir": "checkpoints/hazard_training_new/stage_100_balanced_multi_RI_det",
     "runs_dir": "results/runs/hazard_training_new",
-    "run_log_file": "last_run_stage_100_balanced_warm_RI1n2n3.txt"
+    "run_log_file": "last_run_stage_100_balanced_multi_RI_det.txt"
   }
 }
