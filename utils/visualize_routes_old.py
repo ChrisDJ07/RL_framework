@@ -38,7 +38,6 @@ def load_env_and_model(
     checkpoint = torch.load(ckpt_file, map_location="cpu", weights_only=False)
 
     candidate_modules = [
-        "rl_routing_wCUDA_wCheckP_latest",
         "rl_routing",
         "rl_routing_wCUDA",
         "rl_routing_curriculum",
@@ -115,37 +114,8 @@ def load_env_and_model(
     ) from last_error
 
 
-def _reset_with_mode(env, module, feasibility_mode="raw", max_feasibility_resamples=20):
-    mode = str(feasibility_mode).strip().lower()
-    if mode == "reroll":
-        if hasattr(module, "reset_episode_with_feasibility"):
-            state, feasible, attempts = module.reset_episode_with_feasibility(
-                env,
-                reroll_infeasible=True,
-                max_resamples=max_feasibility_resamples,
-            )
-            return state, feasible, attempts
-
-        attempts = 0
-        while True:
-            state = env.reset()
-            feasible = env.is_current_episode_feasible() if hasattr(env, "is_current_episode_feasible") else True
-            if feasible or attempts >= max_feasibility_resamples:
-                return state, feasible, attempts
-            attempts += 1
-
+def run_episode(env, model, module, epsilon=0.0):
     state = env.reset()
-    feasible = env.is_current_episode_feasible() if hasattr(env, "is_current_episode_feasible") else True
-    return state, feasible, 0
-
-
-def run_episode(env, model, module, epsilon=0.0, feasibility_mode="raw", max_feasibility_resamples=20):
-    state, feasible, rerolls = _reset_with_mode(
-        env,
-        module,
-        feasibility_mode=feasibility_mode,
-        max_feasibility_resamples=max_feasibility_resamples,
-    )
     rain_key = module.RAIN_KEYS[int(np.argmax(env.rain_onehot))]
 
     start_node = env.current_node
@@ -156,26 +126,6 @@ def run_episode(env, model, module, epsilon=0.0, feasibility_mode="raw", max_fea
     total_reward = 0.0
     done = False
     reason = None
-
-    if str(feasibility_mode).strip().lower() == "skip" and not feasible:
-        total_reward = env.failure_penalty("blockage")
-        return {
-            "graph": env.G.copy(),
-            "rain_key": rain_key,
-            "start_node": start_node,
-            "delivery_nodes": delivery_nodes,
-            "completed_nodes": set(),
-            "path_nodes": path_nodes,
-            "path_edges": path_edges,
-            "total_reward": total_reward,
-            "success": False,
-            "reason": "infeasible_at_reset",
-            "blocked_edges": sum(1 for _, _, d in env.G.edges(data=True) if d.get("blocked", False)),
-            "route_hazard": 0.0,
-            "steps": 0,
-            "feasible_at_reset": False,
-            "rerolls": rerolls,
-        }
 
     while not done:
         mask = env.get_action_mask()
@@ -216,8 +166,6 @@ def run_episode(env, model, module, epsilon=0.0, feasibility_mode="raw", max_fea
         "blocked_edges": blocked_edges,
         "route_hazard": route_hazard,
         "steps": len(path_edges),
-        "feasible_at_reset": feasible,
-        "rerolls": rerolls,
     }
 
 
@@ -312,9 +260,7 @@ def _draw_episode(ax, result, episode_idx):
     ax.set_title(
         f"Ep {episode_idx + 1} | {status}\n"
         f"Rain={result['rain_key']} Steps={result['steps']} Reward={result['total_reward']:.1f}\n"
-        f"Blocked={result['blocked_edges']} RouteHaz={result['route_hazard']:.2f} "
-        f"Reason={result['reason']} Feasible={result.get('feasible_at_reset', True)} "
-        f"Rerolls={result.get('rerolls', 0)}",
+        f"Blocked={result['blocked_edges']} RouteHaz={result['route_hazard']:.2f} Reason={result['reason']}",
         fontsize=8,
     )
     ax.set_axis_off()
@@ -335,8 +281,6 @@ def visualize_episodes(
     save_path=None,
     seed=None,
     use_config_seed=False,
-    feasibility_mode="raw",
-    max_feasibility_resamples=20,
 ):
     env, model, module = load_env_and_model(
         config_path=config_path,
@@ -344,17 +288,7 @@ def visualize_episodes(
         seed=seed,
         use_config_seed=use_config_seed,
     )
-    results = [
-        run_episode(
-            env,
-            model,
-            module,
-            epsilon=epsilon,
-            feasibility_mode=feasibility_mode,
-            max_feasibility_resamples=max_feasibility_resamples,
-        )
-        for _ in range(num_episodes)
-    ]
+    results = [run_episode(env, model, module, epsilon=epsilon) for _ in range(num_episodes)]
 
     rows = math.ceil(num_episodes / cols)
     fig, axes = plt.subplots(rows, cols, figsize=(cols * 5.2, rows * 4.2))
@@ -377,8 +311,7 @@ def visualize_episodes(
     fig.legend(handles=legend_handles, loc="lower center", ncol=6, frameon=False, fontsize=9)
     fig.suptitle(
         f"Routing Visualizer | Episodes={num_episodes} | Policy epsilon={epsilon:.2f} | "
-        f"Seed={'config' if use_config_seed and seed is None else seed} | "
-        f"FeasibilityMode={feasibility_mode} | Checkpoint={Path(checkpoint_path).name}",
+        f"Seed={'config' if use_config_seed and seed is None else seed} | Checkpoint={Path(checkpoint_path).name}",
         fontsize=12,
         y=0.995,
     )
@@ -415,19 +348,6 @@ if __name__ == "__main__":
         action="store_true",
         help="Use seed from config when --seed is not provided.",
     )
-    parser.add_argument(
-        "--feasibility-mode",
-        type=str,
-        default="raw",
-        choices=["raw", "skip", "reroll"],
-        help="How to handle infeasible episodes at reset: raw=show them, skip=label and stop immediately, reroll=keep resampling until feasible.",
-    )
-    parser.add_argument(
-        "--max-feasibility-resamples",
-        type=int,
-        default=20,
-        help="Maximum resamples when --feasibility-mode=reroll.",
-    )
     args = parser.parse_args()
 
     visualize_episodes(
@@ -439,8 +359,6 @@ if __name__ == "__main__":
         save_path=(args.save_path if args.save_path else None),
         seed=args.seed,
         use_config_seed=args.use_config_seed,
-        feasibility_mode=args.feasibility_mode,
-        max_feasibility_resamples=args.max_feasibility_resamples,
     )
     
 # python utils/visualize_routes.py --checkpoint-path checkpoints/no_hazard_control/best_model.pt --save-path results/visualization_runs/my_routes.png
@@ -460,17 +378,3 @@ if __name__ == "__main__":
 
 # Nodes: stage 100 with RI1
 # python utils/visualize_routes.py --checkpoint-path checkpoints/staged_training_new/stage_100_balanced_hard/best_model.pt --save-path results/visualization_runs/staged_training_new/stage_100_balanced_hard_RI1_temp.png --config-path configs/profile_training_new/stage_100_balanced_hard.json --num-episodes 9 --cols 3
-
-
-# LATEST FEATURES
-# Raw sampled episodes:
-# python utils/visualize_routes.py --checkpoint-path checkpoints/hazard_training_new/stage_100_balanced_multi_RI_det/best_model.pt --config-path configs/hazard_training_new/stage_100_balanced_multi_RI_det.json --num-episodes 6 --cols 3 --feasibility-mode raw
-
-# Skip impossible episodes cleanly:
-# python utils/visualize_routes.py --checkpoint-path checkpoints/hazard_training_new/stage_100_balanced_multi_RI_det/best_model.pt --config-path configs/hazard_training_new/stage_100_balanced_multi_RI_det.json --num-episodes 6 --cols 3 --feasibility-mode skip
-
-# Only show feasible routes:
-# Multi RI
-# python utils/visualize_routes.py --checkpoint-path checkpoints/hazard_training_new/stage_100_balanced_multi_RI_det/best_model.pt --config-path configs/hazard_training_new/stage_100_balanced_multi_RI_det.json --num-episodes 12 --cols 6 --feasibility-mode reroll --max-feasibility-resamples 50 
-# RI2
-# python utils/visualize_routes.py --checkpoint-path checkpoints/hazard_training_new/stage_100_balanced_RI2_det/best_model.pt --config-path configs/hazard_training_new/stage_100_balanced_RI2_det.json --num-episodes 12 --cols 6 --feasibility-mode reroll --max-feasibility-resamples 50 --save-path results/visualization_runs/hazard_training_new/100n_balanced_RI2_det.png
