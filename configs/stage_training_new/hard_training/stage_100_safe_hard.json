@@ -108,7 +108,7 @@
     "pretrained_model_path": "",
     "resume_optimizer": false,
 
-    "resume_training": true,
+    "resume_training": false,
     "resume_checkpoint_path": "checkpoints/staged_training_new/stage_100_safe_hard/last_model.pt",
     "save_last_every_episodes": 400
   },
