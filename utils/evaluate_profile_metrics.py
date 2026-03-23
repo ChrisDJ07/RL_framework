@@ -340,7 +340,7 @@ def main():
     parser.add_argument(
         "--episodes",
         type=int,
-        default=200,
+        default=1000,
         help="Number of evaluation episodes per profile.",
     )
     parser.add_argument(
@@ -410,8 +410,9 @@ if __name__ == "__main__":
 # python utils/evaluate_profile_metrics.py --episodes 200 --epsilon 0.0 --output-prefix stage_100_profile_eval
 
 """
-.\.venv\Scripts\python.exe utils/evaluate_profile_metrics.py `
-  --spec "Balanced|checkpoints/staged_training_new/stage_100_balanced_warm/best_model.pt|configs/stage_training_new/stage_100_balanced_warm.json" `
-  --spec "Safe|checkpoints/staged_training_new/stage_100_safe_warm/best_model.pt|configs/stage_training_new/stage_100_safe_warm.json" `
-  --spec "Fast|checkpoints/staged_training_new/stage_100_fast_warm/best_model.pt|configs/stage_training_new/stage_100_fast_warm.json"
+python utils/evaluate_profile_metrics.py \
+  --spec "Balanced|checkpoints/staged_training_new/stage_100_balanced_hard/best_model.pt|configs/stage_training_new/hard_training/stage_100_balanced_hard.json" \
+  --spec "Safe|checkpoints/staged_training_new/stage_100_safe_hard/best_model.pt|configs/stage_training_new/hard_training/stage_100_safe_hard.json" \
+  --spec "Fast|checkpoints/staged_training_new/stage_100_fast_hard/best_model.pt|configs/stage_training_new/hard_training/stage_100_fast_hard.json" \
+  --output-prefix stage_100_hard_profiles_eval
 """
