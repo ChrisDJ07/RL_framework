@@ -474,3 +474,74 @@ if __name__ == "__main__":
 # python utils/visualize_routes.py --checkpoint-path checkpoints/hazard_training_new/stage_100_balanced_multi_RI_det/best_model.pt --config-path configs/hazard_training_new/stage_100_balanced_multi_RI_det.json --num-episodes 12 --cols 6 --feasibility-mode reroll --max-feasibility-resamples 50 
 # RI2
 # python utils/visualize_routes.py --checkpoint-path checkpoints/hazard_training_new/stage_100_balanced_RI2_det/best_model.pt --config-path configs/hazard_training_new/stage_100_balanced_RI2_det.json --num-episodes 12 --cols 6 --feasibility-mode reroll --max-feasibility-resamples 50 --save-path results/visualization_runs/hazard_training_new/100n_balanced_RI2_det.png
+
+# Ri4 from RI3
+"""
+python utils/visualize_routes.py --checkpoint-path checkpoints/hazard_training_new/fine_tuned/stage_100_balanced_RI4_from_RI3_det/best_model.pt\
+                                 --config-path configs/hazard_training_new/fine_tuned/stage_100_balanced_RI4_from_RI3_det.json\
+                                 --num-episodes 12\
+                                 --cols 6\
+                                 --feasibility-mode reroll\
+                                 --max-feasibility-resamples 50\
+                                 --save-path results/visualization_runs/hazard_training_new/fine_tuned/stage_100_balanced_RI4_from_RI3_det.png
+"""
+
+
+# RI3 Single
+"""
+python utils/visualize_routes.py --checkpoint-path checkpoints/hazard_training_new/stage_100_balanced_RI3_det/best_model.pt\
+                                 --config-path configs/hazard_training_new/stage_100_balanced_RI3_det.json\
+                                 --num-episodes 12\
+                                 --cols 6\
+                                 --feasibility-mode reroll\
+                                 --max-feasibility-resamples 50\
+                                 --save-path results/visualization_runs/hazard_training_new/fine_tuned/stage_100_balanced_RI3_det.png
+"""
+
+
+# RI4 Single
+"""
+python utils/visualize_routes.py --checkpoint-path checkpoints/hazard_training_new/stage_100_balanced_RI4_det/best_model.pt\
+                                 --config-path configs/hazard_training_new/stage_100_balanced_RI4_det.json\
+                                 --num-episodes 12\
+                                 --cols 6\
+                                 --feasibility-mode reroll\
+                                 --max-feasibility-resamples 50\
+                                 --save-path results/visualization_runs/hazard_training_new/fine_tuned/stage_100_balanced_RI4_det.png
+"""
+
+
+# RI23 Single RI1 only
+"""
+python utils/visualize_routes.py --checkpoint-path checkpoints/hazard_training_new/stage_100_balanced_multi_RI23_det/best_model.pt\
+                                 --config-path configs/hazard_training_new/stage_100_balanced_multi_RI23_det.json\
+                                 --num-episodes 12\
+                                 --cols 6\
+                                 --feasibility-mode reroll\
+                                 --max-feasibility-resamples 50\
+                                 --save-path results/visualization_runs/hazard_training_new/fine_tuned/stage_100_balanced_multi_RI23_det_RI1.png
+"""
+
+
+# Multi RI Single RI1 only
+"""
+python utils/visualize_routes.py --checkpoint-path checkpoints/hazard_training_new/stage_100_balanced_multi_RI_det/best_model.pt\
+                                 --config-path configs/hazard_training_new/stage_100_balanced_multi_RI_det.json\
+                                 --num-episodes 12\
+                                 --cols 6\
+                                 --feasibility-mode reroll\
+                                 --max-feasibility-resamples 50\
+                                 --save-path results/visualization_runs/hazard_training_new/fine_tuned/stage_100_balanced_multi_RI_det_RI1.png
+"""
+
+
+# 200 nodes Single RI2 only
+"""
+python utils/visualize_routes.py --checkpoint-path checkpoints/profile_training_new/stage_200_balanced_warm/best_model.pt\
+                                 --config-path configs/profile_training_new/stage_200_balanced_warm.json\
+                                 --num-episodes 12\
+                                 --cols 6\
+                                 --feasibility-mode reroll\
+                                 --max-feasibility-resamples 50\
+                                 --save-path results/visualization_runs/profile_training_new/stage_200_balanced_warm.png
+"""

@@ -1,11 +1,11 @@
 {
   "seed": 40,
   "graph": {
-    "num_nodes": 100,
-    "min_nodes": 100,
-    "max_nodes": 100,
+    "num_nodes": 200,
+    "min_nodes": 200,
+    "max_nodes": 200,
     "force_download": false,
-    "prebuilt_graphml_path": "data/staged_subgraphs/selected_subgraph_n100.graphml",
+    "prebuilt_graphml_path": "data/staged_subgraphs/selected_subgraph_n200.graphml",
     "use_existing_hazards": true,
     "flood_attr": "flood_hazard",
     "landslide_attr": "landslide_hazard",
@@ -13,9 +13,9 @@
   },
   "environment": {
     "num_deliveries": 2,
-    "min_max_steps": 140,
-    "max_steps_multiplier": 0.5,
-    "episode_time_scale": 6.0
+    "min_max_steps": 220,
+    "max_steps_multiplier": 0.7,
+    "episode_time_scale": 8.0
   },
   "hazard": {
     "rain_levels": {
@@ -62,8 +62,8 @@
       "RI4",
       "RI5"
     ],
-    "flood_time_weight": 0.5,
-    "landslide_time_weight": 0.5,
+    "flood_time_weight": 0.0,
+    "landslide_time_weight": 0.0,
     "high_risk_flood_threshold": 0.6,
     "high_risk_landslide_threshold": 0.5,
     "max_neighbor_slots": 4,
@@ -73,10 +73,10 @@
     "delivery": 60.0,
     "mission_success": 120.0,
     "k_progress": 10.0,
-    "hazard_lambda": 10.0,
+    "hazard_lambda": 20.0,
     "w_flood": 0.6,
     "w_landslide": 0.4,
-    "eta_time": 0.3,
+    "eta_time": 0.1,
     "step_cost": 0.05,
     "revisit_penalty": 0.1,
     "backtrack_penalty": 0.25,
@@ -92,10 +92,10 @@
     "node_embedding_dim": 32
   },
   "replay": {
-    "capacity": 20000
+    "capacity": 60000
   },
   "training": {
-    "num_episodes": 15000,
+    "num_episodes": 18000,
     "gamma": 0.99,
     "lr": 0.00005,
     "batch_size": 128,
@@ -103,12 +103,12 @@
     "epsilon_min": 0.05,
     "epsilon_decay": 0.995,
     "epsilon_schedule": "exp",
-    "epsilon_exp_decay_rate": 0.00045,
+    "epsilon_exp_decay_rate": 0.00030,
     "target_update_every_steps": 500,
     "log_every": 50,
-    "eval_every": 200,
+    "eval_every": 300,
     "use_pretrained_model": true,
-    "pretrained_model_path": "checkpoints/staged_training_new/stage_100_balanced_warm/best_model.pt",
+    "pretrained_model_path": "checkpoints/profile_training_new/stage_200_safe_warm/best_model.pt",
     "resume_optimizer": false,
     "reroll_infeasible_episodes": true,
     "sample_feasible_nodes_directly": true,
@@ -127,8 +127,8 @@
     "epsilon_noisy": 0.05
   },
   "paths": {
-    "checkpoints_dir": "checkpoints/hazard_training_new/stage_100_balanced_multi_RI_det",
-    "runs_dir": "results/runs/hazard_training_new",
-    "run_log_file": "last_run_stage_100_balanced_multi_RI_det.txt"
+    "checkpoints_dir": "checkpoints/hazard_training_200/stage_200_safe_multi_RI_det",
+    "runs_dir": "results/runs/hazard_training_200",
+    "run_log_file": "last_run_stage_200_safe_multi_RI_det.txt"
   }
 }

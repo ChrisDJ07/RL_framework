@@ -56,6 +56,9 @@
       }
     },
     "active_rain_keys": [
+      "RI1",
+      "RI2",
+      "RI3",
       "RI4"
     ],
     "flood_time_weight": 0.5,

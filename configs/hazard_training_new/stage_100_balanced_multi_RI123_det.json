@@ -58,9 +58,7 @@
     "active_rain_keys": [
       "RI1",
       "RI2",
-      "RI3",
-      "RI4",
-      "RI5"
+      "RI3"
     ],
     "flood_time_weight": 0.5,
     "landslide_time_weight": 0.5,
@@ -95,7 +93,7 @@
     "capacity": 20000
   },
   "training": {
-    "num_episodes": 15000,
+    "num_episodes": 11000,
     "gamma": 0.99,
     "lr": 0.00005,
     "batch_size": 128,
@@ -103,7 +101,7 @@
     "epsilon_min": 0.05,
     "epsilon_decay": 0.995,
     "epsilon_schedule": "exp",
-    "epsilon_exp_decay_rate": 0.00045,
+    "epsilon_exp_decay_rate": 0.00040,
     "target_update_every_steps": 500,
     "log_every": 50,
     "eval_every": 200,
@@ -127,8 +125,8 @@
     "epsilon_noisy": 0.05
   },
   "paths": {
-    "checkpoints_dir": "checkpoints/hazard_training_new/stage_100_balanced_multi_RI_det",
+    "checkpoints_dir": "checkpoints/hazard_training_new/stage_100_balanced_multi_RI123_det",
     "runs_dir": "results/runs/hazard_training_new",
-    "run_log_file": "last_run_stage_100_balanced_multi_RI_det.txt"
+    "run_log_file": "last_run_stage_100_balanced_multi_RI123_det.txt"
   }
 }

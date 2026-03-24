@@ -133,6 +133,7 @@ DEFAULT_CONFIG = {
         "pretrained_model_path": "",
         "resume_optimizer": False,
         "reroll_infeasible_episodes": False,
+        "sample_feasible_nodes_directly": False,
         "max_feasibility_resamples": 20,
         "resume_training": False,
         "resume_checkpoint_path": "",
@@ -442,17 +443,46 @@ class HazardRoutingEnv:
 
         return all(node in reachable for node in self.delivery_nodes)
 
-    def reset(self):
+    def _passable_components(self):
+        passable = nx.Graph()
+        passable.add_nodes_from(self.G.nodes())
+        passable.add_edges_from(
+            (u, v) for u, v, data in self.G.edges(data=True) if not data.get("blocked", False)
+        )
+        return [list(component) for component in nx.connected_components(passable)]
+
+    def _assign_random_episode_nodes(self):
+        self.current_node = random.randint(0, self.num_nodes - 1)
+        all_nodes = list(self.G.nodes())
+        all_nodes.remove(self.current_node)
+        self.delivery_nodes = set(random.sample(all_nodes, self.num_deliveries))
+
+    def _assign_feasible_episode_nodes(self):
+        candidate_components = [
+            component for component in self._passable_components() if len(component) >= (self.num_deliveries + 1)
+        ]
+        if not candidate_components:
+            return False
+
+        weights = [len(component) for component in candidate_components]
+        chosen_component = random.choices(candidate_components, weights=weights, k=1)[0]
+        sampled = random.sample(chosen_component, self.num_deliveries + 1)
+        self.current_node = int(sampled[0])
+        self.delivery_nodes = set(int(node) for node in sampled[1:])
+        return True
+
+    def reset(self, sample_feasible_nodes=False):
         rain_key = random.choice(ACTIVE_RAIN_KEYS)
         self.G = activate_hazards(self.base_graph, rain_key)
         rain_idx = RAIN_KEYS.index(rain_key)
         self.rain_onehot = np.zeros(self.rain_dim, dtype=float)
         self.rain_onehot[rain_idx] = 1.0
 
-        self.current_node = random.randint(0, self.num_nodes - 1)
-        all_nodes = list(self.G.nodes())
-        all_nodes.remove(self.current_node)
-        self.delivery_nodes = set(random.sample(all_nodes, self.num_deliveries))
+        assigned = False
+        if sample_feasible_nodes:
+            assigned = self._assign_feasible_episode_nodes()
+        if not assigned:
+            self._assign_random_episode_nodes()
         self.completed = set()
 
         self.total_time = 0.0
@@ -865,11 +895,16 @@ def format_eval_metrics(metrics):
     )
 
 
-def reset_episode_with_feasibility(env, reroll_infeasible=False, max_resamples=20):
-    """Reset the environment, optionally resampling until the episode is feasible."""
+def reset_episode_with_feasibility(
+    env,
+    reroll_infeasible=False,
+    max_resamples=20,
+    sample_feasible_nodes_directly=False,
+):
+    """Reset the environment, optionally sampling directly from feasible nodes or rerolling."""
     attempts = 0
     while True:
-        state = env.reset()
+        state = env.reset(sample_feasible_nodes=sample_feasible_nodes_directly)
         feasible = env.is_current_episode_feasible()
         if feasible or not reroll_infeasible:
             return state, feasible, attempts
@@ -990,6 +1025,7 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
         pretrained_model_path = str(train_cfg.get("pretrained_model_path", "") or "").strip()
         resume_optimizer = bool(train_cfg.get("resume_optimizer", False))
         reroll_infeasible_episodes = bool(train_cfg.get("reroll_infeasible_episodes", False))
+        sample_feasible_nodes_directly = bool(train_cfg.get("sample_feasible_nodes_directly", False))
         max_feasibility_resamples = max(0, int(train_cfg.get("max_feasibility_resamples", 20)))
         save_last_every = int(train_cfg.get("save_last_every_episodes", 200))
         if save_last_every < 0:
@@ -1012,6 +1048,7 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
             f"revisit_penalty={configured_revisit_penalty} | "
             f"backtrack_penalty={configured_backtrack_penalty} | "
             f"reroll_infeasible_episodes={reroll_infeasible_episodes} | "
+            f"sample_feasible_nodes_directly={sample_feasible_nodes_directly} | "
             f"max_feasibility_resamples={max_feasibility_resamples} | "
             f"skip_infeasible_at_reset_eval={skip_infeasible_at_reset_eval} | "
             f"resume_training={resume_training} | "
@@ -1272,6 +1309,7 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
                     env,
                     reroll_infeasible=reroll_infeasible_episodes,
                     max_resamples=max_feasibility_resamples,
+                    sample_feasible_nodes_directly=sample_feasible_nodes_directly,
                 )
                 infeasible_rerolls_total += infeasible_resamples
                 done = False
