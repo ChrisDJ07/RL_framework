@@ -416,3 +416,12 @@ python utils/evaluate_profile_metrics.py \
   --spec "Fast|checkpoints/staged_training_new/stage_100_fast_hard/best_model.pt|configs/stage_training_new/hard_training/stage_100_fast_hard.json" \
   --output-prefix stage_100_hard_profiles_eval
 """
+
+# Warm training new
+"""
+python utils/evaluate_profile_metrics.py \
+  --spec "Balanced|checkpoints/warm_training_new/stage_100_balanced_warm_no_HF/best_model.pt|configs/stage_training_new/warm_training_new/stage_100_balanced_warm_no_HF.json" \
+  --spec "Safe|checkpoints/warm_training_new/stage_100_safe_warm_no_HF/best_model.pt|configs/stage_training_new/warm_training_new/stage_100_safe_warm_no_HF.json" \
+  --spec "Fast|checkpoints/warm_training_new/stage_100_fast_warm_no_HF/best_model.pt|configs/stage_training_new/warm_training_new/stage_100_fast_warm_no_HF.json" \
+  --output-prefix stage_100_warm_profiles_eval_no_HF
+"""
