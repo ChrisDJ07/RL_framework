@@ -1,0 +1,355 @@
+Run config | config_path=C:\Users\japaullu.tsis\Desktop\projects\RL_framework\configs\hazard_training_new\stage_100_balanced_multi_RI23_det.json | seed=40 | num_deliveries=2 | step_cost=0.05 | revisit_penalty=0.1 | backtrack_penalty=0.25 | reroll_infeasible_episodes=True | max_feasibility_resamples=30 | skip_infeasible_at_reset_eval=True | resume_training=False | resume_checkpoint_path=checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\last_model.pt | use_pretrained_model=True | pretrained_model_path=checkpoints/staged_training_new/stage_100_balanced_warm/best_model.pt | resume_optimizer=False
+Loaded pretrained model: checkpoints\staged_training_new\stage_100_balanced_warm\best_model.pt | MissingKeys: 0, UnexpectedKeys: 0
+Pretrained checkpoint config_path: configs/staged_training_new/stage_100_balanced_warm.json
+WARNING: current run config_path differs from checkpoint config_path. This is valid for transfer/fine-tuning, but verify this is intentional.
+Graph stats | Nodes: 100, Edges: 102, AvgBaseTime: 0.4195, AvgHazard: 0.6108, StateDim: 40, ActionDim: 4, Tmax(min): 1991.16, Deliveries: 2, Device: cuda
+Episode 50, LastReward: 198.31, AvgReward(50): 128.94, SuccessRate(50): 92.00%, Epsilon: 0.148, InfeasibleRerolls(total): 82
+Episode 100, LastReward: 210.28, AvgReward(50): 74.37, SuccessRate(50): 82.00%, Epsilon: 0.146, InfeasibleRerolls(total): 148
+Episode 150, LastReward: 185.50, AvgReward(50): 78.56, SuccessRate(50): 84.00%, Epsilon: 0.144, InfeasibleRerolls(total): 218
+Episode 200, LastReward: 229.05, AvgReward(50): 121.31, SuccessRate(50): 90.00%, Epsilon: 0.142, InfeasibleRerolls(total): 280
+[Eval @ Episode 200 | 14:06:03] eps=0.00 -> MeanReward: -60.72, SuccessRate: 32.50% | eps=0.05 -> MeanReward: -43.98, SuccessRate: 35.00%
+[EvalReasons @ Episode 200 | 14:06:03] eps=0.00 -> infeasible_at_reset:116 (58.0%), success:65 (32.5%), step_guard_timeout:19 (9.5%) | eps=0.05 -> infeasible_at_reset:121 (60.5%), success:70 (35.0%), step_guard_timeout:9 (4.5%)
+[EvalStats @ Episode 200 | 14:06:03] eps=0.00 -> AvgSteps:18.86, AvgTime:5.57, AvgHazard:6.64, SuccSteps:17.12, SuccTime:8.04, SuccHazard:8.05 | eps=0.05 -> AvgSteps:13.16, AvgTime:4.54, AvgHazard:5.31, SuccSteps:19.61, SuccTime:8.18, SuccHazard:9.32
+Saved best checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\best_model.pt (episode 200, success=32.50%, reward=-60.72)
+Episode 250, LastReward: 210.65, AvgReward(50): 88.00, SuccessRate(50): 84.00%, Epsilon: 0.140, InfeasibleRerolls(total): 346
+Episode 300, LastReward: 151.23, AvgReward(50): 89.66, SuccessRate(50): 84.00%, Epsilon: 0.139, InfeasibleRerolls(total): 440
+Episode 350, LastReward: -311.68, AvgReward(50): 119.13, SuccessRate(50): 90.00%, Epsilon: 0.137, InfeasibleRerolls(total): 513
+Episode 400, LastReward: 219.00, AvgReward(50): 117.65, SuccessRate(50): 88.00%, Epsilon: 0.135, InfeasibleRerolls(total): 575
+[Eval @ Episode 400 | 14:07:25] eps=0.00 -> MeanReward: -60.70, SuccessRate: 30.00% | eps=0.05 -> MeanReward: -80.91, SuccessRate: 25.00%
+[EvalReasons @ Episode 400 | 14:07:25] eps=0.00 -> infeasible_at_reset:128 (64.0%), success:60 (30.0%), step_guard_timeout:12 (6.0%) | eps=0.05 -> infeasible_at_reset:135 (67.5%), success:50 (25.0%), step_guard_timeout:15 (7.5%)
+[EvalStats @ Episode 400 | 14:07:25] eps=0.00 -> AvgSteps:14.89, AvgTime:4.16, AvgHazard:4.46, SuccSteps:21.63, SuccTime:8.84, SuccHazard:8.44 | eps=0.05 -> AvgSteps:15.45, AvgTime:4.39, AvgHazard:4.89, SuccSteps:19.80, SuccTime:8.98, SuccHazard:8.74
+Saved resumable checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\last_model.pt (episode 400)
+Episode 450, LastReward: 196.98, AvgReward(50): 139.14, SuccessRate(50): 92.00%, Epsilon: 0.134, InfeasibleRerolls(total): 644
+Episode 500, LastReward: -310.05, AvgReward(50): 100.27, SuccessRate(50): 84.00%, Epsilon: 0.132, InfeasibleRerolls(total): 716
+Episode 550, LastReward: -209.52, AvgReward(50): 150.67, SuccessRate(50): 92.00%, Epsilon: 0.130, InfeasibleRerolls(total): 782
+Episode 600, LastReward: 207.37, AvgReward(50): 71.96, SuccessRate(50): 80.00%, Epsilon: 0.129, InfeasibleRerolls(total): 847
+[Eval @ Episode 600 | 14:08:40] eps=0.00 -> MeanReward: -47.98, SuccessRate: 34.50% | eps=0.05 -> MeanReward: -46.51, SuccessRate: 36.50%
+[EvalReasons @ Episode 600 | 14:08:40] eps=0.00 -> infeasible_at_reset:117 (58.5%), success:69 (34.5%), step_guard_timeout:14 (7.0%) | eps=0.05 -> infeasible_at_reset:109 (54.5%), success:73 (36.5%), step_guard_timeout:18 (9.0%)
+[EvalStats @ Episode 600 | 14:08:40] eps=0.00 -> AvgSteps:15.07, AvgTime:5.07, AvgHazard:5.51, SuccSteps:15.29, SuccTime:7.68, SuccHazard:7.79 | eps=0.05 -> AvgSteps:19.77, AvgTime:5.77, AvgHazard:7.14, SuccSteps:19.66, SuccTime:8.24, SuccHazard:9.05
+Saved best checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\best_model.pt (episode 600, success=34.50%, reward=-47.98)
+Episode 650, LastReward: 182.61, AvgReward(50): 94.37, SuccessRate(50): 84.00%, Epsilon: 0.127, InfeasibleRerolls(total): 924
+Episode 700, LastReward: 196.25, AvgReward(50): 148.13, SuccessRate(50): 90.00%, Epsilon: 0.126, InfeasibleRerolls(total): 993
+Episode 750, LastReward: 203.43, AvgReward(50): 117.48, SuccessRate(50): 88.00%, Epsilon: 0.124, InfeasibleRerolls(total): 1102
+Episode 800, LastReward: 165.39, AvgReward(50): 144.27, SuccessRate(50): 92.00%, Epsilon: 0.123, InfeasibleRerolls(total): 1176
+[Eval @ Episode 800 | 14:09:56] eps=0.00 -> MeanReward: -62.25, SuccessRate: 30.00% | eps=0.05 -> MeanReward: -49.36, SuccessRate: 34.00%
+[EvalReasons @ Episode 800 | 14:09:56] eps=0.00 -> infeasible_at_reset:121 (60.5%), success:60 (30.0%), step_guard_timeout:19 (9.5%) | eps=0.05 -> infeasible_at_reset:124 (62.0%), success:68 (34.0%), step_guard_timeout:8 (4.0%)
+[EvalStats @ Episode 800 | 14:09:56] eps=0.00 -> AvgSteps:18.36, AvgTime:4.64, AvgHazard:4.71, SuccSteps:16.85, SuccTime:7.97, SuccHazard:7.92 | eps=0.05 -> AvgSteps:13.21, AvgTime:4.72, AvgHazard:5.28, SuccSteps:22.40, SuccTime:9.60, SuccHazard:10.78
+Saved resumable checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\last_model.pt (episode 800)
+Episode 850, LastReward: 186.16, AvgReward(50): 96.27, SuccessRate(50): 84.00%, Epsilon: 0.121, InfeasibleRerolls(total): 1258
+Episode 900, LastReward: -196.42, AvgReward(50): 144.89, SuccessRate(50): 92.00%, Epsilon: 0.120, InfeasibleRerolls(total): 1344
+Episode 950, LastReward: 216.82, AvgReward(50): 112.86, SuccessRate(50): 86.00%, Epsilon: 0.118, InfeasibleRerolls(total): 1402
+Episode 1000, LastReward: -466.97, AvgReward(50): 116.79, SuccessRate(50): 88.00%, Epsilon: 0.117, InfeasibleRerolls(total): 1478
+[Eval @ Episode 1000 | 14:11:13] eps=0.00 -> MeanReward: -73.40, SuccessRate: 29.50% | eps=0.05 -> MeanReward: -30.44, SuccessRate: 39.00%
+[EvalReasons @ Episode 1000 | 14:11:13] eps=0.00 -> infeasible_at_reset:121 (60.5%), success:59 (29.5%), step_guard_timeout:20 (10.0%) | eps=0.05 -> infeasible_at_reset:117 (58.5%), success:78 (39.0%), step_guard_timeout:5 (2.5%)
+[EvalStats @ Episode 1000 | 14:11:13] eps=0.00 -> AvgSteps:20.25, AvgTime:5.68, AvgHazard:6.26, SuccSteps:21.17, SuccTime:9.61, SuccHazard:9.62 | eps=0.05 -> AvgSteps:11.80, AvgTime:5.02, AvgHazard:5.55, SuccSteps:21.28, SuccTime:10.55, SuccHazard:10.69
+Episode 1050, LastReward: 205.07, AvgReward(50): 120.56, SuccessRate(50): 90.00%, Epsilon: 0.116, InfeasibleRerolls(total): 1566
+Episode 1100, LastReward: 191.82, AvgReward(50): 134.59, SuccessRate(50): 92.00%, Epsilon: 0.114, InfeasibleRerolls(total): 1619
+Episode 1150, LastReward: 166.22, AvgReward(50): 171.07, SuccessRate(50): 98.00%, Epsilon: 0.113, InfeasibleRerolls(total): 1669
+Episode 1200, LastReward: -490.04, AvgReward(50): 140.91, SuccessRate(50): 92.00%, Epsilon: 0.112, InfeasibleRerolls(total): 1742
+[Eval @ Episode 1200 | 14:12:20] eps=0.00 -> MeanReward: -57.80, SuccessRate: 33.50% | eps=0.05 -> MeanReward: -45.82, SuccessRate: 37.50%
+[EvalReasons @ Episode 1200 | 14:12:20] eps=0.00 -> infeasible_at_reset:119 (59.5%), success:67 (33.5%), step_guard_timeout:14 (7.0%) | eps=0.05 -> infeasible_at_reset:106 (53.0%), success:75 (37.5%), step_guard_timeout:19 (9.5%)
+[EvalStats @ Episode 1200 | 14:12:20] eps=0.00 -> AvgSteps:16.54, AvgTime:5.23, AvgHazard:6.73, SuccSteps:20.10, SuccTime:8.74, SuccHazard:8.48 | eps=0.05 -> AvgSteps:20.77, AvgTime:6.00, AvgHazard:7.76, SuccSteps:19.93, SuccTime:8.40, SuccHazard:9.01
+Saved resumable checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\last_model.pt (episode 1200)
+Episode 1250, LastReward: 201.42, AvgReward(50): 164.91, SuccessRate(50): 96.00%, Epsilon: 0.111, InfeasibleRerolls(total): 1801
+Episode 1300, LastReward: 215.07, AvgReward(50): 100.52, SuccessRate(50): 86.00%, Epsilon: 0.109, InfeasibleRerolls(total): 1885
+Episode 1350, LastReward: 205.92, AvgReward(50): 139.77, SuccessRate(50): 92.00%, Epsilon: 0.108, InfeasibleRerolls(total): 1947
+Episode 1400, LastReward: 198.44, AvgReward(50): 115.19, SuccessRate(50): 86.00%, Epsilon: 0.107, InfeasibleRerolls(total): 2034
+[Eval @ Episode 1400 | 14:13:35] eps=0.00 -> MeanReward: -68.63, SuccessRate: 27.00% | eps=0.05 -> MeanReward: -54.75, SuccessRate: 34.00%
+[EvalReasons @ Episode 1400 | 14:13:35] eps=0.00 -> infeasible_at_reset:137 (68.5%), success:54 (27.0%), step_guard_timeout:9 (4.5%) | eps=0.05 -> infeasible_at_reset:116 (58.0%), success:68 (34.0%), step_guard_timeout:16 (8.0%)
+[EvalStats @ Episode 1400 | 14:13:35] eps=0.00 -> AvgSteps:11.99, AvgTime:3.17, AvgHazard:3.58, SuccSteps:21.07, SuccTime:9.25, SuccHazard:9.78 | eps=0.05 -> AvgSteps:17.91, AvgTime:5.79, AvgHazard:6.35, SuccSteps:19.74, SuccTime:7.97, SuccHazard:8.31
+Episode 1450, LastReward: 193.10, AvgReward(50): 162.64, SuccessRate(50): 94.00%, Epsilon: 0.106, InfeasibleRerolls(total): 2094
+Episode 1500, LastReward: 211.66, AvgReward(50): 158.92, SuccessRate(50): 94.00%, Epsilon: 0.105, InfeasibleRerolls(total): 2168
+Episode 1550, LastReward: 226.32, AvgReward(50): 153.54, SuccessRate(50): 94.00%, Epsilon: 0.104, InfeasibleRerolls(total): 2248
+Episode 1600, LastReward: 202.39, AvgReward(50): 113.70, SuccessRate(50): 88.00%, Epsilon: 0.103, InfeasibleRerolls(total): 2315
+[Eval @ Episode 1600 | 14:14:40] eps=0.00 -> MeanReward: -63.81, SuccessRate: 32.00% | eps=0.05 -> MeanReward: -45.75, SuccessRate: 36.50%
+[EvalReasons @ Episode 1600 | 14:14:40] eps=0.00 -> infeasible_at_reset:119 (59.5%), success:64 (32.0%), step_guard_timeout:17 (8.5%) | eps=0.05 -> infeasible_at_reset:115 (57.5%), success:73 (36.5%), step_guard_timeout:12 (6.0%)
+[EvalStats @ Episode 1600 | 14:14:40] eps=0.00 -> AvgSteps:17.11, AvgTime:4.77, AvgHazard:6.78, SuccSteps:16.27, SuccTime:7.92, SuccHazard:8.24 | eps=0.05 -> AvgSteps:16.41, AvgTime:5.04, AvgHazard:6.66, SuccSteps:21.95, SuccTime:8.66, SuccHazard:10.01
+Saved resumable checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\last_model.pt (episode 1600)
+Episode 1650, LastReward: 211.27, AvgReward(50): 178.45, SuccessRate(50): 98.00%, Epsilon: 0.102, InfeasibleRerolls(total): 2374
+Episode 1700, LastReward: 193.00, AvgReward(50): 159.86, SuccessRate(50): 96.00%, Epsilon: 0.101, InfeasibleRerolls(total): 2457
+Episode 1750, LastReward: 187.26, AvgReward(50): 134.27, SuccessRate(50): 90.00%, Epsilon: 0.100, InfeasibleRerolls(total): 2518
+Episode 1800, LastReward: 171.58, AvgReward(50): 153.86, SuccessRate(50): 92.00%, Epsilon: 0.099, InfeasibleRerolls(total): 2592
+[Eval @ Episode 1800 | 14:15:46] eps=0.00 -> MeanReward: -56.73, SuccessRate: 31.00% | eps=0.05 -> MeanReward: -39.83, SuccessRate: 36.00%
+[EvalReasons @ Episode 1800 | 14:15:46] eps=0.00 -> infeasible_at_reset:129 (64.5%), success:62 (31.0%), step_guard_timeout:9 (4.5%) | eps=0.05 -> infeasible_at_reset:120 (60.0%), success:72 (36.0%), step_guard_timeout:8 (4.0%)
+[EvalStats @ Episode 1800 | 14:15:46] eps=0.00 -> AvgSteps:11.38, AvgTime:4.21, AvgHazard:4.42, SuccSteps:16.37, SuccTime:8.89, SuccHazard:8.44 | eps=0.05 -> AvgSteps:12.81, AvgTime:4.45, AvgHazard:4.71, SuccSteps:20.03, SuccTime:9.58, SuccHazard:9.56
+Episode 1850, LastReward: 194.92, AvgReward(50): 139.46, SuccessRate(50): 90.00%, Epsilon: 0.098, InfeasibleRerolls(total): 2649
+Episode 1900, LastReward: 163.25, AvgReward(50): 186.12, SuccessRate(50): 98.00%, Epsilon: 0.097, InfeasibleRerolls(total): 2709
+Episode 1950, LastReward: 187.38, AvgReward(50): 156.61, SuccessRate(50): 94.00%, Epsilon: 0.096, InfeasibleRerolls(total): 2776
+Episode 2000, LastReward: 205.28, AvgReward(50): 168.09, SuccessRate(50): 94.00%, Epsilon: 0.095, InfeasibleRerolls(total): 2845
+[Eval @ Episode 2000 | 14:16:37] eps=0.00 -> MeanReward: -30.16, SuccessRate: 40.00% | eps=0.05 -> MeanReward: -25.52, SuccessRate: 38.50%
+[EvalReasons @ Episode 2000 | 14:16:37] eps=0.00 -> infeasible_at_reset:108 (54.0%), success:80 (40.0%), step_guard_timeout:12 (6.0%) | eps=0.05 -> infeasible_at_reset:118 (59.0%), success:77 (38.5%), step_guard_timeout:5 (2.5%)
+[EvalStats @ Episode 2000 | 14:16:37] eps=0.00 -> AvgSteps:16.49, AvgTime:5.17, AvgHazard:5.96, SuccSteps:20.23, SuccTime:9.25, SuccHazard:10.07 | eps=0.05 -> AvgSteps:10.46, AvgTime:3.98, AvgHazard:4.29, SuccSteps:18.08, SuccTime:8.83, SuccHazard:8.92
+Saved best checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\best_model.pt (episode 2000, success=40.00%, reward=-30.16)
+Saved resumable checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\last_model.pt (episode 2000)
+Episode 2050, LastReward: 207.06, AvgReward(50): 146.95, SuccessRate(50): 90.00%, Epsilon: 0.094, InfeasibleRerolls(total): 2908
+Episode 2100, LastReward: 194.07, AvgReward(50): 142.13, SuccessRate(50): 92.00%, Epsilon: 0.093, InfeasibleRerolls(total): 2960
+Episode 2150, LastReward: -404.01, AvgReward(50): 170.08, SuccessRate(50): 96.00%, Epsilon: 0.092, InfeasibleRerolls(total): 3011
+Episode 2200, LastReward: 190.82, AvgReward(50): 159.20, SuccessRate(50): 94.00%, Epsilon: 0.091, InfeasibleRerolls(total): 3065
+[Eval @ Episode 2200 | 14:17:41] eps=0.00 -> MeanReward: -30.65, SuccessRate: 38.00% | eps=0.05 -> MeanReward: -21.49, SuccessRate: 41.50%
+[EvalReasons @ Episode 2200 | 14:17:41] eps=0.00 -> infeasible_at_reset:116 (58.0%), success:76 (38.0%), step_guard_timeout:8 (4.0%) | eps=0.05 -> infeasible_at_reset:111 (55.5%), success:83 (41.5%), step_guard_timeout:6 (3.0%)
+[EvalStats @ Episode 2200 | 14:17:41] eps=0.00 -> AvgSteps:12.55, AvgTime:4.12, AvgHazard:4.56, SuccSteps:18.30, SuccTime:8.39, SuccHazard:8.50 | eps=0.05 -> AvgSteps:12.59, AvgTime:5.42, AvgHazard:6.00, SuccSteps:20.22, SuccTime:9.16, SuccHazard:10.18
+Episode 2250, LastReward: 218.14, AvgReward(50): 113.32, SuccessRate(50): 86.00%, Epsilon: 0.091, InfeasibleRerolls(total): 3130
+Episode 2300, LastReward: 185.06, AvgReward(50): 130.64, SuccessRate(50): 90.00%, Epsilon: 0.090, InfeasibleRerolls(total): 3193
+Episode 2350, LastReward: 165.76, AvgReward(50): 125.17, SuccessRate(50): 90.00%, Epsilon: 0.089, InfeasibleRerolls(total): 3257
+Episode 2400, LastReward: -366.06, AvgReward(50): 144.91, SuccessRate(50): 94.00%, Epsilon: 0.088, InfeasibleRerolls(total): 3315
+[Eval @ Episode 2400 | 14:18:45] eps=0.00 -> MeanReward: -52.12, SuccessRate: 33.50% | eps=0.05 -> MeanReward: -36.15, SuccessRate: 38.00%
+[EvalReasons @ Episode 2400 | 14:18:45] eps=0.00 -> infeasible_at_reset:123 (61.5%), success:67 (33.5%), step_guard_timeout:10 (5.0%) | eps=0.05 -> infeasible_at_reset:117 (58.5%), success:76 (38.0%), step_guard_timeout:7 (3.5%)
+[EvalStats @ Episode 2400 | 14:18:45] eps=0.00 -> AvgSteps:13.76, AvgTime:4.40, AvgHazard:5.34, SuccSteps:20.18, SuccTime:8.86, SuccHazard:8.16 | eps=0.05 -> AvgSteps:14.14, AvgTime:4.67, AvgHazard:5.75, SuccSteps:24.32, SuccTime:9.36, SuccHazard:10.29
+Saved resumable checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\last_model.pt (episode 2400)
+Episode 2450, LastReward: 212.03, AvgReward(50): 141.14, SuccessRate(50): 92.00%, Epsilon: 0.088, InfeasibleRerolls(total): 3381
+Episode 2500, LastReward: 198.69, AvgReward(50): 153.50, SuccessRate(50): 94.00%, Epsilon: 0.087, InfeasibleRerolls(total): 3469
+Episode 2550, LastReward: 158.63, AvgReward(50): 160.01, SuccessRate(50): 94.00%, Epsilon: 0.086, InfeasibleRerolls(total): 3529
+Episode 2600, LastReward: 188.59, AvgReward(50): 161.83, SuccessRate(50): 96.00%, Epsilon: 0.085, InfeasibleRerolls(total): 3580
+[Eval @ Episode 2600 | 14:19:11] eps=0.00 -> MeanReward: -27.96, SuccessRate: 38.00% | eps=0.05 -> MeanReward: -41.17, SuccessRate: 37.00%
+[EvalReasons @ Episode 2600 | 14:19:11] eps=0.00 -> infeasible_at_reset:119 (59.5%), success:76 (38.0%), step_guard_timeout:5 (2.5%) | eps=0.05 -> infeasible_at_reset:118 (59.0%), success:74 (37.0%), step_guard_timeout:8 (4.0%)
+[EvalStats @ Episode 2600 | 14:19:11] eps=0.00 -> AvgSteps:10.10, AvgTime:3.83, AvgHazard:4.27, SuccSteps:17.36, SuccTime:8.59, SuccHazard:8.88 | eps=0.05 -> AvgSteps:13.42, AvgTime:4.82, AvgHazard:6.37, SuccSteps:21.14, SuccTime:9.56, SuccHazard:10.23
+Episode 2650, LastReward: 213.42, AvgReward(50): 183.80, SuccessRate(50): 98.00%, Epsilon: 0.085, InfeasibleRerolls(total): 3644
+Episode 2700, LastReward: 192.88, AvgReward(50): 155.84, SuccessRate(50): 92.00%, Epsilon: 0.084, InfeasibleRerolls(total): 3690
+Episode 2750, LastReward: 216.27, AvgReward(50): 146.05, SuccessRate(50): 92.00%, Epsilon: 0.083, InfeasibleRerolls(total): 3755
+Episode 2800, LastReward: 216.64, AvgReward(50): 178.00, SuccessRate(50): 98.00%, Epsilon: 0.083, InfeasibleRerolls(total): 3815
+[Eval @ Episode 2800 | 14:19:34] eps=0.00 -> MeanReward: -30.00, SuccessRate: 38.50% | eps=0.05 -> MeanReward: -28.85, SuccessRate: 39.50%
+[EvalReasons @ Episode 2800 | 14:19:34] eps=0.00 -> infeasible_at_reset:112 (56.0%), success:77 (38.5%), step_guard_timeout:11 (5.5%) | eps=0.05 -> infeasible_at_reset:114 (57.0%), success:79 (39.5%), step_guard_timeout:7 (3.5%)
+[EvalStats @ Episode 2800 | 14:19:34] eps=0.00 -> AvgSteps:13.66, AvgTime:3.90, AvgHazard:5.36, SuccSteps:15.48, SuccTime:7.29, SuccHazard:7.61 | eps=0.05 -> AvgSteps:13.08, AvgTime:5.38, AvgHazard:5.86, SuccSteps:20.71, SuccTime:10.17, SuccHazard:10.24
+Saved resumable checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\last_model.pt (episode 2800)
+Episode 2850, LastReward: 197.93, AvgReward(50): 137.53, SuccessRate(50): 90.00%, Epsilon: 0.082, InfeasibleRerolls(total): 3889
+Episode 2900, LastReward: 205.08, AvgReward(50): 142.65, SuccessRate(50): 92.00%, Epsilon: 0.081, InfeasibleRerolls(total): 3950
+Episode 2950, LastReward: 184.55, AvgReward(50): 136.60, SuccessRate(50): 92.00%, Epsilon: 0.081, InfeasibleRerolls(total): 4034
+Episode 3000, LastReward: 208.03, AvgReward(50): 152.97, SuccessRate(50): 92.00%, Epsilon: 0.080, InfeasibleRerolls(total): 4104
+[Eval @ Episode 3000 | 14:20:05] eps=0.00 -> MeanReward: -55.43, SuccessRate: 31.50% | eps=0.05 -> MeanReward: -46.92, SuccessRate: 34.00%
+[EvalReasons @ Episode 3000 | 14:20:05] eps=0.00 -> infeasible_at_reset:122 (61.0%), success:63 (31.5%), step_guard_timeout:15 (7.5%) | eps=0.05 -> infeasible_at_reset:122 (61.0%), success:68 (34.0%), step_guard_timeout:10 (5.0%)
+[EvalStats @ Episode 3000 | 14:20:05] eps=0.00 -> AvgSteps:16.07, AvgTime:4.19, AvgHazard:4.24, SuccSteps:17.70, SuccTime:8.36, SuccHazard:8.68 | eps=0.05 -> AvgSteps:14.23, AvgTime:4.32, AvgHazard:4.67, SuccSteps:21.26, SuccTime:9.36, SuccHazard:9.39
+Episode 3050, LastReward: 215.36, AvgReward(50): 165.46, SuccessRate(50): 94.00%, Epsilon: 0.080, InfeasibleRerolls(total): 4186
+Episode 3100, LastReward: 198.92, AvgReward(50): 160.98, SuccessRate(50): 94.00%, Epsilon: 0.079, InfeasibleRerolls(total): 4259
+Episode 3150, LastReward: 201.89, AvgReward(50): 145.96, SuccessRate(50): 92.00%, Epsilon: 0.078, InfeasibleRerolls(total): 4327
+Episode 3200, LastReward: 221.81, AvgReward(50): 168.21, SuccessRate(50): 94.00%, Epsilon: 0.078, InfeasibleRerolls(total): 4397
+[Eval @ Episode 3200 | 14:20:34] eps=0.00 -> MeanReward: -33.79, SuccessRate: 38.00% | eps=0.05 -> MeanReward: -51.19, SuccessRate: 31.00%
+[EvalReasons @ Episode 3200 | 14:20:34] eps=0.00 -> infeasible_at_reset:113 (56.5%), success:76 (38.0%), step_guard_timeout:11 (5.5%) | eps=0.05 -> infeasible_at_reset:134 (67.0%), success:62 (31.0%), step_guard_timeout:4 (2.0%)
+[EvalStats @ Episode 3200 | 14:20:34] eps=0.00 -> AvgSteps:14.27, AvgTime:4.30, AvgHazard:5.48, SuccSteps:17.29, SuccTime:8.14, SuccHazard:7.87 | eps=0.05 -> AvgSteps:9.48, AvgTime:3.27, AvgHazard:3.07, SuccSteps:21.55, SuccTime:9.43, SuccHazard:9.17
+Saved resumable checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\last_model.pt (episode 3200)
+Episode 3250, LastReward: 220.72, AvgReward(50): 186.48, SuccessRate(50): 98.00%, Epsilon: 0.077, InfeasibleRerolls(total): 4452
+Episode 3300, LastReward: 216.12, AvgReward(50): 138.46, SuccessRate(50): 92.00%, Epsilon: 0.077, InfeasibleRerolls(total): 4508
+Episode 3350, LastReward: 208.32, AvgReward(50): 156.24, SuccessRate(50): 92.00%, Epsilon: 0.076, InfeasibleRerolls(total): 4583
+Episode 3400, LastReward: 123.06, AvgReward(50): 177.82, SuccessRate(50): 98.00%, Epsilon: 0.076, InfeasibleRerolls(total): 4631
+[Eval @ Episode 3400 | 14:21:00] eps=0.00 -> MeanReward: -41.52, SuccessRate: 36.00% | eps=0.05 -> MeanReward: -39.83, SuccessRate: 34.50%
+[EvalReasons @ Episode 3400 | 14:21:00] eps=0.00 -> infeasible_at_reset:119 (59.5%), success:72 (36.0%), step_guard_timeout:9 (4.5%) | eps=0.05 -> infeasible_at_reset:126 (63.0%), success:69 (34.5%), step_guard_timeout:5 (2.5%)
+[EvalStats @ Episode 3400 | 14:21:00] eps=0.00 -> AvgSteps:13.06, AvgTime:5.18, AvgHazard:5.51, SuccSteps:18.78, SuccTime:9.17, SuccHazard:8.72 | eps=0.05 -> AvgSteps:10.49, AvgTime:3.25, AvgHazard:3.67, SuccSteps:20.28, SuccTime:8.30, SuccHazard:8.86
+Episode 3450, LastReward: 200.41, AvgReward(50): 177.30, SuccessRate(50): 98.00%, Epsilon: 0.075, InfeasibleRerolls(total): 4711
+Episode 3500, LastReward: 202.88, AvgReward(50): 175.82, SuccessRate(50): 96.00%, Epsilon: 0.075, InfeasibleRerolls(total): 4775
+Episode 3550, LastReward: 198.88, AvgReward(50): 161.74, SuccessRate(50): 94.00%, Epsilon: 0.074, InfeasibleRerolls(total): 4860
+Episode 3600, LastReward: 200.22, AvgReward(50): 178.85, SuccessRate(50): 96.00%, Epsilon: 0.074, InfeasibleRerolls(total): 4928
+[Eval @ Episode 3600 | 14:21:22] eps=0.00 -> MeanReward: -39.93, SuccessRate: 36.00% | eps=0.05 -> MeanReward: -30.82, SuccessRate: 38.00%
+[EvalReasons @ Episode 3600 | 14:21:22] eps=0.00 -> infeasible_at_reset:119 (59.5%), success:72 (36.0%), step_guard_timeout:9 (4.5%) | eps=0.05 -> infeasible_at_reset:122 (61.0%), success:76 (38.0%), step_guard_timeout:2 (1.0%)
+[EvalStats @ Episode 3600 | 14:21:22] eps=0.00 -> AvgSteps:12.38, AvgTime:4.83, AvgHazard:5.26, SuccSteps:16.89, SuccTime:8.55, SuccHazard:8.26 | eps=0.05 -> AvgSteps:9.55, AvgTime:4.55, AvgHazard:4.81, SuccSteps:21.46, SuccTime:10.47, SuccHazard:9.87
+Saved resumable checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\last_model.pt (episode 3600)
+Episode 3650, LastReward: 178.29, AvgReward(50): 139.57, SuccessRate(50): 92.00%, Epsilon: 0.073, InfeasibleRerolls(total): 4995
+Episode 3700, LastReward: 225.21, AvgReward(50): 178.33, SuccessRate(50): 98.00%, Epsilon: 0.073, InfeasibleRerolls(total): 5053
+Episode 3750, LastReward: 184.82, AvgReward(50): 138.63, SuccessRate(50): 88.00%, Epsilon: 0.072, InfeasibleRerolls(total): 5114
+Episode 3800, LastReward: 189.38, AvgReward(50): 186.15, SuccessRate(50): 98.00%, Epsilon: 0.072, InfeasibleRerolls(total): 5171
+[Eval @ Episode 3800 | 14:21:48] eps=0.00 -> MeanReward: -40.86, SuccessRate: 35.00% | eps=0.05 -> MeanReward: -33.41, SuccessRate: 36.50%
+[EvalReasons @ Episode 3800 | 14:21:48] eps=0.00 -> infeasible_at_reset:121 (60.5%), success:70 (35.0%), step_guard_timeout:9 (4.5%) | eps=0.05 -> infeasible_at_reset:123 (61.5%), success:73 (36.5%), step_guard_timeout:4 (2.0%)
+[EvalStats @ Episode 3800 | 14:21:48] eps=0.00 -> AvgSteps:12.89, AvgTime:4.11, AvgHazard:4.26, SuccSteps:18.84, SuccTime:9.22, SuccHazard:9.00 | eps=0.05 -> AvgSteps:10.13, AvgTime:3.95, AvgHazard:4.06, SuccSteps:20.08, SuccTime:9.35, SuccHazard:9.19
+Episode 3850, LastReward: 174.23, AvgReward(50): 192.02, SuccessRate(50): 100.00%, Epsilon: 0.071, InfeasibleRerolls(total): 5245
+Episode 3900, LastReward: 188.67, AvgReward(50): 158.24, SuccessRate(50): 94.00%, Epsilon: 0.071, InfeasibleRerolls(total): 5292
+Episode 3950, LastReward: 217.50, AvgReward(50): 146.96, SuccessRate(50): 90.00%, Epsilon: 0.071, InfeasibleRerolls(total): 5345
+Episode 4000, LastReward: 210.22, AvgReward(50): 167.17, SuccessRate(50): 94.00%, Epsilon: 0.070, InfeasibleRerolls(total): 5402
+[Eval @ Episode 4000 | 14:22:13] eps=0.00 -> MeanReward: -61.11, SuccessRate: 32.00% | eps=0.05 -> MeanReward: -23.95, SuccessRate: 41.00%
+[EvalReasons @ Episode 4000 | 14:22:13] eps=0.00 -> infeasible_at_reset:124 (62.0%), success:64 (32.0%), step_guard_timeout:12 (6.0%) | eps=0.05 -> infeasible_at_reset:111 (55.5%), success:82 (41.0%), step_guard_timeout:7 (3.5%)
+[EvalStats @ Episode 4000 | 14:22:13] eps=0.00 -> AvgSteps:13.90, AvgTime:4.58, AvgHazard:6.08, SuccSteps:17.20, SuccTime:8.64, SuccHazard:8.70 | eps=0.05 -> AvgSteps:13.02, AvgTime:6.58, AvgHazard:5.72, SuccSteps:19.80, SuccTime:9.55, SuccHazard:9.35
+Saved resumable checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\last_model.pt (episode 4000)
+Episode 4050, LastReward: 187.63, AvgReward(50): 186.58, SuccessRate(50): 100.00%, Epsilon: 0.070, InfeasibleRerolls(total): 5470
+Episode 4100, LastReward: 218.21, AvgReward(50): 168.20, SuccessRate(50): 96.00%, Epsilon: 0.069, InfeasibleRerolls(total): 5528
+Episode 4150, LastReward: 196.53, AvgReward(50): 158.96, SuccessRate(50): 96.00%, Epsilon: 0.069, InfeasibleRerolls(total): 5589
+Episode 4200, LastReward: 159.40, AvgReward(50): 152.64, SuccessRate(50): 92.00%, Epsilon: 0.069, InfeasibleRerolls(total): 5652
+[Eval @ Episode 4200 | 14:22:52] eps=0.00 -> MeanReward: -43.28, SuccessRate: 36.50% | eps=0.05 -> MeanReward: -17.41, SuccessRate: 42.00%
+[EvalReasons @ Episode 4200 | 14:22:52] eps=0.00 -> infeasible_at_reset:115 (57.5%), success:73 (36.5%), step_guard_timeout:12 (6.0%) | eps=0.05 -> infeasible_at_reset:113 (56.5%), success:84 (42.0%), step_guard_timeout:3 (1.5%)
+[EvalStats @ Episode 4200 | 14:22:52] eps=0.00 -> AvgSteps:14.44, AvgTime:5.07, AvgHazard:5.90, SuccSteps:16.53, SuccTime:8.10, SuccHazard:8.03 | eps=0.05 -> AvgSteps:11.11, AvgTime:5.84, AvgHazard:5.43, SuccSteps:21.44, SuccTime:9.50, SuccHazard:9.36
+Episode 4250, LastReward: 221.34, AvgReward(50): 118.19, SuccessRate(50): 86.00%, Epsilon: 0.068, InfeasibleRerolls(total): 5723
+Episode 4300, LastReward: 207.72, AvgReward(50): 191.35, SuccessRate(50): 100.00%, Epsilon: 0.068, InfeasibleRerolls(total): 5789
+Episode 4350, LastReward: 201.60, AvgReward(50): 145.31, SuccessRate(50): 90.00%, Epsilon: 0.068, InfeasibleRerolls(total): 5893
+Episode 4400, LastReward: 179.56, AvgReward(50): 134.34, SuccessRate(50): 90.00%, Epsilon: 0.067, InfeasibleRerolls(total): 5985
+[Eval @ Episode 4400 | 14:23:59] eps=0.00 -> MeanReward: -15.12, SuccessRate: 41.50% | eps=0.05 -> MeanReward: -25.67, SuccessRate: 39.00%
+[EvalReasons @ Episode 4400 | 14:23:59] eps=0.00 -> infeasible_at_reset:112 (56.0%), success:83 (41.5%), step_guard_timeout:5 (2.5%) | eps=0.05 -> infeasible_at_reset:116 (58.0%), success:78 (39.0%), step_guard_timeout:6 (3.0%)
+[EvalStats @ Episode 4400 | 14:23:59] eps=0.00 -> AvgSteps:10.69, AvgTime:4.44, AvgHazard:4.30, SuccSteps:17.31, SuccTime:9.15, SuccHazard:8.92 | eps=0.05 -> AvgSteps:11.79, AvgTime:4.34, AvgHazard:4.59, SuccSteps:19.45, SuccTime:9.26, SuccHazard:8.95
+Saved best checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\best_model.pt (episode 4400, success=41.50%, reward=-15.12)
+Saved resumable checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\last_model.pt (episode 4400)
+Episode 4450, LastReward: 232.07, AvgReward(50): 149.11, SuccessRate(50): 90.00%, Epsilon: 0.067, InfeasibleRerolls(total): 6047
+Episode 4500, LastReward: 193.85, AvgReward(50): 180.91, SuccessRate(50): 98.00%, Epsilon: 0.067, InfeasibleRerolls(total): 6123
+Episode 4550, LastReward: 231.97, AvgReward(50): 136.23, SuccessRate(50): 90.00%, Epsilon: 0.066, InfeasibleRerolls(total): 6217
+Episode 4600, LastReward: 197.74, AvgReward(50): 172.91, SuccessRate(50): 96.00%, Epsilon: 0.066, InfeasibleRerolls(total): 6281
+[Eval @ Episode 4600 | 14:24:56] eps=0.00 -> MeanReward: -39.52, SuccessRate: 35.50% | eps=0.05 -> MeanReward: -24.97, SuccessRate: 38.50%
+[EvalReasons @ Episode 4600 | 14:24:56] eps=0.00 -> infeasible_at_reset:119 (59.5%), success:71 (35.5%), step_guard_timeout:10 (5.0%) | eps=0.05 -> infeasible_at_reset:122 (61.0%), success:77 (38.5%), step_guard_timeout:1 (0.5%)
+[EvalStats @ Episode 4600 | 14:24:56] eps=0.00 -> AvgSteps:13.55, AvgTime:4.24, AvgHazard:4.29, SuccSteps:18.45, SuccTime:8.60, SuccHazard:8.90 | eps=0.05 -> AvgSteps:8.05, AvgTime:3.71, AvgHazard:4.01, SuccSteps:19.10, SuccTime:9.13, SuccHazard:9.32
+Episode 4650, LastReward: 165.14, AvgReward(50): 152.44, SuccessRate(50): 94.00%, Epsilon: 0.066, InfeasibleRerolls(total): 6359
+Episode 4700, LastReward: 203.01, AvgReward(50): 167.22, SuccessRate(50): 94.00%, Epsilon: 0.065, InfeasibleRerolls(total): 6434
+Episode 4750, LastReward: 216.60, AvgReward(50): 147.79, SuccessRate(50): 94.00%, Epsilon: 0.065, InfeasibleRerolls(total): 6524
+Episode 4800, LastReward: 133.20, AvgReward(50): 152.13, SuccessRate(50): 96.00%, Epsilon: 0.065, InfeasibleRerolls(total): 6572
+[Eval @ Episode 4800 | 14:25:55] eps=0.00 -> MeanReward: -34.10, SuccessRate: 38.00% | eps=0.05 -> MeanReward: -35.60, SuccessRate: 37.50%
+[EvalReasons @ Episode 4800 | 14:25:55] eps=0.00 -> infeasible_at_reset:116 (58.0%), success:76 (38.0%), step_guard_timeout:8 (4.0%) | eps=0.05 -> infeasible_at_reset:121 (60.5%), success:75 (37.5%), step_guard_timeout:4 (2.0%)
+[EvalStats @ Episode 4800 | 14:25:55] eps=0.00 -> AvgSteps:12.85, AvgTime:5.08, AvgHazard:5.37, SuccSteps:19.08, SuccTime:10.06, SuccHazard:9.47 | eps=0.05 -> AvgSteps:10.78, AvgTime:4.48, AvgHazard:5.38, SuccSteps:21.27, SuccTime:9.18, SuccHazard:10.55
+Saved resumable checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\last_model.pt (episode 4800)
+Episode 4850, LastReward: -326.24, AvgReward(50): 146.59, SuccessRate(50): 92.00%, Epsilon: 0.064, InfeasibleRerolls(total): 6618
+Episode 4900, LastReward: 210.47, AvgReward(50): 155.44, SuccessRate(50): 96.00%, Epsilon: 0.064, InfeasibleRerolls(total): 6696
+Episode 4950, LastReward: 172.47, AvgReward(50): 160.75, SuccessRate(50): 94.00%, Epsilon: 0.064, InfeasibleRerolls(total): 6753
+Episode 5000, LastReward: 191.83, AvgReward(50): 151.14, SuccessRate(50): 96.00%, Epsilon: 0.064, InfeasibleRerolls(total): 6829
+[Eval @ Episode 5000 | 14:26:41] eps=0.00 -> MeanReward: -40.70, SuccessRate: 35.00% | eps=0.05 -> MeanReward: -17.75, SuccessRate: 41.00%
+[EvalReasons @ Episode 5000 | 14:26:41] eps=0.00 -> infeasible_at_reset:124 (62.0%), success:70 (35.0%), step_guard_timeout:6 (3.0%) | eps=0.05 -> infeasible_at_reset:116 (58.0%), success:82 (41.0%), step_guard_timeout:2 (1.0%)
+[EvalStats @ Episode 5000 | 14:26:41] eps=0.00 -> AvgSteps:11.39, AvgTime:4.65, AvgHazard:4.30, SuccSteps:20.56, SuccTime:9.44, SuccHazard:8.93 | eps=0.05 -> AvgSteps:9.41, AvgTime:4.55, AvgHazard:4.70, SuccSteps:19.55, SuccTime:9.92, SuccHazard:10.09
+Episode 5050, LastReward: 189.79, AvgReward(50): 183.06, SuccessRate(50): 98.00%, Epsilon: 0.063, InfeasibleRerolls(total): 6901
+Episode 5100, LastReward: 209.97, AvgReward(50): 170.35, SuccessRate(50): 96.00%, Epsilon: 0.063, InfeasibleRerolls(total): 6970
+Episode 5150, LastReward: 200.41, AvgReward(50): 154.42, SuccessRate(50): 94.00%, Epsilon: 0.063, InfeasibleRerolls(total): 7039
+Episode 5200, LastReward: 205.97, AvgReward(50): 144.80, SuccessRate(50): 92.00%, Epsilon: 0.062, InfeasibleRerolls(total): 7100
+[Eval @ Episode 5200 | 14:27:17] eps=0.00 -> MeanReward: -60.31, SuccessRate: 30.00% | eps=0.05 -> MeanReward: -20.43, SuccessRate: 40.00%
+[EvalReasons @ Episode 5200 | 14:27:17] eps=0.00 -> infeasible_at_reset:132 (66.0%), success:60 (30.0%), step_guard_timeout:8 (4.0%) | eps=0.05 -> infeasible_at_reset:118 (59.0%), success:80 (40.0%), step_guard_timeout:2 (1.0%)
+[EvalStats @ Episode 5200 | 14:27:17] eps=0.00 -> AvgSteps:11.93, AvgTime:4.20, AvgHazard:4.16, SuccSteps:21.10, SuccTime:9.43, SuccHazard:9.33 | eps=0.05 -> AvgSteps:9.58, AvgTime:4.27, AvgHazard:4.28, SuccSteps:20.45, SuccTime:9.50, SuccHazard:9.40
+Saved resumable checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\last_model.pt (episode 5200)
+Episode 5250, LastReward: 230.11, AvgReward(50): 169.89, SuccessRate(50): 96.00%, Epsilon: 0.062, InfeasibleRerolls(total): 7182
+Episode 5300, LastReward: 190.53, AvgReward(50): 168.27, SuccessRate(50): 96.00%, Epsilon: 0.062, InfeasibleRerolls(total): 7254
+Episode 5350, LastReward: -223.13, AvgReward(50): 150.75, SuccessRate(50): 92.00%, Epsilon: 0.062, InfeasibleRerolls(total): 7312
+Episode 5400, LastReward: 148.05, AvgReward(50): 168.76, SuccessRate(50): 96.00%, Epsilon: 0.062, InfeasibleRerolls(total): 7380
+[Eval @ Episode 5400 | 14:27:53] eps=0.00 -> MeanReward: -23.65, SuccessRate: 40.00% | eps=0.05 -> MeanReward: -29.30, SuccessRate: 38.00%
+[EvalReasons @ Episode 5400 | 14:27:53] eps=0.00 -> infeasible_at_reset:113 (56.5%), success:80 (40.0%), step_guard_timeout:7 (3.5%) | eps=0.05 -> infeasible_at_reset:122 (61.0%), success:76 (38.0%), step_guard_timeout:2 (1.0%)
+[EvalStats @ Episode 5400 | 14:27:53] eps=0.00 -> AvgSteps:12.76, AvgTime:4.63, AvgHazard:4.76, SuccSteps:19.64, SuccTime:9.83, SuccHazard:9.73 | eps=0.05 -> AvgSteps:9.74, AvgTime:4.30, AvgHazard:4.37, SuccSteps:21.95, SuccTime:10.84, SuccHazard:10.84
+Episode 5450, LastReward: -236.19, AvgReward(50): 155.58, SuccessRate(50): 92.00%, Epsilon: 0.061, InfeasibleRerolls(total): 7438
+Episode 5500, LastReward: 159.86, AvgReward(50): 161.58, SuccessRate(50): 94.00%, Epsilon: 0.061, InfeasibleRerolls(total): 7495
+Episode 5550, LastReward: 197.61, AvgReward(50): 169.89, SuccessRate(50): 96.00%, Epsilon: 0.061, InfeasibleRerolls(total): 7543
+Episode 5600, LastReward: 180.14, AvgReward(50): 176.39, SuccessRate(50): 96.00%, Epsilon: 0.061, InfeasibleRerolls(total): 7604
+[Eval @ Episode 5600 | 14:28:59] eps=0.00 -> MeanReward: -30.25, SuccessRate: 38.00% | eps=0.05 -> MeanReward: -7.26, SuccessRate: 44.50%
+[EvalReasons @ Episode 5600 | 14:28:59] eps=0.00 -> infeasible_at_reset:118 (59.0%), success:76 (38.0%), step_guard_timeout:6 (3.0%) | eps=0.05 -> infeasible_at_reset:106 (53.0%), success:89 (44.5%), step_guard_timeout:5 (2.5%)
+[EvalStats @ Episode 5600 | 14:28:59] eps=0.00 -> AvgSteps:11.17, AvgTime:4.15, AvgHazard:4.48, SuccSteps:18.34, SuccTime:8.93, SuccHazard:9.26 | eps=0.05 -> AvgSteps:13.13, AvgTime:5.17, AvgHazard:5.46, SuccSteps:21.64, SuccTime:9.39, SuccHazard:10.21
+Saved resumable checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\last_model.pt (episode 5600)
+Episode 5650, LastReward: 214.85, AvgReward(50): 195.71, SuccessRate(50): 100.00%, Epsilon: 0.060, InfeasibleRerolls(total): 7664
+Episode 5700, LastReward: 176.37, AvgReward(50): 157.43, SuccessRate(50): 96.00%, Epsilon: 0.060, InfeasibleRerolls(total): 7722
+Episode 5750, LastReward: 218.58, AvgReward(50): 164.19, SuccessRate(50): 96.00%, Epsilon: 0.060, InfeasibleRerolls(total): 7783
+Episode 5800, LastReward: 158.66, AvgReward(50): 138.96, SuccessRate(50): 90.00%, Epsilon: 0.060, InfeasibleRerolls(total): 7835
+[Eval @ Episode 5800 | 14:30:19] eps=0.00 -> MeanReward: -24.65, SuccessRate: 40.50% | eps=0.05 -> MeanReward: -41.14, SuccessRate: 34.50%
+[EvalReasons @ Episode 5800 | 14:30:19] eps=0.00 -> infeasible_at_reset:111 (55.5%), success:81 (40.5%), step_guard_timeout:8 (4.0%) | eps=0.05 -> infeasible_at_reset:127 (63.5%), success:69 (34.5%), step_guard_timeout:4 (2.0%)
+[EvalStats @ Episode 5800 | 14:30:19] eps=0.00 -> AvgSteps:13.48, AvgTime:5.12, AvgHazard:5.47, SuccSteps:19.47, SuccTime:10.25, SuccHazard:9.81 | eps=0.05 -> AvgSteps:9.43, AvgTime:3.77, AvgHazard:3.91, SuccSteps:19.22, SuccTime:9.67, SuccHazard:9.55
+Episode 5850, LastReward: 180.53, AvgReward(50): 187.90, SuccessRate(50): 98.00%, Epsilon: 0.060, InfeasibleRerolls(total): 7902
+Episode 5900, LastReward: 210.08, AvgReward(50): 181.84, SuccessRate(50): 98.00%, Epsilon: 0.059, InfeasibleRerolls(total): 7979
+Episode 5950, LastReward: 193.70, AvgReward(50): 149.42, SuccessRate(50): 94.00%, Epsilon: 0.059, InfeasibleRerolls(total): 8050
+Episode 6000, LastReward: 208.67, AvgReward(50): 186.43, SuccessRate(50): 98.00%, Epsilon: 0.059, InfeasibleRerolls(total): 8123
+[Eval @ Episode 6000 | 14:31:34] eps=0.00 -> MeanReward: -20.09, SuccessRate: 40.00% | eps=0.05 -> MeanReward: -8.44, SuccessRate: 44.50%
+[EvalReasons @ Episode 6000 | 14:31:34] eps=0.00 -> infeasible_at_reset:114 (57.0%), success:80 (40.0%), step_guard_timeout:6 (3.0%) | eps=0.05 -> infeasible_at_reset:107 (53.5%), success:89 (44.5%), step_guard_timeout:4 (2.0%)
+[EvalStats @ Episode 6000 | 14:31:34] eps=0.00 -> AvgSteps:11.02, AvgTime:3.82, AvgHazard:4.20, SuccSteps:17.04, SuccTime:8.25, SuccHazard:8.82 | eps=0.05 -> AvgSteps:14.87, AvgTime:5.41, AvgHazard:5.55, SuccSteps:27.12, SuccTime:11.10, SuccHazard:10.83
+Saved resumable checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\last_model.pt (episode 6000)
+Episode 6050, LastReward: 213.03, AvgReward(50): 152.83, SuccessRate(50): 94.00%, Epsilon: 0.059, InfeasibleRerolls(total): 8203
+Episode 6100, LastReward: 230.56, AvgReward(50): 157.62, SuccessRate(50): 94.00%, Epsilon: 0.059, InfeasibleRerolls(total): 8261
+Episode 6150, LastReward: 158.08, AvgReward(50): 186.72, SuccessRate(50): 100.00%, Epsilon: 0.059, InfeasibleRerolls(total): 8332
+Episode 6200, LastReward: 174.79, AvgReward(50): 191.45, SuccessRate(50): 100.00%, Epsilon: 0.058, InfeasibleRerolls(total): 8386
+[Eval @ Episode 6200 | 14:32:52] eps=0.00 -> MeanReward: -23.94, SuccessRate: 38.00% | eps=0.05 -> MeanReward: -36.29, SuccessRate: 35.50%
+[EvalReasons @ Episode 6200 | 14:32:52] eps=0.00 -> infeasible_at_reset:123 (61.5%), success:76 (38.0%), step_guard_timeout:1 (0.5%) | eps=0.05 -> infeasible_at_reset:129 (64.5%), success:71 (35.5%)
+[EvalStats @ Episode 6200 | 14:32:52] eps=0.00 -> AvgSteps:7.46, AvgTime:3.48, AvgHazard:3.46, SuccSteps:17.79, SuccTime:8.83, SuccHazard:8.72 | eps=0.05 -> AvgSteps:8.31, AvgTime:3.84, AvgHazard:3.80, SuccSteps:23.42, SuccTime:10.81, SuccHazard:10.71
+Episode 6250, LastReward: 180.12, AvgReward(50): 179.63, SuccessRate(50): 98.00%, Epsilon: 0.058, InfeasibleRerolls(total): 8453
+Episode 6300, LastReward: 202.86, AvgReward(50): 168.93, SuccessRate(50): 96.00%, Epsilon: 0.058, InfeasibleRerolls(total): 8549
+Episode 6350, LastReward: 222.27, AvgReward(50): 151.66, SuccessRate(50): 92.00%, Epsilon: 0.058, InfeasibleRerolls(total): 8611
+Episode 6400, LastReward: 216.26, AvgReward(50): 187.88, SuccessRate(50): 98.00%, Epsilon: 0.058, InfeasibleRerolls(total): 8652
+[Eval @ Episode 6400 | 14:34:00] eps=0.00 -> MeanReward: -37.65, SuccessRate: 34.50% | eps=0.05 -> MeanReward: -17.62, SuccessRate: 42.00%
+[EvalReasons @ Episode 6400 | 14:34:00] eps=0.00 -> infeasible_at_reset:129 (64.5%), success:69 (34.5%), step_guard_timeout:2 (1.0%) | eps=0.05 -> infeasible_at_reset:111 (55.5%), success:84 (42.0%), step_guard_timeout:5 (2.5%)
+[EvalStats @ Episode 6400 | 14:34:00] eps=0.00 -> AvgSteps:7.86, AvgTime:3.36, AvgHazard:3.27, SuccSteps:18.72, SuccTime:9.25, SuccHazard:9.04 | eps=0.05 -> AvgSteps:12.38, AvgTime:4.53, AvgHazard:5.45, SuccSteps:21.15, SuccTime:9.58, SuccHazard:10.45
+Saved resumable checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\last_model.pt (episode 6400)
+Episode 6450, LastReward: 212.07, AvgReward(50): 167.28, SuccessRate(50): 94.00%, Epsilon: 0.058, InfeasibleRerolls(total): 8748
+Episode 6500, LastReward: 198.48, AvgReward(50): 177.46, SuccessRate(50): 98.00%, Epsilon: 0.057, InfeasibleRerolls(total): 8814
+Episode 6550, LastReward: 173.67, AvgReward(50): 177.91, SuccessRate(50): 98.00%, Epsilon: 0.057, InfeasibleRerolls(total): 8887
+Episode 6600, LastReward: 177.36, AvgReward(50): 170.36, SuccessRate(50): 96.00%, Epsilon: 0.057, InfeasibleRerolls(total): 8961
+[Eval @ Episode 6600 | 14:35:13] eps=0.00 -> MeanReward: -20.33, SuccessRate: 39.50% | eps=0.05 -> MeanReward: -22.09, SuccessRate: 39.00%
+[EvalReasons @ Episode 6600 | 14:35:13] eps=0.00 -> infeasible_at_reset:115 (57.5%), success:79 (39.5%), step_guard_timeout:6 (3.0%) | eps=0.05 -> infeasible_at_reset:121 (60.5%), success:78 (39.0%), step_guard_timeout:1 (0.5%)
+[EvalStats @ Episode 6600 | 14:35:13] eps=0.00 -> AvgSteps:10.12, AvgTime:3.91, AvgHazard:3.88, SuccSteps:15.00, SuccTime:8.15, SuccHazard:8.02 | eps=0.05 -> AvgSteps:7.59, AvgTime:3.79, AvgHazard:3.82, SuccSteps:17.67, SuccTime:9.43, SuccHazard:9.67
+Episode 6650, LastReward: 191.36, AvgReward(50): 178.57, SuccessRate(50): 98.00%, Epsilon: 0.057, InfeasibleRerolls(total): 9025
+Episode 6700, LastReward: 185.34, AvgReward(50): 188.93, SuccessRate(50): 98.00%, Epsilon: 0.057, InfeasibleRerolls(total): 9079
+Episode 6750, LastReward: -256.71, AvgReward(50): 183.78, SuccessRate(50): 96.00%, Epsilon: 0.057, InfeasibleRerolls(total): 9153
+Episode 6800, LastReward: 175.50, AvgReward(50): 179.48, SuccessRate(50): 98.00%, Epsilon: 0.057, InfeasibleRerolls(total): 9207
+[Eval @ Episode 6800 | 14:36:18] eps=0.00 -> MeanReward: -25.88, SuccessRate: 39.50% | eps=0.05 -> MeanReward: -28.21, SuccessRate: 40.00%
+[EvalReasons @ Episode 6800 | 14:36:18] eps=0.00 -> infeasible_at_reset:116 (58.0%), success:79 (39.5%), step_guard_timeout:5 (2.5%) | eps=0.05 -> infeasible_at_reset:119 (59.5%), success:80 (40.0%), step_guard_timeout:1 (0.5%)
+[EvalStats @ Episode 6800 | 14:36:18] eps=0.00 -> AvgSteps:10.83, AvgTime:4.52, AvgHazard:5.00, SuccSteps:18.56, SuccTime:9.49, SuccHazard:9.59 | eps=0.05 -> AvgSteps:10.41, AvgTime:4.75, AvgHazard:5.69, SuccSteps:24.27, SuccTime:11.43, SuccHazard:13.18
+Saved resumable checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\last_model.pt (episode 6800)
+Episode 6850, LastReward: 171.03, AvgReward(50): 186.36, SuccessRate(50): 100.00%, Epsilon: 0.056, InfeasibleRerolls(total): 9275
+Episode 6900, LastReward: 128.00, AvgReward(50): 194.36, SuccessRate(50): 100.00%, Epsilon: 0.056, InfeasibleRerolls(total): 9319
+Episode 6950, LastReward: 215.48, AvgReward(50): 150.45, SuccessRate(50): 92.00%, Epsilon: 0.056, InfeasibleRerolls(total): 9408
+Episode 7000, LastReward: 154.37, AvgReward(50): 165.29, SuccessRate(50): 96.00%, Epsilon: 0.056, InfeasibleRerolls(total): 9474
+[Eval @ Episode 7000 | 14:37:29] eps=0.00 -> MeanReward: -50.93, SuccessRate: 34.00% | eps=0.05 -> MeanReward: -13.72, SuccessRate: 42.50%
+[EvalReasons @ Episode 7000 | 14:37:29] eps=0.00 -> infeasible_at_reset:120 (60.0%), success:68 (34.0%), step_guard_timeout:12 (6.0%) | eps=0.05 -> infeasible_at_reset:112 (56.0%), success:85 (42.5%), step_guard_timeout:3 (1.5%)
+[EvalStats @ Episode 7000 | 14:37:29] eps=0.00 -> AvgSteps:14.20, AvgTime:4.34, AvgHazard:5.37, SuccSteps:17.06, SuccTime:8.69, SuccHazard:8.80 | eps=0.05 -> AvgSteps:11.01, AvgTime:4.65, AvgHazard:4.83, SuccSteps:20.95, SuccTime:10.37, SuccHazard:11.11
+Episode 7050, LastReward: 208.92, AvgReward(50): 169.95, SuccessRate(50): 96.00%, Epsilon: 0.056, InfeasibleRerolls(total): 9548
+Episode 7100, LastReward: 226.08, AvgReward(50): 189.44, SuccessRate(50): 100.00%, Epsilon: 0.056, InfeasibleRerolls(total): 9603
+Episode 7150, LastReward: -465.30, AvgReward(50): 165.07, SuccessRate(50): 96.00%, Epsilon: 0.056, InfeasibleRerolls(total): 9676
+Episode 7200, LastReward: 202.30, AvgReward(50): 164.26, SuccessRate(50): 96.00%, Epsilon: 0.056, InfeasibleRerolls(total): 9742
+[Eval @ Episode 7200 | 14:38:42] eps=0.00 -> MeanReward: -24.52, SuccessRate: 39.50% | eps=0.05 -> MeanReward: -25.20, SuccessRate: 39.00%
+[EvalReasons @ Episode 7200 | 14:38:42] eps=0.00 -> infeasible_at_reset:116 (58.0%), success:79 (39.5%), step_guard_timeout:5 (2.5%) | eps=0.05 -> infeasible_at_reset:121 (60.5%), success:78 (39.0%), step_guard_timeout:1 (0.5%)
+[EvalStats @ Episode 7200 | 14:38:42] eps=0.00 -> AvgSteps:10.30, AvgTime:4.16, AvgHazard:4.92, SuccSteps:17.23, SuccTime:8.80, SuccHazard:8.75 | eps=0.05 -> AvgSteps:9.59, AvgTime:4.39, AvgHazard:4.46, SuccSteps:22.79, SuccTime:11.06, SuccHazard:11.28
+Saved resumable checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\last_model.pt (episode 7200)
+Episode 7250, LastReward: 122.27, AvgReward(50): 146.52, SuccessRate(50): 92.00%, Epsilon: 0.056, InfeasibleRerolls(total): 9824
+Episode 7300, LastReward: 163.50, AvgReward(50): 182.55, SuccessRate(50): 98.00%, Epsilon: 0.055, InfeasibleRerolls(total): 9906
+Episode 7350, LastReward: 213.13, AvgReward(50): 191.28, SuccessRate(50): 100.00%, Epsilon: 0.055, InfeasibleRerolls(total): 9974
+Episode 7400, LastReward: 205.17, AvgReward(50): 185.93, SuccessRate(50): 98.00%, Epsilon: 0.055, InfeasibleRerolls(total): 10083
+[Eval @ Episode 7400 | 14:39:52] eps=0.00 -> MeanReward: -8.32, SuccessRate: 43.00% | eps=0.05 -> MeanReward: -33.10, SuccessRate: 36.00%
+[EvalReasons @ Episode 7400 | 14:39:52] eps=0.00 -> infeasible_at_reset:111 (55.5%), success:86 (43.0%), step_guard_timeout:3 (1.5%) | eps=0.05 -> infeasible_at_reset:128 (64.0%), success:72 (36.0%)
+[EvalStats @ Episode 7400 | 14:39:52] eps=0.00 -> AvgSteps:9.79, AvgTime:3.93, AvgHazard:4.16, SuccSteps:17.88, SuccTime:8.43, SuccHazard:9.17 | eps=0.05 -> AvgSteps:7.61, AvgTime:3.84, AvgHazard:3.60, SuccSteps:21.14, SuccTime:10.66, SuccHazard:10.01
+Saved best checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\best_model.pt (episode 7400, success=43.00%, reward=-8.32)
+Episode 7450, LastReward: 224.46, AvgReward(50): 193.11, SuccessRate(50): 100.00%, Epsilon: 0.055, InfeasibleRerolls(total): 10178
+Episode 7500, LastReward: 214.75, AvgReward(50): 196.39, SuccessRate(50): 100.00%, Epsilon: 0.055, InfeasibleRerolls(total): 10250
+Episode 7550, LastReward: 190.24, AvgReward(50): 178.63, SuccessRate(50): 98.00%, Epsilon: 0.055, InfeasibleRerolls(total): 10324
+Episode 7600, LastReward: 206.41, AvgReward(50): 180.97, SuccessRate(50): 98.00%, Epsilon: 0.055, InfeasibleRerolls(total): 10378
+[Eval @ Episode 7600 | 14:40:50] eps=0.00 -> MeanReward: -6.77, SuccessRate: 44.00% | eps=0.05 -> MeanReward: -25.18, SuccessRate: 39.00%
+[EvalReasons @ Episode 7600 | 14:40:50] eps=0.00 -> infeasible_at_reset:111 (55.5%), success:88 (44.0%), step_guard_timeout:1 (0.5%) | eps=0.05 -> infeasible_at_reset:120 (60.0%), success:78 (39.0%), step_guard_timeout:2 (1.0%)
+[EvalStats @ Episode 7600 | 14:40:50] eps=0.00 -> AvgSteps:8.88, AvgTime:4.17, AvgHazard:4.61, SuccSteps:18.58, SuccTime:9.22, SuccHazard:10.16 | eps=0.05 -> AvgSteps:8.87, AvgTime:4.10, AvgHazard:4.42, SuccSteps:19.14, SuccTime:10.36, SuccHazard:10.23
+Saved best checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\best_model.pt (episode 7600, success=44.00%, reward=-6.77)
+Saved resumable checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\last_model.pt (episode 7600)
+Episode 7650, LastReward: 204.79, AvgReward(50): 180.52, SuccessRate(50): 98.00%, Epsilon: 0.055, InfeasibleRerolls(total): 10460
+Episode 7700, LastReward: 194.35, AvgReward(50): 169.38, SuccessRate(50): 96.00%, Epsilon: 0.055, InfeasibleRerolls(total): 10509
+Episode 7750, LastReward: 194.78, AvgReward(50): 191.15, SuccessRate(50): 98.00%, Epsilon: 0.055, InfeasibleRerolls(total): 10560
+Episode 7800, LastReward: 224.29, AvgReward(50): 174.60, SuccessRate(50): 96.00%, Epsilon: 0.054, InfeasibleRerolls(total): 10627
+[Eval @ Episode 7800 | 14:41:55] eps=0.00 -> MeanReward: -14.16, SuccessRate: 42.50% | eps=0.05 -> MeanReward: -28.58, SuccessRate: 37.50%
+[EvalReasons @ Episode 7800 | 14:41:55] eps=0.00 -> infeasible_at_reset:109 (54.5%), success:85 (42.5%), step_guard_timeout:6 (3.0%) | eps=0.05 -> infeasible_at_reset:123 (61.5%), success:75 (37.5%), step_guard_timeout:2 (1.0%)
+[EvalStats @ Episode 7800 | 14:41:55] eps=0.00 -> AvgSteps:12.10, AvgTime:4.56, AvgHazard:5.02, SuccSteps:18.58, SuccTime:9.01, SuccHazard:9.23 | eps=0.05 -> AvgSteps:9.68, AvgTime:3.91, AvgHazard:3.89, SuccSteps:22.08, SuccTime:9.62, SuccHazard:9.63
+Episode 7850, LastReward: 192.88, AvgReward(50): 192.95, SuccessRate(50): 100.00%, Epsilon: 0.054, InfeasibleRerolls(total): 10723
+Episode 7900, LastReward: 228.02, AvgReward(50): 181.27, SuccessRate(50): 98.00%, Epsilon: 0.054, InfeasibleRerolls(total): 10806
+Episode 7950, LastReward: 166.88, AvgReward(50): 162.73, SuccessRate(50): 94.00%, Epsilon: 0.054, InfeasibleRerolls(total): 10868
+Episode 8000, LastReward: 190.09, AvgReward(50): 193.79, SuccessRate(50): 100.00%, Epsilon: 0.054, InfeasibleRerolls(total): 10945
+[Eval @ Episode 8000 | 14:43:03] eps=0.00 -> MeanReward: -34.03, SuccessRate: 36.00% | eps=0.05 -> MeanReward: -33.97, SuccessRate: 36.50%
+[EvalReasons @ Episode 8000 | 14:43:03] eps=0.00 -> infeasible_at_reset:124 (62.0%), success:72 (36.0%), step_guard_timeout:4 (2.0%) | eps=0.05 -> infeasible_at_reset:124 (62.0%), success:73 (36.5%), step_guard_timeout:3 (1.5%)
+[EvalStats @ Episode 8000 | 14:43:03] eps=0.00 -> AvgSteps:8.91, AvgTime:3.80, AvgHazard:3.97, SuccSteps:16.97, SuccTime:8.89, SuccHazard:8.64 | eps=0.05 -> AvgSteps:9.68, AvgTime:4.15, AvgHazard:4.23, SuccSteps:20.75, SuccTime:9.89, SuccHazard:9.53
+Saved resumable checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\last_model.pt (episode 8000)
+Episode 8050, LastReward: 200.89, AvgReward(50): 191.30, SuccessRate(50): 100.00%, Epsilon: 0.054, InfeasibleRerolls(total): 11006
+Episode 8100, LastReward: 221.03, AvgReward(50): 183.50, SuccessRate(50): 98.00%, Epsilon: 0.054, InfeasibleRerolls(total): 11084
+Episode 8150, LastReward: -357.06, AvgReward(50): 162.12, SuccessRate(50): 94.00%, Epsilon: 0.054, InfeasibleRerolls(total): 11150
+Episode 8200, LastReward: 204.15, AvgReward(50): 171.45, SuccessRate(50): 96.00%, Epsilon: 0.054, InfeasibleRerolls(total): 11221
+[Eval @ Episode 8200 | 14:44:10] eps=0.00 -> MeanReward: -8.74, SuccessRate: 42.50% | eps=0.05 -> MeanReward: -7.37, SuccessRate: 43.50%
+[EvalReasons @ Episode 8200 | 14:44:10] eps=0.00 -> infeasible_at_reset:109 (54.5%), success:85 (42.5%), step_guard_timeout:6 (3.0%) | eps=0.05 -> infeasible_at_reset:111 (55.5%), success:87 (43.5%), step_guard_timeout:2 (1.0%)
+[EvalStats @ Episode 8200 | 14:44:10] eps=0.00 -> AvgSteps:11.70, AvgTime:3.89, AvgHazard:3.83, SuccSteps:17.64, SuccTime:8.45, SuccHazard:8.77 | eps=0.05 -> AvgSteps:9.99, AvgTime:4.65, AvgHazard:4.57, SuccSteps:19.76, SuccTime:9.39, SuccHazard:9.43
+Episode 8250, LastReward: 188.23, AvgReward(50): 196.15, SuccessRate(50): 100.00%, Epsilon: 0.054, InfeasibleRerolls(total): 11335
+Episode 8300, LastReward: 237.47, AvgReward(50): 173.34, SuccessRate(50): 96.00%, Epsilon: 0.054, InfeasibleRerolls(total): 11385
+Episode 8350, LastReward: 203.91, AvgReward(50): 165.12, SuccessRate(50): 94.00%, Epsilon: 0.054, InfeasibleRerolls(total): 11474
+Episode 8400, LastReward: 201.64, AvgReward(50): 187.63, SuccessRate(50): 98.00%, Epsilon: 0.053, InfeasibleRerolls(total): 11554
+[Eval @ Episode 8400 | 14:45:17] eps=0.00 -> MeanReward: -10.22, SuccessRate: 44.50% | eps=0.05 -> MeanReward: -22.34, SuccessRate: 39.00%
+[EvalReasons @ Episode 8400 | 14:45:17] eps=0.00 -> infeasible_at_reset:103 (51.5%), success:89 (44.5%), step_guard_timeout:8 (4.0%) | eps=0.05 -> infeasible_at_reset:121 (60.5%), success:78 (39.0%), step_guard_timeout:1 (0.5%)
+[EvalStats @ Episode 8400 | 14:45:17] eps=0.00 -> AvgSteps:14.79, AvgTime:5.28, AvgHazard:5.79, SuccSteps:20.65, SuccTime:10.17, SuccHazard:10.11 | eps=0.05 -> AvgSteps:8.53, AvgTime:3.98, AvgHazard:3.81, SuccSteps:20.08, SuccTime:9.96, SuccHazard:9.68
+Saved best checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\best_model.pt (episode 8400, success=44.50%, reward=-10.22)
+Saved resumable checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\last_model.pt (episode 8400)
+Episode 8450, LastReward: 217.60, AvgReward(50): 179.13, SuccessRate(50): 98.00%, Epsilon: 0.053, InfeasibleRerolls(total): 11598
+Episode 8500, LastReward: 160.52, AvgReward(50): 192.96, SuccessRate(50): 100.00%, Epsilon: 0.053, InfeasibleRerolls(total): 11669
+Episode 8550, LastReward: 207.74, AvgReward(50): 162.47, SuccessRate(50): 94.00%, Epsilon: 0.053, InfeasibleRerolls(total): 11748
+Episode 8600, LastReward: 199.91, AvgReward(50): 182.47, SuccessRate(50): 98.00%, Epsilon: 0.053, InfeasibleRerolls(total): 11829
+[Eval @ Episode 8600 | 14:46:24] eps=0.00 -> MeanReward: -22.94, SuccessRate: 40.00% | eps=0.05 -> MeanReward: -24.35, SuccessRate: 39.00%
+[EvalReasons @ Episode 8600 | 14:46:24] eps=0.00 -> infeasible_at_reset:115 (57.5%), success:80 (40.0%), step_guard_timeout:5 (2.5%) | eps=0.05 -> infeasible_at_reset:119 (59.5%), success:78 (39.0%), step_guard_timeout:3 (1.5%)
+[EvalStats @ Episode 8600 | 14:46:24] eps=0.00 -> AvgSteps:10.12, AvgTime:4.30, AvgHazard:4.77, SuccSteps:16.56, SuccTime:8.74, SuccHazard:8.49 | eps=0.05 -> AvgSteps:10.03, AvgTime:4.03, AvgHazard:4.34, SuccSteps:20.33, SuccTime:9.61, SuccHazard:9.72
+Episode 8650, LastReward: -312.68, AvgReward(50): 133.55, SuccessRate(50): 90.00%, Epsilon: 0.053, InfeasibleRerolls(total): 11912
+Episode 8700, LastReward: 145.56, AvgReward(50): 181.49, SuccessRate(50): 98.00%, Epsilon: 0.053, InfeasibleRerolls(total): 11994
+Episode 8750, LastReward: 197.30, AvgReward(50): 182.91, SuccessRate(50): 98.00%, Epsilon: 0.053, InfeasibleRerolls(total): 12055
+Episode 8800, LastReward: 186.75, AvgReward(50): 178.54, SuccessRate(50): 98.00%, Epsilon: 0.053, InfeasibleRerolls(total): 12139
+[Eval @ Episode 8800 | 14:47:34] eps=0.00 -> MeanReward: -10.77, SuccessRate: 42.00% | eps=0.05 -> MeanReward: -15.04, SuccessRate: 42.00%
+[EvalReasons @ Episode 8800 | 14:47:34] eps=0.00 -> infeasible_at_reset:114 (57.0%), success:84 (42.0%), step_guard_timeout:2 (1.0%) | eps=0.05 -> infeasible_at_reset:114 (57.0%), success:84 (42.0%), step_guard_timeout:2 (1.0%)
+[EvalStats @ Episode 8800 | 14:47:34] eps=0.00 -> AvgSteps:8.58, AvgTime:4.24, AvgHazard:4.08, SuccSteps:17.10, SuccTime:8.85, SuccHazard:8.57 | eps=0.05 -> AvgSteps:11.18, AvgTime:4.34, AvgHazard:4.97, SuccSteps:23.29, SuccTime:9.45, SuccHazard:9.84
+Saved resumable checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\last_model.pt (episode 8800)
+Episode 8850, LastReward: 194.08, AvgReward(50): 162.43, SuccessRate(50): 94.00%, Epsilon: 0.053, InfeasibleRerolls(total): 12220
+Episode 8900, LastReward: 168.59, AvgReward(50): 193.26, SuccessRate(50): 100.00%, Epsilon: 0.053, InfeasibleRerolls(total): 12288
+Episode 8950, LastReward: 206.71, AvgReward(50): 170.58, SuccessRate(50): 96.00%, Epsilon: 0.053, InfeasibleRerolls(total): 12356
+Episode 9000, LastReward: 219.59, AvgReward(50): 165.53, SuccessRate(50): 94.00%, Epsilon: 0.053, InfeasibleRerolls(total): 12418
+[Eval @ Episode 9000 | 14:48:42] eps=0.00 -> MeanReward: -35.11, SuccessRate: 37.00% | eps=0.05 -> MeanReward: -37.54, SuccessRate: 36.50%
+[EvalReasons @ Episode 9000 | 14:48:42] eps=0.00 -> infeasible_at_reset:119 (59.5%), success:74 (37.0%), step_guard_timeout:7 (3.5%) | eps=0.05 -> infeasible_at_reset:123 (61.5%), success:73 (36.5%), step_guard_timeout:4 (2.0%)
+[EvalStats @ Episode 9000 | 14:48:42] eps=0.00 -> AvgSteps:13.10, AvgTime:4.96, AvgHazard:4.58, SuccSteps:22.16, SuccTime:10.97, SuccHazard:11.21 | eps=0.05 -> AvgSteps:10.69, AvgTime:4.73, AvgHazard:4.79, SuccSteps:21.60, SuccTime:11.20, SuccHazard:11.65
+Saved last checkpoint: checkpoints\hazard_training_new\stage_100_balanced_multi_RI23_det\last_model.pt
+Evaluation over 200 episodes | 14:49:09 | eps=0.00 MeanReward: -25.00, SuccessRate: 38.00% | eps=0.05 MeanReward: -28.49, SuccessRate: 37.50%
+Evaluation termination reasons | eps=0.00: infeasible_at_reset:120 (60.0%), success:76 (38.0%), step_guard_timeout:4 (2.0%) | eps=0.05: infeasible_at_reset:123 (61.5%), success:75 (37.5%), step_guard_timeout:2 (1.0%)
+Evaluation route stats | eps=0.00: AvgSteps:9.55, AvgTime:3.55, AvgHazard:3.50, SuccSteps:17.78, SuccTime:8.95, SuccHazard:8.62 | eps=0.05: AvgSteps:8.60, AvgTime:4.19, AvgHazard:3.87, SuccSteps:19.20, SuccTime:9.97, SuccHazard:9.58
+Best checkpoint summary | Episode: 8400, PrimaryEval MeanReward: -10.22, SuccessRate: 44.50%
+Run log saved to: results\runs\hazard_training_new\last_run_stage_100_balanced_multi_RI23_det.txt
