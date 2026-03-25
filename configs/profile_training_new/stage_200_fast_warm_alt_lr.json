@@ -44,8 +44,8 @@
     "active_rain_keys": [
       "RI1"
     ],
-    "flood_time_weight": 0.5,
-    "landslide_time_weight": 0.5,
+    "flood_time_weight": 0.0,
+    "landslide_time_weight": 0.0,
     "high_risk_flood_threshold": 0.6,
     "high_risk_landslide_threshold": 0.5,
     "max_neighbor_slots": 4,
@@ -79,7 +79,7 @@
   "training": {
     "num_episodes": 15000,
     "gamma": 0.99,
-    "lr": 0.0001,
+    "lr": 0.0002,
     "batch_size": 128,
     "epsilon_start": 0.2,
     "epsilon_min": 0.05,
@@ -93,7 +93,7 @@
     "pretrained_model_path": "checkpoints/staged_training/stage_200_further/best_model.pt",
     "resume_optimizer": false,
     "resume_training": true,
-    "resume_checkpoint_path": "checkpoints/profile_training_new/stage_200_fast_warm_HF/last_model.pt",
+    "resume_checkpoint_path": "checkpoints/profile_training_new/stage_200_fast_warm_alt_lr/last_model.pt",
     "save_last_every_episodes": 400
   },
   "evaluation": {
@@ -104,8 +104,8 @@
     "epsilon_noisy": 0.05
   },
   "paths": {
-    "checkpoints_dir": "checkpoints/profile_training_new/stage_200_fast_warm_HF",
-    "runs_dir": "results/runs/profile_training_new/with_HF",
-    "run_log_file": "last_run_stage_200_fast_warm_HF.txt"
+    "checkpoints_dir": "checkpoints/profile_training_new/stage_200_fast_warm_alt_lr",
+    "runs_dir": "results/runs/profile_training_new",
+    "run_log_file": "last_run_stage_200_fast_warm_alt_lr.txt"
   }
 }

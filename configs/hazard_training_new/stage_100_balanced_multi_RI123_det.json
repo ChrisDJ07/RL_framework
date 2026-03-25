@@ -112,8 +112,8 @@
     "sample_feasible_nodes_directly": true,
     "max_feasibility_resamples": 30,
     "device": "auto",
-    "resume_training": false,
-    "resume_checkpoint_path": "",
+    "resume_training": true,
+    "resume_checkpoint_path": "checkpoints/hazard_training_new/stage_100_balanced_multi_RI123_det/last_model.pt",
     "save_last_every_episodes": 400
   },
   "evaluation": {
