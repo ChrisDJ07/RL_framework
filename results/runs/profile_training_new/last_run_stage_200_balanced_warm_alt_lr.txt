@@ -1,0 +1,29 @@
+Run config | config_path=C:\Users\japaullu.tsis\Desktop\projects\RL_framework\configs\profile_training_new\stage_200_balanced_warm_alt_lr.json | seed=40 | num_deliveries=2 | step_cost=0.05 | revisit_penalty=0.1 | backtrack_penalty=0.25 | reroll_infeasible_episodes=False | sample_feasible_nodes_directly=False | max_feasibility_resamples=20 | skip_infeasible_at_reset_eval=False | resume_training=False | resume_checkpoint_path=checkpoints\profile_training_new\stage_200_balanced_warm_alt_lr\last_model.pt | use_pretrained_model=True | pretrained_model_path=checkpoints/staged_training/stage_200_further/best_model.pt | resume_optimizer=False
+Loaded pretrained model: checkpoints\staged_training\stage_200_further\best_model.pt | MissingKeys: 0, UnexpectedKeys: 0
+Pretrained checkpoint config_path: configs/staged_training/stage_200_further.json
+WARNING: current run config_path differs from checkpoint config_path. This is valid for transfer/fine-tuning, but verify this is intentional.
+Graph stats | Nodes: 200, Edges: 209, AvgBaseTime: 0.3531, AvgHazard: 0.6713, StateDim: 40, ActionDim: 4, Tmax(min): 4171.94, Deliveries: 2, Device: cuda
+Episode 50, LastReward: -718.40, AvgReward(50): -239.28, SuccessRate(50): 54.00%, Epsilon: 0.197, InfeasibleRerolls(total): 0
+Episode 100, LastReward: -1044.60, AvgReward(50): -392.14, SuccessRate(50): 22.00%, Epsilon: 0.194, InfeasibleRerolls(total): 0
+Episode 150, LastReward: -307.81, AvgReward(50): -348.17, SuccessRate(50): 22.00%, Epsilon: 0.191, InfeasibleRerolls(total): 0
+Episode 200, LastReward: 132.74, AvgReward(50): -335.03, SuccessRate(50): 24.00%, Epsilon: 0.188, InfeasibleRerolls(total): 0
+Episode 250, LastReward: -326.69, AvgReward(50): -198.86, SuccessRate(50): 50.00%, Epsilon: 0.185, InfeasibleRerolls(total): 0
+Episode 300, LastReward: -975.06, AvgReward(50): -148.35, SuccessRate(50): 60.00%, Epsilon: 0.182, InfeasibleRerolls(total): 0
+[Eval @ Episode 300 | 12:04:43] eps=0.00 -> MeanReward: -455.34, SuccessRate: 16.00% | eps=0.05 -> MeanReward: -299.73, SuccessRate: 40.00%
+[EvalReasons @ Episode 300 | 12:04:43] eps=0.00 -> step_guard_timeout:168 (84.0%), success:32 (16.0%) | eps=0.05 -> step_guard_timeout:120 (60.0%), success:80 (40.0%)
+[EvalStats @ Episode 300 | 12:04:43] eps=0.00 -> AvgSteps:189.22, AvgTime:41.34, AvgHazard:70.83, SuccSteps:27.59, SuccTime:10.37, SuccHazard:17.56 | eps=0.05 -> AvgSteps:161.07, AvgTime:34.63, AvgHazard:61.15, SuccSteps:72.67, SuccTime:18.08, SuccHazard:29.30
+Saved best checkpoint: checkpoints\profile_training_new\stage_200_balanced_warm_alt_lr\best_model.pt (episode 300, success=16.00%, reward=-455.34)
+Episode 350, LastReward: 104.50, AvgReward(50): -42.03, SuccessRate(50): 80.00%, Epsilon: 0.180, InfeasibleRerolls(total): 0
+Episode 400, LastReward: 76.03, AvgReward(50): -31.43, SuccessRate(50): 86.00%, Epsilon: 0.177, InfeasibleRerolls(total): 0
+Saved resumable checkpoint: checkpoints\profile_training_new\stage_200_balanced_warm_alt_lr\last_model.pt (episode 400)
+Episode 450, LastReward: -153.27, AvgReward(50): -10.21, SuccessRate(50): 86.00%, Epsilon: 0.174, InfeasibleRerolls(total): 0
+Episode 500, LastReward: 28.55, AvgReward(50): -49.53, SuccessRate(50): 82.00%, Epsilon: 0.172, InfeasibleRerolls(total): 0
+Episode 550, LastReward: 150.63, AvgReward(50): 50.39, SuccessRate(50): 90.00%, Epsilon: 0.169, InfeasibleRerolls(total): 0
+Episode 600, LastReward: 174.05, AvgReward(50): 32.94, SuccessRate(50): 88.00%, Epsilon: 0.167, InfeasibleRerolls(total): 0
+[Eval @ Episode 600 | 12:14:50] eps=0.00 -> MeanReward: -237.73, SuccessRate: 52.00% | eps=0.05 -> MeanReward: -70.72, SuccessRate: 74.50%
+[EvalReasons @ Episode 600 | 12:14:50] eps=0.00 -> success:104 (52.0%), step_guard_timeout:96 (48.0%) | eps=0.05 -> success:149 (74.5%), step_guard_timeout:51 (25.5%)
+[EvalStats @ Episode 600 | 12:14:50] eps=0.00 -> AvgSteps:119.11, AvgTime:27.91, AvgHazard:59.19, SuccSteps:25.98, SuccTime:10.42, SuccHazard:15.27 | eps=0.05 -> AvgSteps:94.94, AvgTime:28.03, AvgHazard:42.14, SuccSteps:52.13, SuccTime:16.69, SuccHazard:22.98
+Saved best checkpoint: checkpoints\profile_training_new\stage_200_balanced_warm_alt_lr\best_model.pt (episode 600, success=52.00%, reward=-237.73)
+Episode 650, LastReward: 187.02, AvgReward(50): 22.29, SuccessRate(50): 90.00%, Epsilon: 0.164, InfeasibleRerolls(total): 0
+Episode 700, LastReward: 25.87, AvgReward(50): 123.00, SuccessRate(50): 98.00%, Epsilon: 0.162, InfeasibleRerolls(total): 0
+Episode 750, LastReward: 78.97, AvgReward(50): 99.41, SuccessRate(50): 96.00%, Epsilon: 0.160, InfeasibleRerolls(total): 0
