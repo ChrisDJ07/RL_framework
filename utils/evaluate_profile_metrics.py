@@ -434,3 +434,10 @@ python utils/evaluate_profile_metrics.py \
   --spec "Fast|checkpoints/profile_training_new/stage_200_fast_warm/best_model.pt|configs/profile_training_new/stage_200_fast_warm.json" \
   --output-prefix stage_200_warm_profiles_eval_no_HF
 """
+"""
+python utils/evaluate_profile_metrics.py \
+  --spec "Balanced|checkpoints/profile_training_new/stage_200_balanced_warm/best_model.pt|configs/profile_training_new/stage_200_balanced_warm.json" \
+  --spec "Safe|checkpoints/profile_training_new/stage_200_safe_warm/best_model.pt|configs/profile_training_new/stage_200_safe_warm.json" \
+  --spec "Fast|checkpoints/profile_training_new/stage_200_fast_warm_alt_lr/best_model.pt|configs/profile_training_new/stage_200_fast_warm_alt_lr.json" \
+  --output-prefix stage_200_warm_profiles_eval_no_HF_alt_lr
+"""

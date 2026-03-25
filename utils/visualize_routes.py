@@ -545,3 +545,15 @@ python utils/visualize_routes.py --checkpoint-path checkpoints/profile_training_
                                  --max-feasibility-resamples 50\
                                  --save-path results/visualization_runs/profile_training_new/stage_200_balanced_warm.png
 """
+
+
+# 200 nodes Single RI1-3 only
+"""
+python utils/visualize_routes.py --checkpoint-path checkpoints/hazard_training_200/stage_200_balanced_multi_RI_det/best_model.pt\
+                                 --config-path configs/hazard_training_200/stage_200_balanced_multi_RI_det.json\
+                                 --num-episodes 12\
+                                 --cols 6\
+                                 --feasibility-mode reroll\
+                                 --max-feasibility-resamples 50\
+                                 --save-path results/visualization_runs/hazard_training_200/stage_200_balanced_multi_RI_det.png
+"""
