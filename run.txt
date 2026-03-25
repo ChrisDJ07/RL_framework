@@ -1,0 +1,17 @@
+Batch 1:
+python rl_routing_wCUDA_wCheckP_latest.py --config configs/hazard_training_final/balanced_HF/stage_200_balanced_HF_RI2_det.json
+python rl_routing_wCUDA_wCheckP_latest.py --config configs/hazard_training_final/safe_HF/stage_200_safe_HF_RI2_det.json
+python rl_routing_wCUDA_wCheckP_latest.py --config configs/hazard_training_final/fast_HF/stage_200_fast_HF_RI2_det.json
+python rl_routing_wCUDA_wCheckP_latest.py --config configs/hazard_training_final/balanced_HF/stage_200_balanced_HF_RI3_det.json
+
+Batch 2:
+python rl_routing_wCUDA_wCheckP_latest.py --config configs/hazard_training_final/safe_HF/stage_200_safe_HF_RI3_det.json
+python rl_routing_wCUDA_wCheckP_latest.py --config configs/hazard_training_final/fast_HF/stage_200_fast_HF_RI3_det.json
+python rl_routing_wCUDA_wCheckP_latest.py --config configs/hazard_training_final/balanced_HF/stage_200_balanced_HF_RI4_det.json
+python rl_routing_wCUDA_wCheckP_latest.py --config configs/hazard_training_final/safe_HF/stage_200_safe_HF_RI4_det.json
+
+Batch 3:
+python rl_routing_wCUDA_wCheckP_latest.py --config configs/hazard_training_final/fast_HF/stage_200_fast_HF_RI4_det.json
+python rl_routing_wCUDA_wCheckP_latest.py --config configs/hazard_training_final/balanced_HF/stage_200_balanced_HF_RI5_det.json
+python rl_routing_wCUDA_wCheckP_latest.py --config configs/hazard_training_final/safe_HF/stage_200_safe_HF_RI5_det.json
+python rl_routing_wCUDA_wCheckP_latest.py --config configs/hazard_training_final/fast_HF/stage_200_fast_HF_RI5_det.json
