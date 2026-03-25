@@ -435,7 +435,7 @@ python utils/evaluate_profile_metrics.py \
   --output-prefix stage_200_warm_profiles_eval_no_HF
 """
 
-# Warm and alt_lr
+# Warm and alt_lr and HF
 """
 python utils/evaluate_profile_metrics.py \
   --spec "Balanced|checkpoints/profile_training_new/stage_200_balanced_warm/best_model.pt|configs/profile_training_new/stage_200_balanced_warm.json" \
@@ -444,5 +444,8 @@ python utils/evaluate_profile_metrics.py \
   --spec "Balanced_alt_lr|checkpoints/profile_training_new/stage_200_balanced_warm_alt_lr/best_model.pt|configs/profile_training_new/stage_200_balanced_warm_alt_lr.json" \
   --spec "Safe_alt_lr|checkpoints/profile_training_new/stage_200_safe_warm_alt_lr/best_model.pt|configs/profile_training_new/stage_200_safe_warm_alt_lr.json" \
   --spec "Fast_alt_lr|checkpoints/profile_training_new/stage_200_fast_warm_alt_lr/best_model.pt|configs/profile_training_new/stage_200_fast_warm_alt_lr.json" \
-  --output-prefix stage_200_warm_profiles_eval_no_HF_vs_alt_lr
+  --spec "Balanced_HF|checkpoints/profile_training_new/stage_200_balanced_warm_HF/best_model.pt|configs/profile_training_new/with_HF/stage_200_balanced_warm_HF.json" \
+  --spec "Safe_HF|checkpoints/profile_training_new/stage_200_safe_warm_HF/best_model.pt|configs/profile_training_new/with_HF/stage_200_safe_warm_HF.json" \
+  --spec "Fast_HF|checkpoints/profile_training_new/stage_200_fast_warm_HF/best_model.pt|configs/profile_training_new/with_HF/stage_200_fast_warm_HF.json" \
+  --output-prefix stage_200_warm_profiles_eval_no_HF_vs_alt_lr_vs_HF
 """

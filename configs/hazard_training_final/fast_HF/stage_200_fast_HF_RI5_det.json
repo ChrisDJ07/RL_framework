@@ -1,0 +1,130 @@
+{
+  "seed": 40,
+  "graph": {
+    "num_nodes": 200,
+    "min_nodes": 200,
+    "max_nodes": 200,
+    "force_download": false,
+    "prebuilt_graphml_path": "data/staged_subgraphs/selected_subgraph_n200.graphml",
+    "use_existing_hazards": true,
+    "flood_attr": "flood_hazard",
+    "landslide_attr": "landslide_hazard",
+    "travel_time_attr": "travel_time_min"
+  },
+  "environment": {
+    "num_deliveries": 2,
+    "min_max_steps": 220,
+    "max_steps_multiplier": 0.7,
+    "episode_time_scale": 8
+  },
+  "hazard": {
+    "rain_levels": {
+      "RI1": {
+        "speed_mult": 0.94,
+        "flood_block_threshold": 1.1,
+        "flood_block_prob": 0,
+        "landslide_block_threshold": 1.1,
+        "landslide_block_prob": 0
+      },
+      "RI2": {
+        "speed_mult": 0.9,
+        "flood_block_threshold": 1,
+        "flood_block_prob": 1,
+        "landslide_block_threshold": 1.1,
+        "landslide_block_prob": 0
+      },
+      "RI3": {
+        "speed_mult": 0.85,
+        "flood_block_threshold": 0.6,
+        "flood_block_prob": 1,
+        "landslide_block_threshold": 1.1,
+        "landslide_block_prob": 0
+      },
+      "RI4": {
+        "speed_mult": 0.4,
+        "flood_block_threshold": 0.6,
+        "flood_block_prob": 1,
+        "landslide_block_threshold": 1,
+        "landslide_block_prob": 1
+      },
+      "RI5": {
+        "speed_mult": 0.2,
+        "flood_block_threshold": 0.6,
+        "flood_block_prob": 1,
+        "landslide_block_threshold": 0.6,
+        "landslide_block_prob": 1
+      }
+    },
+    "active_rain_keys": [
+      "RI5"
+    ],
+    "flood_time_weight": 0.5,
+    "landslide_time_weight": 0.5,
+    "high_risk_flood_threshold": 0.6,
+    "high_risk_landslide_threshold": 0.5,
+    "max_neighbor_slots": 4,
+    "neighbor_feature_dim": 7
+  },
+  "reward": {
+    "delivery": 60,
+    "mission_success": 120,
+    "k_progress": 10,
+    "hazard_lambda": 5,
+    "w_flood": 0.6,
+    "w_landslide": 0.4,
+    "eta_time": 0.8,
+    "step_cost": 0.05,
+    "revisit_penalty": 0.1,
+    "backtrack_penalty": 0.25,
+    "penalty_timeout": -120,
+    "penalty_blockage": -120,
+    "penalty_incomplete_per_delivery": -20
+  },
+  "model": {
+    "hidden_sizes": [
+      128,
+      64
+    ],
+    "node_embedding_dim": 32
+  },
+  "replay": {
+    "capacity": 60000
+  },
+  "training": {
+    "num_episodes": 5000,
+    "gamma": 0.99,
+    "lr": 5e-05,
+    "device": "auto",
+    "batch_size": 128,
+    "epsilon_start": 0.15,
+    "epsilon_min": 0.05,
+    "epsilon_decay": 0.995,
+    "epsilon_schedule": "exp",
+    "epsilon_exp_decay_rate": 0.00088,
+    "target_update_every_steps": 500,
+    "log_every": 50,
+    "eval_every": 200,
+    "use_pretrained_model": true,
+    "pretrained_model_path": "checkpoints/profile_training_new/stage_200_fast_warm_HF/best_model.pt",
+    "resume_optimizer": false,
+    "reroll_infeasible_episodes": true,
+    "sample_feasible_nodes_directly": true,
+    "max_feasibility_resamples": 30,
+    "resume_training": false,
+    "resume_checkpoint_path": "",
+    "save_last_every_episodes": 400
+  },
+  "evaluation": {
+    "episodes": 200,
+    "epsilon_primary": 0.05,
+    "run_epsilon_greedy_eval": true,
+    "skip_infeasible_at_reset": true,
+    "epsilon_greedy": 0,
+    "epsilon_noisy": 0.05
+  },
+  "paths": {
+    "checkpoints_dir": "checkpoints/hazard_training_final/fast_HF/stage_200_fast_HF_RI5_det",
+    "runs_dir": "results/runs/hazard_training_final/fast_HF",
+    "run_log_file": "last_run_stage_200_fast_HF_RI5_det.txt"
+  }
+}
