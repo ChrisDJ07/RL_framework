@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from utils.eval_pipeline_common import read_json
+from eval_pipeline_common import read_json
 
 
 def build_parser():
@@ -117,3 +117,20 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# Summarize route output JSON files into summary metrics CSV files. The overall summary aggregates results by method, while the per_ri summary aggregates results by method and rain_key. The raw CSV contains all episode-level data for further analysis if needed.
+'''
+python utils/summarize_route_results.py \
+  --routes \
+    results/route_outputs/safe_hf_routes.json \
+    results/route_outputs/balanced_hf_routes.json \
+    results/route_outputs/fast_hf_routes.json \
+  --output-prefix results/eval_results/rl_profiles_200n
+  
+python utils/summarize_route_results.py \
+  --routes \
+    results/route_outputs/safe_hf_routes_ri1.json \
+    results/route_outputs/balanced_hf_routes_ri1.json \
+    results/route_outputs/fast_hf_routes_ri1.json \
+  --output-prefix results/eval_results/rl_profiles_200n_ri1
+'''

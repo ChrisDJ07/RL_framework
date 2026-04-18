@@ -4,7 +4,7 @@ import argparse
 import random
 from pathlib import Path
 
-from utils.eval_pipeline_common import (
+from eval_pipeline_common import (
     choose_episode_nodes_feasible,
     choose_episode_nodes_random,
     episode_blocked_edges,
@@ -166,3 +166,27 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# Generate shared dataset
+'''
+python utils/generate_eval_dataset.py \
+  --config configs/hazard_training_final/balanced_HF/stage_200_balanced_HF_RI2_det.json \
+  --episodes 1000 \
+  --num-deliveries 2 \
+  --rain-keys RI1,RI2,RI3,RI4,RI5 \
+  --output results/evaluation_datasets/eval_200n_d2_all_ri.json
+
+'''
+
+# Generate feasible-only dataset with direct sampling
+'''
+python utils/generate_eval_dataset.py \
+  --config configs/hazard_training_final/balanced_HF/stage_200_balanced_HF_RI2_det.json \
+  --episodes 1000 \
+  --num-deliveries 2 \
+  --rain-keys RI1,RI2,RI3,RI4,RI5 \
+  --feasible-only \
+  --sample-feasible-directly \
+  --output results/evaluation_datasets/eval_200n_d2_all_ri_feasible.json
+'''
