@@ -1,0 +1,108 @@
+from __future__ import annotations
+
+import argparse
+from pathlib import Path
+
+from utils.eval_pipeline_common import (
+    initialize_env_from_episode,
+    load_model_env,
+    read_json,
+    rollout_policy_episode,
+    write_json,
+)
+
+
+def build_parser():
+    parser = argparse.ArgumentParser(
+        description="Run a trained RL model on a shared episode dataset and export route outputs."
+    )
+    parser.add_argument("--dataset", required=True, help="Path to the generated evaluation dataset JSON.")
+    parser.add_argument("--config", required=True, help="Config path for the RL model.")
+    parser.add_argument("--checkpoint", required=True, help="Checkpoint path for the RL model.")
+    parser.add_argument("--label", required=True, help="Method label to store in the route output.")
+    parser.add_argument(
+        "--epsilon",
+        type=float,
+        default=0.0,
+        help="Policy epsilon for rollout. Use 0.0 for greedy evaluation.",
+    )
+    parser.add_argument(
+        "--skip-infeasible-at-reset",
+        action="store_true",
+        help="If set, episodes marked infeasible at reset produce an immediate route record with no rollout.",
+    )
+    parser.add_argument("--output", required=True, help="Output JSON path.")
+    return parser
+
+
+def main():
+    args = build_parser().parse_args()
+    dataset = read_json(args.dataset)
+    if dataset.get("dataset_type") != "routing_episode_dataset":
+        raise ValueError("Unsupported dataset file. Expected dataset_type='routing_episode_dataset'.")
+
+    generation = dataset.get("generation", {})
+    num_deliveries = int(generation.get("num_deliveries"))
+    loaded = load_model_env(
+        config_path=args.config,
+        checkpoint_path=args.checkpoint,
+        seed=int(generation.get("seed", 40)),
+        num_deliveries_override=num_deliveries,
+    )
+
+    env = loaded.env
+    module = loaded.module
+    model = loaded.model
+
+    output_episodes = []
+    for record in dataset["episodes"]:
+        initialize_env_from_episode(
+            env,
+            module,
+            rain_key=record["rain_key"],
+            start_node=int(record["start_node"]),
+            delivery_nodes=[int(node) for node in record["delivery_nodes"]],
+        )
+        result = rollout_policy_episode(
+            env,
+            module,
+            model,
+            epsilon=float(args.epsilon),
+            stop_on_infeasible=bool(args.skip_infeasible_at_reset),
+        )
+        output_episodes.append(
+            {
+                "episode_id": int(record["episode_id"]),
+                "rain_key": record["rain_key"],
+                "start_node": int(record["start_node"]),
+                "delivery_nodes": [int(node) for node in record["delivery_nodes"]],
+                "feasible_at_reset": bool(record.get("feasible_at_reset", True)),
+                **result,
+            }
+        )
+
+    payload = {
+        "schema_version": 1,
+        "route_output_type": "routing_route_output",
+        "method": {
+            "label": args.label,
+            "type": "rl",
+            "config_path": str(Path(args.config)),
+            "checkpoint_path": str(Path(args.checkpoint)),
+            "epsilon": float(args.epsilon),
+            "skip_infeasible_at_reset": bool(args.skip_infeasible_at_reset),
+        },
+        "dataset": {
+            "path": str(Path(args.dataset)),
+            "episodes": int(len(output_episodes)),
+            "num_deliveries": int(num_deliveries),
+        },
+        "episodes": output_episodes,
+    }
+    write_json(args.output, payload)
+    print(f"Saved route output: {args.output}")
+    print(f"Method: {args.label} | Episodes: {len(output_episodes)}")
+
+
+if __name__ == "__main__":
+    main()
