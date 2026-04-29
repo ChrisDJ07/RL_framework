@@ -183,10 +183,10 @@ python utils/generate_eval_dataset.py \
 '''
 python utils/generate_eval_dataset.py \
   --config configs/hazard_training_final/balanced_HF/stage_200_balanced_HF_RI2_det.json \
-  --episodes 1000 \
-  --num-deliveries 2 \
-  --rain-keys RI1,RI2,RI3,RI4,RI5 \
+  --episodes 500 \
+  --num-deliveries 3 \
+  --rain-keys RI1 \
   --feasible-only \
   --sample-feasible-directly \
-  --output results/evaluation_datasets/eval_200n_d2_all_ri_feasible.json
+  --output results/evaluation_datasets/eval_200n_d3_ri1_feasible.json
 '''

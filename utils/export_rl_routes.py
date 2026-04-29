@@ -137,3 +137,60 @@ python utils/export_rl_routes.py \
   --skip-infeasible-at-reset \
   --output results/route_outputs/balanced_hf_routes_ri1.json
 '''
+
+'''
+python utils/export_rl_routes.py \
+  --dataset results/evaluation_datasets/eval_200n_d5_ri1_feasible.json \
+  --config configs/profile_training_new/with_HF/stage_200_safe_warm_HF.json \
+  --checkpoint checkpoints/profile_training_new/stage_200_safe_warm_HF/best_model.pt \
+  --label Safe_HF_ri1_d5 \
+  --epsilon 0.0 \
+  --skip-infeasible-at-reset \
+  --output results/route_outputs/safe_hf_routes_ri1_d5.json
+  
+python utils/export_rl_routes.py \
+  --dataset results/evaluation_datasets/eval_200n_d5_ri1_feasible.json \
+  --config configs/profile_training_new/with_HF/stage_200_fast_warm_HF.json \
+  --checkpoint checkpoints/profile_training_new/stage_200_fast_warm_HF/best_model.pt \
+  --label Fast_HF_ri1 \
+  --epsilon 0.0 \
+  --skip-infeasible-at-reset \
+  --output results/route_outputs/fast_hf_routes_ri1.json
+  
+python utils/export_rl_routes.py \
+  --dataset results/evaluation_datasets/eval_200n_d5_ri1_feasible.json \
+  --config configs/profile_training_new/with_HF/stage_200_balanced_warm_HF.json \
+  --checkpoint checkpoints/profile_training_new/stage_200_balanced_warm_HF/best_model.pt \
+  --label Balanced_HF_ri1 \
+  --epsilon 0.0 \
+  --skip-infeasible-at-reset \
+  --output results/route_outputs/balanced_hf_routes_ri1.json
+'''
+'''
+python utils/export_rl_routes.py \
+  --dataset results/evaluation_datasets/eval_200n_d5_ri1_feasible.json \
+  --config configs/profile_training_new/with_HF/stage_200_safe_warm_HF.json \
+  --checkpoint checkpoints/profile_training_new/stage_200_safe_warm_HF/best_model.pt \
+  --label Safe_HF_ri1_d5 \
+  --epsilon 0.0 \
+  --skip-infeasible-at-reset \
+  --output results/route_outputs/safe_hf_routes_ri1_d5.json
+  
+python utils/export_rl_routes.py \
+  --dataset results/evaluation_datasets/eval_200n_d5_ri1_feasible.json \
+  --config configs/profile_training_new/with_HF/stage_200_fast_warm_HF.json \
+  --checkpoint checkpoints/profile_training_new/stage_200_fast_warm_HF/best_model.pt \
+  --label Fast_HF_ri1 \
+  --epsilon 0.0 \
+  --skip-infeasible-at-reset \
+  --output results/route_outputs/fast_hf_routes_ri1.json
+  
+python utils/export_rl_routes.py \
+  --dataset results/evaluation_datasets/eval_200n_d5_ri1_feasible.json \
+  --config configs/profile_training_new/with_HF/stage_200_balanced_warm_HF.json \
+  --checkpoint checkpoints/profile_training_new/stage_200_balanced_warm_HF/best_model.pt \
+  --label Balanced_HF_ri1 \
+  --epsilon 0.0 \
+  --skip-infeasible-at-reset \
+  --output results/route_outputs/balanced_hf_routes_ri1.json
+'''

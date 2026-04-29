@@ -1,0 +1,2 @@
+method,episodes,success_rate_pct,timeout_rate_pct,infeasible_at_reset_rate_pct,feasible_success_rate_pct,avg_time_success,avg_distance_success,avg_steps_success,avg_hazard_exposure_success,avg_hazard_score_success,avg_hazard_score_all,avg_runtime_sec
+Safe_HF_ri1_d5,1000,87.5,12.5,0.0,87.5,26.99953965133095,8926.289330557136,48.528,3414.6922296446146,12.863359999999998,14.471880000000004,0.030165682697901503

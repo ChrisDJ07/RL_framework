@@ -133,4 +133,9 @@ python utils/summarize_route_results.py \
     results/route_outputs/balanced_hf_routes_ri1.json \
     results/route_outputs/fast_hf_routes_ri1.json \
   --output-prefix results/eval_results/rl_profiles_200n_ri1
+  
+python utils/summarize_route_results.py \
+  --routes \
+    results/route_outputs/safe_hf_routes_ri1_d5.json \
+  --output-prefix results/eval_results/rl_profiles_200n_ri1_d5
 '''
