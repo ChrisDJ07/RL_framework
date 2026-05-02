@@ -8,7 +8,7 @@ from typing import Dict, List
 import matplotlib.pyplot as plt
 import networkx as nx
 
-from graph_io import (
+from utils.subgraph_selection.graph_io import (
     DEFAULT_FLOOD_TRANSFORM,
     DEFAULT_LANDSLIDE_TRANSFORM,
     DEFAULT_RI_MULTIPLIERS,
@@ -16,7 +16,7 @@ from graph_io import (
     graphml_safe_graph,
     load_simple_graph,
 )
-from selection import (
+from utils.subgraph_selection.selection import (
     CandidateSubgraph,
     aggregate_corridor_weights,
     candidate_to_json,
@@ -25,7 +25,7 @@ from selection import (
     score_candidate_subgraph,
     select_seed_nodes,
 )
-from tradeoff import sample_tradeoff_pairs
+from utils.subgraph_selection.tradeoff import sample_tradeoff_pairs
 
 
 def build_arg_parser() -> argparse.ArgumentParser:

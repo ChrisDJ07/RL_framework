@@ -7,8 +7,8 @@ from typing import Dict, Hashable, Iterable, List, Mapping, Sequence, Set, Tuple
 
 import networkx as nx
 
-from graph_io import EdgeKey, NodeId, canonical_edge
-from tradeoff import PairTradeoffAggregate
+from utils.subgraph_selection.graph_io import EdgeKey, NodeId, canonical_edge
+from utils.subgraph_selection.tradeoff import PairTradeoffAggregate
 
 
 @dataclass

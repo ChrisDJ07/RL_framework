@@ -34,6 +34,7 @@ class LoadedModelEnv(LoadedEnv):
 
 def load_trainer_module():
     candidate_modules = [
+        "rl_routing_FINAL",
         "rl_routing_wCUDA_wCheckP_latest",
         "rl_routing_wCUDA_wCheckP",
         "rl_routing",

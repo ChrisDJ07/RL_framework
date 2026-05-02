@@ -6,7 +6,7 @@ from typing import Dict, Hashable, Iterable, List, Mapping, Sequence, Set, Tuple
 
 import networkx as nx
 
-from graph_io import EdgeKey, RiskModel, canonical_edge
+from utils.subgraph_selection.graph_io import EdgeKey, RiskModel, canonical_edge
 
 
 NodeId = Hashable

@@ -12,23 +12,23 @@ from typing import Dict, Iterable, List, Sequence, Tuple
 import networkx as nx
 
 try:
-    from graph_io import (
+    from utils.subgraph_selection.graph_io import (
         DEFAULT_FLOOD_TRANSFORM,
         DEFAULT_LANDSLIDE_TRANSFORM,
         DEFAULT_RI_MULTIPLIERS,
         RiskModel,
         load_simple_graph,
     )
-    from tradeoff import compute_pair_tradeoff
+    from utils.subgraph_selection.tradeoff import compute_pair_tradeoff
 except ImportError:
-    from subgraph_selection.graph_io import (
+    from utils.subgraph_selection.graph_io import (
         DEFAULT_FLOOD_TRANSFORM,
         DEFAULT_LANDSLIDE_TRANSFORM,
         DEFAULT_RI_MULTIPLIERS,
         RiskModel,
         load_simple_graph,
     )
-    from subgraph_selection.tradeoff import compute_pair_tradeoff
+    from utils.subgraph_selection.tradeoff import compute_pair_tradeoff
 
 
 def build_arg_parser() -> argparse.ArgumentParser:

@@ -38,6 +38,7 @@ def load_env_and_model(
     checkpoint = torch.load(ckpt_file, map_location="cpu", weights_only=False)
 
     candidate_modules = [
+        "rl_routing_FINAL",
         "rl_routing_wCUDA_wCheckP_latest",
         "rl_routing",
         "rl_routing_wCUDA",
