@@ -102,7 +102,7 @@
     "log_every": 50,
     "eval_every": 300,
     "use_pretrained_model": true,
-    "pretrained_model_path": "checkpoints/retraining_260/backbone_stage_150_d2_nohf/best_model.pt",
+    "pretrained_model_path": "checkpoints/shared_backbone/backbone_stage_150_d2_nohf/best_model.pt",
     "resume_optimizer": false,
     "resume_training": false,
     "resume_checkpoint_path": "",

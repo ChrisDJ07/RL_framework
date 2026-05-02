@@ -1,21 +1,21 @@
 {
   "seed": 40,
   "graph": {
-    "num_nodes": 100,
-    "min_nodes": 100,
-    "max_nodes": 100,
+    "num_nodes": 260,
+    "min_nodes": 260,
+    "max_nodes": 260,
     "force_download": false,
-    "prebuilt_graphml_path": "data/final_subgraphs/subgraph_n100.graphml",
+    "prebuilt_graphml_path": "data/final_subgraphs/subgraph_n260.graphml",
     "use_existing_hazards": true,
     "flood_attr": "flood_hazard",
     "landslide_attr": "landslide_hazard",
     "travel_time_attr": "travel_time_min"
   },
   "environment": {
-    "num_deliveries": 2,
-    "min_max_steps": 140,
-    "max_steps_multiplier": 0.5,
-    "episode_time_scale": 6.0
+    "num_deliveries": 4,
+    "min_max_steps": 300,
+    "max_steps_multiplier": 0.9,
+    "episode_time_scale": 9.0
   },
   "hazard": {
     "rain_levels": {
@@ -60,8 +60,8 @@
     ],
     "flood_time_weight": 0.0,
     "landslide_time_weight": 0.0,
-    "high_risk_flood_threshold": 1.1,
-    "high_risk_landslide_threshold": 1.1,
+    "high_risk_flood_threshold": 0.6,
+    "high_risk_landslide_threshold": 0.5,
     "max_neighbor_slots": 4,
     "neighbor_feature_dim": 7
   },
@@ -69,11 +69,13 @@
     "delivery": 60.0,
     "mission_success": 120.0,
     "k_progress": 10.0,
-    "hazard_lambda": 0.0,
-    "w_flood": 0.0,
-    "w_landslide": 0.0,
-    "eta_time": 0.2,
+    "hazard_lambda": 10.0,
+    "w_flood": 0.6,
+    "w_landslide": 0.4,
+    "eta_time": 0.3,
     "step_cost": 0.05,
+    "revisit_penalty": 0.1,
+    "backtrack_penalty": 0.25,
     "penalty_timeout": -120.0,
     "penalty_blockage": -120.0,
     "penalty_incomplete_per_delivery": -20.0
@@ -86,23 +88,23 @@
     "node_embedding_dim": 32
   },
   "replay": {
-    "capacity": 20000
+    "capacity": 80000
   },
   "training": {
-    "num_episodes": 30000,
+    "num_episodes": 20000,
     "gamma": 0.99,
-    "lr": 0.0002,
+    "lr": 0.0001,
     "batch_size": 128,
-    "epsilon_start": 1.0,
+    "epsilon_start": 0.2,
     "epsilon_min": 0.05,
     "epsilon_decay": 0.995,
     "epsilon_schedule": "exp",
-    "epsilon_exp_decay_rate": 0.00015,
+    "epsilon_exp_decay_rate": 0.00035,
     "target_update_every_steps": 500,
     "log_every": 50,
-    "eval_every": 200,
-    "use_pretrained_model": false,
-    "pretrained_model_path": "",
+    "eval_every": 300,
+    "use_pretrained_model": true,
+    "pretrained_model_path": "checkpoints/retraining_260/backbone_stage_260_d4_nohf_further/best_model.pt",
     "resume_optimizer": false,
     "resume_training": false,
     "resume_checkpoint_path": "",
@@ -111,7 +113,7 @@
       "enabled": true,
       "patience_evals": 8,
       "min_evals": 8,
-      "min_episodes": 22000,
+      "min_episodes": 15000,
       "restore_best_weights_for_final_eval": true
     }
   },
@@ -123,8 +125,8 @@
     "epsilon_noisy": 0.05
   },
   "paths": {
-    "checkpoints_dir": "checkpoints/retraining_260/backbone_stage_100_d2_nohf",
+    "checkpoints_dir": "checkpoints/retraining_260/warm_stage_2_260_balanced_d4_nohf",
     "runs_dir": "results/runs/retraining_260",
-    "run_log_file": "backbone_stage_100_d2_nohf.txt"
+    "run_log_file": "warm_stage_2_260_balanced_d4_nohf.txt"
   }
 }
