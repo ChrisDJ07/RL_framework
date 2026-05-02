@@ -89,7 +89,7 @@
     "capacity": 20000
   },
   "training": {
-    "num_episodes": 18000,
+    "num_episodes": 30000,
     "gamma": 0.99,
     "lr": 0.0002,
     "batch_size": 128,
@@ -106,7 +106,14 @@
     "resume_optimizer": false,
     "resume_training": false,
     "resume_checkpoint_path": "",
-    "save_last_every_episodes": 400
+    "save_last_every_episodes": 400,
+    "early_stopping": {
+      "enabled": true,
+      "patience_evals": 8,
+      "min_evals": 8,
+      "min_episodes": 22000,
+      "restore_best_weights_for_final_eval": true
+    }
   },
   "evaluation": {
     "episodes": 200,

@@ -1,21 +1,21 @@
 {
   "seed": 40,
   "graph": {
-    "num_nodes": 200,
-    "min_nodes": 200,
-    "max_nodes": 200,
+    "num_nodes": 260,
+    "min_nodes": 260,
+    "max_nodes": 260,
     "force_download": false,
-    "prebuilt_graphml_path": "data/final_subgraphs/subgraph_n200.graphml",
+    "prebuilt_graphml_path": "data/final_subgraphs/subgraph_n260.graphml",
     "use_existing_hazards": true,
     "flood_attr": "flood_hazard",
     "landslide_attr": "landslide_hazard",
     "travel_time_attr": "travel_time_min"
   },
   "environment": {
-    "num_deliveries": 3,
-    "min_max_steps": 240,
+    "num_deliveries": 2,
+    "min_max_steps": 260,
     "max_steps_multiplier": 0.8,
-    "episode_time_scale": 8.5
+    "episode_time_scale": 8.8
   },
   "hazard": {
     "rain_levels": {
@@ -86,24 +86,24 @@
     "node_embedding_dim": 32
   },
   "replay": {
-    "capacity": 60000
+    "capacity": 80000
   },
   "training": {
-    "num_episodes": 24000,
+    "num_episodes": 18000,
     "gamma": 0.99,
     "lr": 0.0001,
     "batch_size": 128,
     "epsilon_start": 0.2,
-    "epsilon_min": 0.05,
+    "epsilon_min": 0.04,
     "epsilon_decay": 0.995,
     "epsilon_schedule": "exp",
-    "epsilon_exp_decay_rate": 0.00016,
+    "epsilon_exp_decay_rate": 0.00011,
     "target_update_every_steps": 500,
     "log_every": 50,
     "eval_every": 300,
     "use_pretrained_model": true,
-    "pretrained_model_path": "checkpoints/retraining_260/backbone_stage_150_d2_nohf/best_model.pt",
-    "resume_optimizer": false,
+    "pretrained_model_path": "checkpoints/retraining_260_old_based/backbone_stage_260_d2_nohf/best_model.pt",
+    "resume_optimizer": true,
     "resume_training": false,
     "resume_checkpoint_path": "",
     "save_last_every_episodes": 400,
@@ -111,7 +111,7 @@
       "enabled": true,
       "patience_evals": 8,
       "min_evals": 8,
-      "min_episodes": 17000,
+      "min_episodes": 14000,
       "restore_best_weights_for_final_eval": true
     }
   },
@@ -123,8 +123,8 @@
     "epsilon_noisy": 0.05
   },
   "paths": {
-    "checkpoints_dir": "checkpoints/retraining_260/backbone_stage_200_d3_nohf",
-    "runs_dir": "results/runs/retraining_260",
-    "run_log_file": "backbone_stage_200_d3_nohf.txt"
+    "checkpoints_dir": "checkpoints/retraining_260_old_based/backbone_stage_260_d2_nohf_further",
+    "runs_dir": "results/runs/retraining_260_old_based",
+    "run_log_file": "backbone_stage_260_d2_nohf_further.txt"
   }
 }

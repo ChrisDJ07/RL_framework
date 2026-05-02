@@ -138,6 +138,13 @@ DEFAULT_CONFIG = {
         "resume_training": False,
         "resume_checkpoint_path": "",
         "save_last_every_episodes": 200,
+        "early_stopping": {
+            "enabled": False,
+            "patience_evals": 20,
+            "min_evals": 8,
+            "min_episodes": 0,
+            "restore_best_weights_for_final_eval": True,
+        },
     },
     "evaluation": {
         "episodes": 300,
@@ -1119,6 +1126,12 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
         eval_episodes = int(eval_cfg["episodes"])
         eval_eps0 = float(eval_cfg["epsilon_greedy"])
         eval_eps_noise = float(eval_cfg["epsilon_noisy"])
+        early_stop_cfg = train_cfg.get("early_stopping", {})
+        early_stop_enabled = bool(early_stop_cfg.get("enabled", False))
+        early_stop_patience_evals = int(early_stop_cfg.get("patience_evals", 20))
+        early_stop_min_evals = int(early_stop_cfg.get("min_evals", 8))
+        early_stop_min_episodes = int(early_stop_cfg.get("min_episodes", 0))
+        early_stop_restore_best = bool(early_stop_cfg.get("restore_best_weights_for_final_eval", True))
 
         start_episode = 0
         train_steps = 0
@@ -1128,6 +1141,9 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
         best_eval_reward = -1e9
         best_episode = 0
         last_completed_episode = 0
+        eval_count = 0
+        evals_since_improvement = 0
+        early_stopped = False
 
         def _to_float(value, default):
             try:
@@ -1429,6 +1445,7 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
                     )
 
                 if (episode + 1) % eval_every == 0:
+                    eval_count += 1
                     eval_clock = datetime.now().strftime("%H:%M:%S")
                     eval_reward_eps0, eval_success_eps0, eval_reasons_eps0, eval_metrics_eps0 = evaluate_policy(
                         online,
@@ -1464,17 +1481,37 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
                         f"eps={eval_eps_noise:.2f} -> {format_eval_metrics(eval_metrics_epsn)}"
                     )
 
-                    if (eval_success_eps0 > best_eval_success) or (
+                    improved = (eval_success_eps0 > best_eval_success) or (
                         eval_success_eps0 == best_eval_success and eval_reward_eps0 > best_eval_reward
-                    ):
+                    )
+                    if improved:
                         best_eval_success = eval_success_eps0
                         best_eval_reward = eval_reward_eps0
                         best_episode = episode + 1
+                        evals_since_improvement = 0
                         torch.save(_make_checkpoint_payload(best_episode), best_model_path)
                         log(
                             f"Saved best checkpoint: {best_model_path} "
                             f"(episode {best_episode}, success={best_eval_success:.2%}, reward={best_eval_reward:.2f})"
                         )
+                    else:
+                        evals_since_improvement += 1
+
+                    if (
+                        early_stop_enabled
+                        and eval_count >= early_stop_min_evals
+                        and (episode + 1) >= early_stop_min_episodes
+                        and evals_since_improvement >= early_stop_patience_evals
+                    ):
+                        early_stopped = True
+                        log(
+                            "Early stopping triggered: "
+                            f"no primary-eval improvement for {evals_since_improvement} evals "
+                            f"after episode {episode + 1}. "
+                            f"Best episode={best_episode}, best success={best_eval_success:.2%}, "
+                            f"best reward={best_eval_reward:.2f}."
+                        )
+                        break
 
                 if save_last_every > 0 and ((episode + 1) % save_last_every == 0):
                     torch.save(_make_checkpoint_payload(episode + 1), last_model_path)
@@ -1493,7 +1530,17 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
             log("Resume by setting training.resume_training=true.")
             return
 
-        torch.save(_make_checkpoint_payload(num_episodes), last_model_path)
+        if early_stopped and early_stop_restore_best and best_episode > 0 and Path(best_model_path).exists():
+            best_payload = torch.load(best_model_path, map_location=device)
+            online.load_state_dict(best_payload["model_state_dict"])
+            target.load_state_dict(online.state_dict())
+            log(
+                "Restored best checkpoint weights before final save/eval "
+                f"from episode {best_episode} due to early stopping."
+            )
+
+        final_completed_episode = last_completed_episode if early_stopped else num_episodes
+        torch.save(_make_checkpoint_payload(final_completed_episode), last_model_path)
         log(f"Saved last checkpoint: {last_model_path}")
 
         final_reward_eps0, final_success_eps0, final_reasons_eps0, final_metrics_eps0 = evaluate_policy(
