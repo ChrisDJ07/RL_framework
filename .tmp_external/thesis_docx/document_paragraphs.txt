@@ -1,0 +1,773 @@
+A Deep Reinforcement Learning Framework for Hazard-Aware Routing in Disaster-Prone Rural Road Networks: Leveraging Project NOAH Data for Last-Mile Logistics
+
+
+
+A Thesis Proposal
+
+
+Submitted to
+
+The Faculty of the Department of Computer Science
+College of Computer Studies
+Mindanao State University - Iligan Institute of Technology
+
+In Partial Fulfillment of the Requirements in CSC198 Research Methods
+
+
+
+
+
+
+by
+
+Christian Dave J. Janiola
+Ian Gabriel D. Paulmino
+Josiah Raziel S. Lluch
+
+
+
+
+
+Prof. Orven E. Llantos
+Supervisor/s
+
+
+
+2025
+
+Abstract
+Rural Philippine road networks face severe disruptions from floods and landslides during typhoon seasons, isolating communities and delaying essential services such as medical transport and commercial deliveries. While Project NOAH provides scientifically validated flood and landslide hazard maps, current routing practices do not operationally integrate this geospatial information, relying instead on static shortest-path algorithms or reactive crowdsourced updates that fail in sparse rural settings. This research develops and evaluates a Deep Q-Learning-based reinforcement learning framework that integrates Project NOAH hazard maps with OpenStreetMap road networks to enable adaptive, hazard-aware multi-stop routing under probabilistic disaster conditions in La Trinidad, Benguet. The routing problem is formalized as a Markov Decision Process, with the agent trained via curriculum learning across progressively challenging rainfall intensities and delivery node configurations. Performance is benchmarked against the nearest-neighbor heuristic from prior Monte Carlo simulation work using metrics that balance delivery completion rate, travel time, and hazard exposure. Results are expected to demonstrate that learned routing policies achieve higher success rates and lower risk exposure than deterministic heuristics, establishing a scalable computational bridge between authoritative hazard data and operational last-mile logistics decision-making in disaster-prone rural environments.
+
+Keywords: Deep reinforcement learning, hazard-aware routing, disaster logistics, vehicle routing problem, geospatial risk modeling, rural Philippines
+Table of Contents
+
+
+1.0 Research Description
+
+Rural communities in the Philippines regularly experience floods and landslides that damage roads, cut off bridges, and isolate barangays, disrupting deliveries, humanitarian logistics, and other basic services such as medical transport and government support (ACAPS, 2024; Caritas Philippines, 2024). As a country located in the Pacific typhoon belt with steep mountains and dense river systems, the Philippines is highly exposed to frequent, intense tropical cyclones and heavy rainfall events that trigger both flash flooding in low-lying areas and landslides or slope failures in upland terrain (Red Cross Red Crescent Climate Centre, 2024; World Bank, 2020, 2021). In many rural municipalities, local road networks are sparse, lightly engineered, and serve as critical lifelines that provide the only access to education, health facilities, markets, and emergency services, making communities particularly vulnerable when these links fail (Péter Zsolt, 2020; World Bank, 2022). When severe weather strikes, a single washed-out section or impassable bridge can isolate entire communities and delay or prevent the delivery of essential goods and services for days (ACAPS, 2024; AHA Centre, 2024).
+At the same time, the country has invested in scientific tools such as Project NOAH, which provides nationwide flood and landslide maps based on hydrologic modeling, terrain analysis, and remote sensing. These maps show which locations are more likely to flood or experience landslides at different rainfall levels (Manliguez et al., 2017). However, they currently serve primarily as static references for long-term planning. In actual operations, routing decisions in rural areas still rely heavily on local knowledge, trial-and-error, or simple shortest-path algorithms that ignore this hazard information. Drivers and responders often know "this road usually floods" or "this slope is unstable," but there is no systematic way to turn that knowledge and NOAH's maps into safer routes that adapt as conditions change.
+Recent work in deep reinforcement learning (DRL) shows that software agents can learn how to make step-by-step decisions in uncertain environments, including navigation tasks on road networks (Koh et al., 2020; Li et al., 2024; Van Steenbergen et al., 2023). At the same time, disaster and hazard mapping research has matured to the point where high-resolution hazard layers are available for many regions, including rural parts of the Philippines (Pourghasemi et al., 2021; Lagmay et al., 2017). This opens a clear opportunity where instead of treating hazard maps as static background information, they can be used directly inside an intelligent routing system that learns how to balance travel time and safety.
+This study focuses on that opportunity by designing and evaluating a reinforcement learning-based routing framework that uses Project NOAH flood and landslide maps as part of its decision-making. Building directly upon the prior Monte Carlo framework for multi-stop last-mile delivery (Paulmino & Llantos, 2025), this study extends that foundation by addressing the same multi-stop routing task, but replacing the fixed nearest-neighbor heuristic with a learned adaptive policy trained via DRL. This includes delivering parcels along routes that cross flood-prone areas, reaching multiple patients when some roads may be blocked, or efficiently serving multiple barangay locations in seasons of heavy rain.
+In all of these cases, the central problem is the same: there is currently no data-driven, hazard-aware routing framework that can read real hazard maps and adapt routes under uncertain, changing conditions in rural Philippine settings.
+
+1.1. Background of the Study
+1.1.1 Rural Road Networks and Hazard Vulnerability in the Philippines
+Many rural areas in the Philippines have few roads, steep slopes, and long distances between key facilities. Roads often follow river valleys or are carved along mountainsides, which makes them both crucial and fragile. When heavy rain arrives, low-lying sections near rivers can flood, while unstable slopes can fail and block or damage roads with landslides (Pourghasemi et al, 2021; Gao et al. 2025). Reports have highlighted provinces like Benguet and Southern Leyte as facing a "dual hazard" of floods and landslides because they combine river plains and high-altitude terrain within the same transport corridors (Unson & Cariaso, 2024). Benguet province in particular is identified as a high-risk area for both landslides and flooding, with hazard maps classifying 80 percent of its territory under the red zone indicating the worst possible scenario for these dual hazards (Agoot, 2022).
+In recent years, e-commerce platforms and courier services have expanded beyond major cities into rural communities, increasing the volume of last-mile deliveries along these vulnerable routes (Amit et al., 2022). Rural health centers, schools, and local government units also depend on regular access for supplies, staff movement, and emergency referrals. When a key road segment fails, these activities slow down or stop (Gao et al., 2025; Collado, 2019).
+Unlike urban areas that often have multiple alternative routes, rural networks usually have low redundancy (Allen et al., 2024). A single blocked road or bridge can cut off access to essential services for days. The challenge is therefore not only physical but also informational: drivers, responders, and planners currently have limited tools to anticipate where hazards are likely to occur and to choose safer routes before they encounter problems on the ground.
+1.1.2 Gap Between Hazard Mapping and Operational Routing
+Project NOAH and similar systems abroad such as FEMA flood maps and other national risk platforms represent a major step forward in understanding where hazards are likely to occur (Mukherjee & Falguni, 2020). They produce flood and landslide layers that show expected depths, extents, or susceptibility levels for different rainfall or return-period scenarios, often validated against past events (Mukherjee & Falguni, 2020; Mandal et al., 2024). These products have proven valuable for strategic applications: GIS-based exposure analyses that estimate how many people, buildings, or kilometers of road lie within hazard zones; land-use planning that restricts development in flood-prone areas; and long-term infrastructure projects that prioritize mitigation investments (Aguirre-Ayerbe et al., 2020).
+Despite this, hazard maps are rarely used in day-to-day routing decisions. In practice, drivers and responders rely heavily on consumer navigation apps like Google Maps or Waze, which generally operate without direct reference to scientifically validated hazard layers. These platforms depend on crowdsourced reports to mark road incidents in real time. In dense urban areas this can work reasonably well, but in rural settings with few active users it often breaks down. A flooded segment in a remote barangay may go unreported for hours, and conditions can change faster than users can document them. When a delivery rider leaves for a rural destination, the computed route typically assumes that all roads are passable until a problem is reported, so hazards are often discovered only upon arrival at the affected segment.
+This reactive model has practical consequences across sectors. Emergency medical referrals may follow the default shortest path without tools to compare safer alternatives based on hydrological risk. Delivery operations encounter last-minute detours or are forced to abandon routes mid-storm when the initial path becomes impassable. The impact is worse in rural areas where there are few or no alternative routes; no amount of crowdsourced updates can create a detour if the network itself has no redundancy (Allen et al., 2024).
+The core issue is not the absence of hazard information but the lack of a computational bridge between that information and routing tools. Hazard maps are still treated mainly as static reference documents for planning and assessment, rather than as dynamic inputs that can shape navigation as conditions evolve.
+1.1.3 Limitations of Deterministic Routing Approaches
+Most standard routing methods, such as nearest-neighbor heuristics, Dijkstra's shortest path, and classical Vehicle Routing Problem solvers, assume that the road network is equally viable while the route is being planned and followed (Archetti et al., 2025). Travel times, road availability, and network structure are treated as fixed inputs. In disaster-prone rural areas, these assumptions catastrophically fail: two routes with similar distance carry vastly different risk profiles. Once a route is computed, these algorithms have no ability to learn from these historical data or to adjust for available hazard information.
+Deterministic algorithms also tend to compute a route once and follow it from start to finish, with limited ability to replan when according to new hazard information. Each run is independent; the algorithm does not learn which routes failed in previous events or what patterns of disruption tend to occur in certain parts of the network. Metaheuristic approaches such as genetic algorithms or ant colony optimization can search larger solution spaces and often find better routes than simple heuristics, but they are still usually designed for static problem settings and can be computationally expensive when run from scratch for each new scenario. In fast-moving disaster contexts, repeatedly solving a complex optimization problem on the fly can be too slow for real-time decision-making.
+In contrast, a trained reinforcement learning agent separates the expensive computation from the time-critical phase. The model can be trained offline, before or between disaster events, using many simulated hazard information. Once trained, route decisions reduce to running inference on the learned policy, which is typically fast and has stable computation time per decision step (Li et al., 2024). This trade-off, involving heavy training when time is available and lightweight inference when time is critical, makes learned policies attractive for rural disaster environments where rapid routing decisions are needed under changing conditions.
+1.1.4 Prior Work: Monte Carlo Simulation as a Benchmark Framework
+A Monte Carlo-based simulation framework was developed to study last-mile delivery performance in a rural setting under disaster-like disruptions (Paulmino & Llantos, 2025). In each simulation run, a vehicle was tasked with visiting a set of randomly sampled delivery nodes (typically 20 nodes representing customer locations) using a nearest-neighbor heuristic that greedily selected the closest unvisited node at each step. That work modeled rainfall intensity as a random variable and used different severity levels to trigger simulated disruptions on a road network. When severity increased, some edges in the graph became slower or impassable, and the framework adjusted edge weights to reflect these impacts. Routes were then generated using a nearest-neighbor heuristic over many simulation runs, and multiprocessing was used to parallelize thousands of Monte Carlo replications. This allowed the authors to estimate delivery success rates, travel time distributions, and how performance changed as weather severity worsened.
+This previous framework provides a useful benchmark and starting point, but it has two key limitations for the current study. First, hazard locations in the network were chosen randomly, specifically by assigning a fixed percentage of edges as "disaster-prone", without using real flood or landslide data. This limits how well the results can be applied to specific places and real planning questions. Second, the routing component was restricted to simple heuristics like nearest neighbor, which cannot learn or improve over time and does not consider a broader solution space. The simulation could test how these heuristics behave under different random disruptions, but it could not produce a policy that adapts based on experience.
+The present study builds on this foundation in two main ways. It replaces random hazard assignment with actual Project NOAH flood and landslide maps, so that disruptions and risk patterns are grounded in real geography. It also introduces a Deep Q-Learning-based routing agent that interacts with the similar kind of simulated environment but can learn routing strategies from repeated exposure to many hazard scenarios. This shifts the research focus from simulating what might happen through predictive analysis to learning what to do. In this way, the previous Monte Carlo work serves as the stochastic environment inspiration, while the new DRL agent serves as the experienced operator within that environment.
+
+1.2. Statement of the Problem
+Despite the availability of detailed flood and landslide hazard maps from Project NOAH, rural communities in the Philippines still lack a hazard-aware navigation system that can translate this geospatial data into safer and operationally efficient routing decisions during disaster conditions.
+
+1.3. Research Objectives
+This study aims to investigate the feasibility of applying deep reinforcement learning for hazard-aware routing in rural road networks using real geospatial hazard data.
+1.3.1. General Objective
+To develop and evaluate a Deep Q-Learning–based reinforcement learning framework that integrates Project NOAH flood and landslide hazard maps with rural road networks, enabling hazard-aware multi-stop routing under probabilistic disaster conditions in rural Philippines through simulation-based analysis.
+1.3.2. Specific Objectives
+To integrate flood and landslide hazard maps from Project NOAH with rural road networks derived from OpenStreetMap, producing hazard-aware edge representations suitable for routing analysis.
+To formulate the disaster-aware multi-stop routing problem as a Markov Decision Process (MDP), incorporating hazard-informed state representations, discrete routing actions, and a reward structure that balances delivery completion, travel efficiency, and hazard exposure.
+To implement a Deep Q-Learning–based reinforcement learning framework with curriculum-based training across increasing rainfall intensities and hazard severity levels, enabling the routing policy to progressively adapt to more severe disaster conditions.
+To establish the prior Monte Carlo simulation framework and nearest-neighbor heuristic as baseline methods, and to compare their performance against the proposed DRL approach using relevant metrics under varying simulated disaster conditions and routing trade-offs.
+To develop an interactive visualization tool that supports interpretability and comparison of hazard-aware routing behavior across different rainfall intensities, routing profiles, baseline methods, and controlled hazard updates.
+
+1.4. Scope and Limitations of the Research
+1.4.1 Geographic Scope
+This research focuses on a rural Philippine setting using La Trinidad, Benguet as the primary study area. La Trinidad is a mountainous municipality with documented flood and landslide risks, accessible Project NOAH hazard data, and road network characteristics typical of hazard-prone rural regions (Cruz et al., 2019). Road network data are derived from OpenStreetMap (OSM), for the municipality's street network.
+1.4.2 Technical Scope
+The study considers single-vehicle, multi-stop routing as a foundational navigation problem in which one vehicle must sequentially visit a set of randomly sampled delivery nodes over a hazard-prone road network, mirroring the task structure of the prior Monte Carlo study (Paulmino & Llantos, 2025) where a delivery agent serves multiple customer locations per episode. Only flood and landslide hazards from Project NOAH are modeled; other disaster effects such as wind damage, storm surge, or earthquake impacts are not included. Demand is simplified to a fixed set of destinations without time windows or vehicle capacity constraints, and new requests arriving during an event are not modeled. While the framework could be designed to eventually support operational deployment in vehicles and logistics systems, this study focuses on developing and validating the core decision-making agent (the DRL policy) through simulation and training, rather than implementing user-facing applications or conducting real-world field testing. Integration into a user-facing mobile application or fleet management dashboard is reserved for future development. All training and evaluation are carried out through stochastic simulation; there is no deployment on actual vehicles or live field testing.
+1.4.3 Methodological Scope
+Deep reinforcement learning is implemented using Deep Q-Learning (DDQN) with experience replay and a target network. Other RL methods such as PPO or A3C are not explored. Baselines are limited to the nearest-neighbor algorithm (NNA) from the earlier Monte Carlo framework (Paulmino & Llantos, 2025) applied to multi-stop tours, and to simple heuristic approaches such as static shortest-path methods adapted for sequential delivery (e.g., Dijkstra-based greedy insertion). Metaheuristic methods (e.g., genetic algorithms, ant colony optimization) and exact optimization solvers are outside the scope of this work. Training and experimentation are constrained by available undergraduate-level computing resources, which limits the size of networks and the length of training that can be practically performed.
+1.4.4 Evaluation Limitations
+The results of this study are based on simulated environments and do not directly measure performance on real vehicles or actual logistics operations. Because the model is trained and tuned for La Trinidad, applying it to other provinces or different hazard contexts may require additional calibration or retraining. Finally, the quality of routing decisions depends on the accuracy, resolution, and timeliness of Project NOAH data; any gaps, uncertainties, or outdated layers in the hazard maps will affect how well the learned routing policies reflect real-world risk.
+
+1.5. Significance of the Research
+This research shows how detailed hazard maps can be turned into operational routing decisions through reinforcement learning. On the technical side, it proposes a clear way to encode flood and landslide information into an MDP for multi-stop routing tasks and to train a DRL agent that learns to balance completing all deliveries safely against travel efficiency. On the practical side, it offers a step-by-step framework, from collecting NOAH and OSM data to training and testing a routing agent, that can be adapted by other groups working in similar rural, hazard-prone areas. By comparing the learned policies against the nearest-neighbor heuristic baseline from the prior Monte Carlo study (Paulmino & Llantos, 2025), which visited 20 delivery nodes per simulation run, the study demonstrates the added value of learning over greedy heuristics in multi-stop disaster logistics. More broadly, the approach can support future systems that help multi-sector beneficiaries including emergency responders, local government units, and commercial logistics providers make safer routing decisions in the face of floods and landslides, both in the Philippines and in other regions with comparable risk profiles.
+2.0 Review of Related Literature
+This systematic review was conducted following the PRISMA 2020 guidelines to identify, screen, and synthesize peer-reviewed studies relevant to reinforcement learning–based routing, disaster-aware optimization, and geospatial hazard integration. The search aimed to build a consolidated evidence base for developing a hazard-aware reinforcement learning framework for rural health logistics and disaster routing. The database search was completed on November 30, 2025, and yielded a combined total of 19,410 records from Lens.org, IEEE Xplore, ScienceDirect, and JSTOR. After applying publication year limits (2020–2025), open-access filters, and subject-area screening, 9,233, 6,464, and 2,072 records were removed respectively, resulting in 1,641 records eligible for title and abstract screening.
+
+Figure 1. PRISMA Flow chart
+A total of 1,585 records were excluded during title and abstract screening based on predefined criteria such as domain irrelevance, lack of routing or hazard modeling, or absence of empirical methods. The remaining 56 reports were retrieved and assessed for full-text eligibility, all of which satisfied the inclusion criteria. Thus, 56 studies were ultimately included in this systematic review. The complete screening process is summarized in Figure 1.
+To ensure transparency and replicability, detailed inclusion and exclusion criteria were defined for each of the three thematic query groups. These criteria, along with the database queries and the number of included papers per theme, are presented in Tables 1 and 2. These tables document how studies were selected based on their relevance to reinforcement learning for routing, uncertainty-aware disaster logistics, and GIS-based hazard modeling with Philippine applications.
+
+Table 1: Database queries per RRL theme
+
+Table 2: Inclusion and Exclusion Criteria
+
+Following the selection process detailed in Figure 1, the final set of included studies was analyzed to extract key methodological contributions and findings relevant to hazard-aware logistics. Table 3 presents the systematic extraction matrix, summarizing the objectives, methods, and key findings of the primary studies reviewed.
+
+Table 3: Systematic review and data extraction of selected studies
+2.1 Disaster-Affected Routing in Rural Environments
+Floods and landslides sever road links, reduce capacity, and trap isolated communities. However, most modeling efforts stop at mapping the hazard rather than adapting routes under evolving conditions. Physically based rainfall-runoff-inundation models demonstrate how quickly conditions deteriorate along key corridors. In the Marikina-Pasig basin, a multiscale shallow-water model with adaptive mesh refinement shows that a single high-intensity, short-duration storm generates compound pluvial-fluvial flooding. This inundates low-lying roads, with peak depths and arrival times varying block by block across a flat urban floodplain (Dasallas et al., 2022). Similar coupled 1D-2D HEC-RAS simulations for the October 2020 Hyderabad flood reveal that two decades of unplanned urbanization significantly increased flood volumes. Road segments that were marginal in 2000 now experience frequent and severe inundation (Rangari et al., 2021). These findings imply that any routing logic assuming static link availability or time-invariant travel costs will misrepresent actual access during extreme events.
+Empirical work on freight networks further illustrates how network-level metrics obscure localized failures. In Metro Manila, analysis of truck GPS traces under flood scenarios shows that operators often cancel trips or divert away from severely affected corridors (Bacero & Fillone, 2023). On the flooded links that remain in use, travel times increase substantially. From a routing perspective, this confirms that shortest-path algorithms calibrated on normal conditions underestimate both risk and delay on hazard-exposed arcs.
+Landslides pose analogous challenges along mountainous highways. Susceptibility mapping in Gilan Province identifies steep, deforested slopes as forming elongated bands of high susceptibility that coincide with existing road corridors (Bahrami et al., 2021). Along India's National Highway 1D, frequency-ratio models find that more than 40% of the alignment falls in high susceptibility classes (Nanda et al., 2021). These studies underscore that in rural settings, few alternative links exist. A single landslide isolates entire valleys. Consequently, static "safe" versus "unsafe" classifications offer limited guidance on how to route vehicles as conditions evolve dynamically.
+Only a few recent contributions explicitly connect hazard information with routing algorithms. In China, a Bayesian Network model integrates landslide data into an improved A* pathfinding algorithm (Gao et al., 2025). Experiments show that risk-aware A* produces routes that avoid high-probability slopes. This work demonstrates that hazard-blind routing is inadequate where network redundancy is limited. It motivates the need for adaptive schemes that ingest time-varying probabilistic hazard surfaces, which is precisely the requirement for rural Philippine uplands.
+
+2.2 Hazard Mapping and Geospatial Risk Modeling
+Flood and landslide hazards are routinely expressed as geospatial products derived from hydrodynamic models, remote sensing, and multi-criteria analysis. These form the backbone of platforms such as Project NOAH and its international analogues. Multiscale flood models in the Philippines demonstrate that coupling rainfall-runoff processes with 2D shallow-water solvers reproduces observed depths for extreme storms (Dasallas et al., 2022). This approach identifies zones of intense accumulation and correctly times peak inundation, making the resulting maps suitable for early warning. Similarly, studies in Hyderabad show how simulations driven by realistic rainfall quantify how land-use changes amplify urban flood hazards (Rangari et al., 2021). At smaller community scales, Osei et al. (2025) utilize SWAT-GIS coupling to simulate flood depths based on decades of land-use change. Their resulting scenario maps successfully identify inundated road segments and rail lines, validating the utility of localized modeling for infrastructure assessment.
+Where dense hydrometric data is unavailable, GIS-based multi-criteria decision analysis (MCDA) remains the dominant strategy. In Harris County, Texas, Mukherjee and Singh (2020) derive weighted overlays of geomorphic and hydrologic variables to produce flood-prone maps that align well with FEMA hazard zones. Vanolya and Jelokhani-Niaraki (2021) further refine this through OWA-based assessments in Iran, comparing subjective expert weights against objective measures to improve historical agreement. Similar AHP-weighted frameworks have generated robust risk maps in data-scarce Ethiopian catchments, where researchers such as Ayenew and Kebede (2023), Ahmed et al. (2024), and Almouctar et al. (2024) successfully prioritize land-use planning by integrating rainfall, drainage, and topographic data.
+Machine learning and probabilistic extensions further enrich these geospatial products. In Iran's Sardabroud watershed, Habibi et al. (2023) use ensemble learners to isolate influential factors like rainfall and river proximity, classifying flood hazards with high accuracy. Osman and Das (2024) apply Naïve Bayes Trees with bivariate statistical models in the Lower Damodar River Basin, achieving high reliability in hazard zonation. For urban settings, Abedin and MacVicar (2025) introduce stochastic coupling of SWMM and HEC-RAS to generate ensembles of inundation maps. Their work explicitly derives entropy-based uncertainty layers, arguing that probabilistic hazard surfaces capture risks that deterministic single-run maps often miss.
+National and global initiatives mirror the strategic utility of Project NOAH. Legass et al. (2025) map flood vulnerability in Ethiopia by integrating global products like Fathom and Aqueduct, showing that ensemble configurations provide the most conservative impact estimates for exposed populations. In coastal Bangladesh, Mahmood et al. (2025) apply the IPCC AR6 framework to combine multi-hazard severity indices with adaptive capacity indicators, identifying high-risk districts for millions of residents. Other studies integrate SAR-derived inundation layers with social vulnerability indices or Bayesian-network risk models to generate spatially explicit risk maps at village and national scales (Vanama et al., 2021; Mandal et al., 2024; Lu et al., 2024; Dulawan et al., 2024).
+Despite this rich ecosystem of mapping methods, ranging from deterministic hydraulics to probabilistic machine learning and global risk assessments, most products function as static layers for regulation, infrastructure siting, or long-term exposure analysis. With the notable exception of Gao et al. (2025), who embed landslide surfaces into routing algorithms, researchers have not tightly integrated these geospatial representations with operational pathfinding. This gap is particularly interesting given the sophisticated data available. It confirms that while the scientific community has successfully mapped where hazards occur, the computational bridge to operationalize this data for real-time navigation remains missing.
+2.3 Stochastic Modeling and Simulation for Disaster Routing
+Stochastic modeling plays a crucial role in disaster routing because hazards and travel times change unpredictably. Van Steenbergen et al. (2023) model humanitarian relief as a stochastic dynamic program. They use Monte Carlo simulation to sample travel times and estimate future rewards, training reinforcement learning (RL) policies that reduce lateness penalties by 85% compared to static solutions. This proves that simulation helps produce policies that remain effective when infrastructure is damaged.
+Anuar et al. (2022) study a multi-depot dynamic VRP with stochastic road capacity. They represent road capacities as Poisson-distributed variables that decay near earthquake epicenters. Their approximate dynamic programming approach uses Monte Carlo sampling to estimate value functions, showing that simulation-based approximation copes well with time-dependent network reliability. Jiang and Chang (2025) also treat demand and travel time as stochastic, using LSTM models to predict arrivals and feeding these into a DQN routing agent combined with queueing-theoretic stability constraints.
+Flood-based evacuation work includes hazard activation more explicitly. Li et al. (2024) generate flood depth maps and treat flood depth as a dynamic attribute of road segments. They train an RL policy that avoids flooded links, reducing total evacuation time. Similarly, Tsai et al. (2021) model overlapping hurricane and pandemic impacts by treating social distancing and vehicle capacity as random or scenario-based parameters, applying deep RL to evacuation routing under these compound conditions.
+Across these studies, stochastic simulations support this study in two ways. First, they approximate complex hazard processes in a form that RL agents can handle. Second, they generate the training episodes necessary for policies to generalize across different disaster realizations. Notably, the prior Monte Carlo study (Paulmino & Llantos, 2025) demonstrated this approach by simulating last-mile delivery under multiple rainfall severity levels, using Monte Carlo sampling to estimate delivery success rates and travel times across stochastic hazard scenarios. In that work, a vehicle visited a set of 20 randomly sampled delivery nodes per episode, and the nearest-neighbor heuristic was evaluated under different rainfall intensities (RI₁–RI₅). The present study builds directly on this stochastic framework by replacing the fixed greedy heuristic with a learned DQN policy trained across the same Monte Carlo sampling approach, now grounded in real Project NOAH hazard data rather than random edge disruptions.
+2.4 Routing Algorithms Under Uncertainty
+2.4.1 Deterministic and Heuristic Routing
+Traditional algorithms including Dijkstra's shortest path, Nearest Neighbor, and classical Vehicle Routing Problem solvers operate under static assumptions. The map structure remains consistent throughout the execution. Liu et al. (2023) classify these as constructive heuristics, noting that they build solutions quickly following fixed empirical procedures. The Nearest Neighbor algorithm selects the closest unvisited customer at each step. While computationally fast, it does not guarantee optimality. Hajar et al. (2025) demonstrate that while Nearest Neighbor generates routes quickly, it remains fundamentally limited to simple problem instances and cannot adapt to dynamic network conditions where shortest routes do not correspond to fastest travel times. Similarly, Manzo et al. (2025) apply nearest-neighbor-based heuristics to multi-depot problems, finding that the approach yields reasonable initial solutions but loses scalability as complexity increases. Operationally, these methods are "fast but blind," making them unsuitable for environments where road safety changes by the minute.
+2.4.2 Metaheuristics-Based Routing in Static Environments
+Metaheuristic approaches such as genetic algorithms, ant colony optimization, simulated annealing, and tabu search address the limitations of classical heuristics by exploring larger solution spaces. Liu et al. (2023) note that genetic algorithms dominate the research landscape with more than 300 publications in solving VRPs. Su et al. (2024) propose a lightweight genetic algorithm with variable neighborhood search, demonstrating competitive performance on benchmark instances. However, they acknowledge extensive parameter tuning requirements that limit immediate generalization. Comert and Yazgan (2024) combine ant colony optimization with genetic operators for asymmetric routing, but the multi-stage design shows limited ability to adapt when conditions diverge from initial assumptions. Stadler et al. (2023) introduce a hybrid genetic search for rural routing in Bavaria, yet the method lacks mechanisms to integrate real-time updates during execution.
+Other studies show incremental improvements in static optimization. (Rungrueang & Paisarnvirosrak, 2024) apply an integrated harmony search and tabu search framework to temperature-controlled food delivery. Mzili et al. (2024) demonstrate the efficacy of nature-inspired metaheuristics, such as Rat Swarm and Whale Optimization, for optimizing large-scale rural vaccination logistics in Morocco. Adam et al. (2024) utilize genetic algorithms to optimize the flight paths of mobile aerial base stations for restoring cellular coverage in disaster zones. Despite their computational efficiency for static scenarios, these frameworks assume unchanging network conditions. This renders them brittle in dynamic disaster environments, where they fail to maintain operational resilience without explicit stochastic modeling.
+2.4.3 Metaheuristics and Heuristic Routing Under Uncertainty
+Real-world disaster logistics operate in environments defined by uncertainty and dynamism. Ammouriova et al. (2023) provide a taxonomy of these approaches, classifying them based on whether they address stochastic uncertainty, dynamic evolution, or real-time constraints.
+Stochastic Vehicle Routing (SVRP) treats inputs as random variables described by probability distributions. Traditional heuristics cannot solve SVRPs directly. The dominant approach is Simheuristics, which integrates Monte Carlo simulation with metaheuristic optimization to estimate solution reliability. Perez-Carabaza et al. (2024) extend stochastic routing to search-and-rescue by using Ant Colony Optimization to minimize detection time based on evolving Bayesian maps. Tureci-Isik et al. (2025) illustrate this with a two-stage stochastic program for truck-drone delivery, using Variable Neighborhood Search to minimize expected arrival times across disaster scenarios.
+Dynamic Vehicle Routing (DVRP) addresses environments where information changes over time. Tarhan et al. (2024) demonstrate this with a Dynamic Multi-Objective Disaster Response model, using a rolling horizon approach and Tabu Search to re-balance efficiency and risk as conditions evolve. Wang et al. (2020) employ a Multi-Objective Cellular Genetic Algorithm (MOCGA) that updates risk parameters in each operational period, enabling the strategy to adapt continuously to the evolving disaster landscape. Ammouriova et al. (2023) also highlight Learnheuristics, where machine learning predicts evolving conditions such as road congestion to guide the heuristic search proactively.
+Robust Vehicle Routing (RVRP) optimizes for worst-case feasibility. Assuncao and Santos (2025) exemplify this with R-STOP-DP, using a budgeted uncertainty set to guarantee route feasibility without post-hoc simulation. Du et al. (2020) extend robust optimization to multi-stage humanitarian logistics using exact mathematical programming, ensuring that relief routes remain feasible even under extreme secondary disaster scenarios. Long et al. (2021) present a Robust Multi-Objective Location-Routing Problem that integrates robust optimization with the PICEA-g-td metaheuristic, balancing efficiency and equity under stochastic epidemic demand.
+Fuzzy and Risk-Averse Optimization address uncertainty from imprecise parameters. Joshi et al. (2025) use a Fully Fuzzy Multi-Objective Transshipment model to convert vague parameters into flexible solutions. Wu et al. (2024) address collaborative emergency logistics using a hybrid EDA-MOSGA algorithm, transforming chance-constrained problems into deterministic equivalents through Uncertainty Theory. Osorio-Mora et al. (2024) optimize Conditional Value-at-Risk (CVaR) to minimize the average loss across worst-case scenarios, offering a middle ground between stochastic and robust optimization.
+While these methods offer sophisticated mathematical treatments of uncertainty, they often face operational limitations. Robust optimization can result in overly conservative routes, while Simheuristics and Metaheuristics typically require heavy computation that delays operational response. This highlights the need for an approach that combines the adaptability of dynamic routing with the speed of a pre-trained agent.
+2.5 Reinforcement Learning Approaches to Routing and Navigation
+2.5.1 RL Fundamentals for Sequential Routing
+Reinforcement learning models routing as a Markov Decision Process (MDP), where an agent observes a state, selects an action, receives a reward, and moves to the next state. Mili and Argoubi (2025) clearly define their humanitarian routing model as an MDP that includes vehicle locations, demand levels, security conditions, and road accessibility. The action space covers choices such as which vehicle to move and which node to serve next. The transition function reflects random changes in demand and security. Anuar et al. (2022) similarly treat their multi-depot VRP with stochastic road capacity as an MDP, defining states over pre-decision and post-decision variables including vehicle positions, arrival times, remaining capacity, and random link capacities.
+Van Steenbergen et al. (2023) use a stochastic dynamic programming view, defining state variables for vehicle availability, remaining payload, lateness costs, and unfulfilled demand. Their decisions specify both destination and delivery amount. In all three studies, the goal is to learn a policy that maximizes cumulative reward, such as total delivered goods minus lateness penalties. This MDP view aligns perfectly with hazard-aware routing, where the state includes hazard intensity, road accessibility, and time elapsed, and where each action corresponds to a safe next move for a vehicle.
+For multi-stop routing problems analogous to the Traveling Salesman Problem (TSP) or multi-customer vehicle routing, the MDP state must track which delivery nodes have been visited and spatial relationships to remaining unvisited targets. The action space consists of selecting the next node to visit from the set of feasible neighbors. The reward structure typically includes per-delivery rewards (incentivizing task completion) and terminal bonuses for completing all deliveries, in addition to time and hazard penalties. Studies such as Kool et al. (2019) and Bdeir et al. (2021) demonstrate that encoding unvisited-node masks or attention mechanisms over delivery sets enables RL agents to learn effective multi-stop policies. This formulation directly applies to the disaster-aware multi-stop routing problem addressed in this thesis, where the agent must visit multiple rural delivery nodes under hazard constraints.
+2.5.2 Deep RL for Dynamic Routing
+Deep RL extends these concepts by using neural networks to approximate policies in large or continuous state spaces. Van Steenbergen et al. (2023) apply both value function approximation (VFA) and policy function approximation (PFA) to last-mile relief routing. They report that dynamic RL policies lower lateness penalties by 85% compared to static expected-time plans, maintaining good performance even under high travel time variability. He et al. (2025) use PPO to control an ALNS-based emergency relief solver, achieving better objective values and higher demand satisfaction than static ALNS and ACO across multi-constraint instances.
+Tsai et al. (2021) show that an attention-based deep RL model learns evacuation routes more efficiently than the Sweep Algorithm, achieving routing time reductions of up to 40% under certain capacity settings. However, they also find that RL cannot fully offset delays caused by strict social distancing constraints. Mili and Argoubi (2025) combine PPO with a Graph Neural Network (GNN) encoder to model spatial relations and dynamic security risks. Their PPO-GNN model achieves lower cost, lower risk exposure, and lower unmet demand than both a PPO-only baseline and the Clarke-Wright heuristic. These examples demonstrate that deep RL adapts to dynamic hazards more effectively than static optimization and metaheuristics, especially when trained on many simulated scenarios.
+2.5.3 Deep Q-Learning (DQN) for Discrete Routing
+Deep Q-Learning (DQN) is well-suited to routing on road networks where the agent chooses from a discrete set of next nodes or road segments. Jiang and Chang (2025) use DQN as the routing component in their system, combining vehicle locations, order attributes, and predicted travel times. They enforce feasibility through a queueing-theoretic controller that filters infeasible actions. In their experiments, the DQN improves service efficiency and delivery time compared to heuristic baselines while maintaining stability.
+Aslan Yildiz et al. (2025) implement tabular Q-learning for capacitated EV routing. Their state captures the current node, remaining battery charge, and remaining cargo load. They use a masking scheme to remove infeasible actions before updating Q-values, blocking actions such as revisiting serviced customers or exceeding capacity. This scheme generates routes within 0.1-0.2% of optimal for up to 60 customers and runs approximately 360 times faster than solving the full MILP model. Bdeir et al. (2021) extend Q-learning to a neural setting using Double DQN with prioritized replay and an attention-based encoder-decoder, showing strong performance on CVRP and MDVRP.
+These findings indicate that DQN fits hazard-aware road-network routing well, provided the state encodes hazard information compactly and masking or constraint layers block unsafe actions. This masking concept is critical for hazard-aware routing, as it allows the system to strictly forbid entry into impassable flood zones while learning soft preferences for safer roads. The literature also identifies two challenges: handling large state spaces, which motivates fixed-size encodings such as grid-based heatmaps (Dastpak & Errico, 2021), and generalizing across different network sizes and demand levels.
+Given these characteristics, this study adopts Deep Q‑Learning, specifically Double DQN, as the core reinforcement learning method. The routing problem in La Trinidad is naturally expressed as a sequence of discrete choices among neighboring road segments, which aligns with the strengths of Q‑based methods (Jiang & Chang, 2025; Aslan Yıldız et al., 2025). DQN is also an off‑policy algorithm that learns from a replay buffer, allowing the agent to reuse rare but important hazard encounters, such as flooded or landslide‑prone segments, more efficiently than on‑policy methods like PPO that discard data after each update (Bdeir et al., 2021). Finally, using Double DQN helps reduce the overestimation bias of standard DQN while keeping the architecture simpler and lighter than actor–critic alternatives, which is important for an undergraduate thesis implementation and still sufficient to establish the feasibility of hazard‑aware routing on rural road networks.
+2.5.4 Curriculum Learning for Progressive Complexity
+Training strategies that gradually increase problem difficulty align with curriculum learning principles. He et al. (2025) tune weights for multiple objectives and expose the PPO-ALNS system to instances of increasing size and complexity, guiding the policy from simple to difficult scenarios. Dastpak and Errico (2021) train their DecQN policy using instances with different duration limits and demand variability, showing that a single policy works across this range with minimal optimality loss.
+Tsai et al. (2021) test their attention-based RL model on neighborhoods of growing size under progressively stricter social distancing rules. They find that the advantage of RL over baseline methods remains clear in realistic cases. Mili and Argoubi (2025) follow a staged process by tuning reward weights on simpler synthetic networks before applying the PPO-GNN model to real complex networks with security and demand patterns. 
+For this thesis, these examples support a training curriculum that starts with low rainfall intensities and progresses to extreme typhoon scenarios. This ensures the agent learns basic navigation before tackling complex disaster avoidance.
+
+
+
+2.6 Integrated Approaches: RL + Hazard Data + Routing
+Integrated approaches combining RL with explicit hazard or risk layers offer useful patterns. Mili and Argoubi (2025) model security risks and checkpoint access as edge attributes in a road graph. A GNN processes this graph and passes node and edge embeddings to a PPO agent, which optimizes a reward balancing travel cost, risk exposure, unmet demand, and constraint violations. A two-tier validation module checks whether each proposed route respects critical constraints before allowing it. This design shows how risk layers can appear both in the RL state and in a safety filter that sits on top of the learned policy.
+Van Steenbergen et al. (2023) assign each node an "uncertainty factor" (low, medium, or high) based on proximity to the disaster area. Their RL policies use this factor to treat high-uncertainty nodes differently when planning routes for trucks and UAVs. Li et al. (2024) directly combine flood simulation outputs with RL by treating simulated flood depth as a time-varying constraint on each road segment. They train an RL agent to minimize evacuation time while avoiding flooded links, showing improved safety and total travel time on large urban networks. Tsai et al. (2021) treat social distancing as a hazard layer, reducing vehicle capacities and using soft penalties to represent infection risk, then training a deep RL model to route evacuees under these combined constraints.
+2.7 Synthesis and Research Gap
+The literature confirms that individual components for a disaster-resilient routing system exist but have not been integrated into an operational framework. Hazard mapping (Section 2.2) provides high-resolution data that is currently constrained in strategic planning documents. Stochastic modeling (Section 2.3) offers mathematical foundations for uncertainty but lacks a learning mechanism. Routing algorithms (Section 2.4) are either fast but blind with heuristics and metaheuristics or mathematically sophisticated but computationally expensive. Reinforcement Learning (Section 2.5) offers the ideal mechanism for adaptive control, yet existing applications focused on urban traffic or or standard VRP benchmarks without explicit physical hazard layers. Disaster-focused RL studies usually address evacuation or relief delivery but do not examine routine and emergency service access in rural regions.
+Additionally, there is no published framework that operationalizes Project NOAH maps within a Deep Q-Learning agent to guide real-time logistics in rural Philippines, and more specifically, no work that directly extends the prior Monte Carlo multi-stop delivery study with a learned routing policy. This study addresses this specific gap. By embedding real-world hazard data into a reinforcement learning environment and training a DQN agent on a curriculum learning principle applied to multi-stop routing tasks (visiting 2–20 delivery nodes per episode), this research transforms hazard maps from passive references into active decision-support tools for multi-sector disaster logistics.
+
+3.0 Research Methodology
+This study employs a systematic methodology that integrates geospatial hazard data acquisition, stochastic disaster simulation, deep reinforcement learning, and comparative benchmarking to develop and evaluate a hazard-aware routing agent for multi-stop last-mile delivery in disaster-prone rural Philippine road networks. Building directly upon the prior Monte Carlo framework (Paulmino & Llantos, 2025), which evaluated nearest-neighbor routing for visiting multiple delivery nodes under flood and landslide risks, this study extends that foundation by replacing the fixed greedy heuristic with a learned adaptive policy trained via Deep Q-Learning (DQN).
+
+The methodology mirrors the structure of the original Monte Carlo study: instead of routing between a single origin-destination (OD) pair per episode, the agent is tasked with visiting a set of n randomly sampled delivery nodes without return to origin, replicating the real-world last-mile delivery scenario where a logistics vehicle must serve multiple stops in sequence. The routing problem is formalized as a Markov Decision Process (MDP) and solved using DQN with curriculum-based exposure to progressively challenging hazard scenarios and increasing numbers of delivery nodes. The trained agent is benchmarked against the Monte Carlo-evaluated nearest-neighbor approach and other deterministic routing algorithms using metrics that balance delivery success, travel efficiency, safety, and operational feasibility.
+
+Algorithm 1 specifies the complete pipeline, formalizing how hazard data integration, curriculum-based training, evaluation, and visualization support are operationalized across Sections 3.1 through 3.7.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Methodology pipeline
+
+Algorithm  1:  Hazard-Aware Routing Framework
+
+// Phase 1: Data Integration and Preprocessing (Section 3.1)
+1: G_base ← Extract_OSM_Network("La Trinidad, Benguet")
+2. For each edge e ∈ G_base: // Section 3.1.2
+3.     H_f(e), H_l(e) ← Integrate_NOAH_Hazards(e)  // Section 3.1.2
+4. G_hazard ← G_base with {H_f, H_l} attributes
+
+// Phase 2: Curriculum-Based Training (Sections 3.2-3.4)
+5. Initialize DQN_online, DQN_target, ReplayBuffer D
+6. For each curriculum_stage ∈ {Easy, Medium, Hard}: // Section 3.4.2
+7.   For episode ← 1 to N_episodes:
+8.     RI ← Sample_Rainfall_Intensity(stage) // Section 3.1.3
+9.     D_nodes ← Sample_Delivery_Nodes(G_hazard)
+10.   G_episode ← Activate_Hazards(G_hazard, RI)  // Block/adjust edges
+11.    
+12.    s ← Initialize_State(G_episode, D_nodes)  // Section 3.2.2
+13.    While NOT done:
+14.      a ← ε_Greedy_Select(DQN_online(s), Feasible_Actions(G_episode))  // Section 3.3.3
+15.      (s', r) ← Execute_Action(G_episode, a)  // Sections 3.2.4, 3.2.5
+16.      Store (s, a, r, s') → D
+17.      Update_DQN_Double(D)  // Section 3.3.2
+18.    End While
+19.  End For
+20. End For
+21. Save trained policy weights {π_Safe, π_Balanced, π_Fast}  // Section 3.2.6
+
+// Phase 3: Evaluation (Sections 3.5-3.6)
+22. For test_episode ← 1 to N_test:
+23.   G_episode ← Activate_Hazards(G_hazard, RI_test)
+24.   metrics_DQN ← Evaluate(π_DQN, G_episode)
+25.   metrics_NNA ← Evaluate(Nearest_Neighbor, G_episode)
+26. Report comparative metrics  // Section 3.6.1
+
+// Phase 4: Interactive Visualization and Analysis (Section 3.7)
+27. Initialize web-based dashboard with Folium, Plotly, Flask // Section 3.7.3
+28. Load trained policy weights {π_Safe, π_Balanced, π_Fast}
+29. For interactive session:
+30.   User selects RI ∈ {RI₁, RI₂, RI₃, RI₄, RI₅} // Section 3.7.2
+31.   User selects routing_profile ∈ {Safe, Balanced, Fast}  // Section 3.2.6
+32.   G_episode ← Activate_Hazards(G_hazard, RI)
+33.   route_DQN ← Inference(π_{routing_profile}, G_episode)
+34.   route_NNA ← Nearest_Neighbor(G_episode)
+35.   
+36.   Render interactive map with:
+37.      Hazard layers (color-coded by severity)  // Section 3.7.2
+38.      Comparative routes (DQN, NNA)
+39.      Individual metrics (distance, time, hazard exposure)
+40.   Enable route animation and parameter adjustment  // Sections 3.7.2, 3.7.3
+3.0.1 Implementation Overview
+Phase 1 constructs a static hazard-enriched graph  by integrating OpenStreetMap topology with Project NOAH flood and landslide hazard scores for each road segment (Section 3.1). Phase 2 trains the DQN agent by instantiating episode-specific graphs  for each training episode, sampling rainfall intensity levels and stochastically activating hazards according to Table 4 (Section 3.1.3). The agent navigates  by selecting feasible neighboring roads at each step, receiving rewards that balance delivery completion, travel efficiency, and hazard avoidance (Sections 3.2–3.4). Curriculum learning exposes the agent to progressively challenging scenarios ,from low rainfall intensities and small delivery sets to high rainfall intensities and complex multi-stop configurations, enabling the learned policy to generalize across diverse disaster realizations. Phase 3 evaluates the trained policy on held-out test episodes where new  instances are generated with different rainfall and stochastic hazard activations, and compares DQN performance against the nearest-neighbor baseline (Sections 3.5–3.6). Phase 4 is an interactive visualization tool that allows interactive exploration of DQN routing decisions, comparative visualization with baselines, and sensitivity analysis across rainfall intensities and routing profiles (Section 3.7).
+
+3.1 Network Modeling and Hazard Data Integration
+The foundation of the routing environment is a geospatially accurate representation of the rural road network enriched with authoritative hazard information from Project NOAH. This subsection describes how the network graph is constructed, how NOAH flood and landslide maps are integrated as edge-level features, how hazard severity levels are operationalized through rainfall-intensity-based activation logic, and how these components interact to produce a more realistic disaster-affected navigation environment.
+3.1.1 Road Network Extraction
+The study area is La Trinidad, Benguet, a flood- and landslide-prone municipality in the northern Philippines characterized by mountainous terrain, steep slopes, and proximity to major river systems. La Trinidad has experienced repeated flood and landslide events, making it a representative case study for hazard-aware routing in rural Philippine contexts. The road network is extracted from OpenStreetMap (OSM) using the OSMnx library (Boeing, 2025), which provides programmatic access to street geometries, topologies, and metadata. OSMnx generates a directed graph , where  represents intersections and endpoints (nodes) and  represents road segments (edges). Each edge  is characterized by:
+Length (, meters): Physical distance along the road segment, derived from the georeferenced polyline geometry.
+Road type (e.g., tertiary, residential, primary, secondary): OSM classification tag indicating functional road hierarchy.
+Geometry: Sequence of latitude–longitude coordinates defining the road's path, enabling precise spatial overlay with hazard rasters.
+Speed limit (, km/h): Default or OSM-tagged maximum speed. For rural Philippine roads without explicit tags, a baseline of 30 km/h is assumed, consistent with Department of Transportation guidelines for secondary and tertiary roads in mountainous terrain (DOT, DILG, & DPWH, 2018).
+The extracted graph is stored using the NetworkX library (Hagberg et al., 2008) to enable efficient shortest-path computation, neighbor queries, and attribute updates during simulation. This graph serves as the base layer upon which hazard features, rainfall effects, and routing decisions are superimposed. Figure 2 illustrates the La Trinidad road network and figure 3 shows possible delivery nodes (n=20). 
+
+This approach mirrors Li et al.'s (2024) use of OSMnx for large-scale urban flood evacuation networks and Mili & Argoubi's (2025) OSM-based road graph construction for conflict-zone humanitarian routing, ensuring that the simulated environment reflects real-world road connectivity and geographic constraints.
+3.1.2 Integration of Project NOAH Hazard Maps
+Project NOAH (Nationwide Operational Assessment of Hazards), managed by the Department of Science and Technology (DOST) and the University of the Philippines, provides two primary hazard products relevant to routing: flood hazard maps (FHM) and landslide susceptibility maps (LSM). Figure 4 and 5 shows the La Trinidad road network with an overlaid NOAH hazard map. These maps are publicly available as georeferenced rasters at 10-meter to 30-meter resolution and classify terrain into discrete hazard levels based on hydrological modeling, terrain analysis, and historical event data (Project NOAH, 2017). Understanding the semantic meaning of these hazard classes is critical for translating static susceptibility layers into dynamic, actionable routing constraints.
+
+A. Semantic Interpretation of NOAH Hazard Classifications
+NOAH flood hazard maps are derived from hydrodynamic modeling (e.g., HEC-RAS, MIKE FLOOD) that simulates river overflow and inundation under specified rainfall return periods (5-year, 25-year, 100-year). The maps classify each geographic cell by expected inundation depth under a given storm scenario, rather than by abstract "risk" levels (Project NOAH, 2017; Dasallas et al. 2022). According to NOAH documentation and GIS-based flood hazard studies in the Philippines, the standard depth-based classification scheme is:
+Low hazard (yellow): 0.0–0.5 meters flood depth. Water reaches ankle to mid-calf level. Most vehicles can pass with caution, but pedestrian mobility is impaired.
+Moderate hazard (orange): 0.5–1.5 meters flood depth. Water reaches knee to waist level. Standard vehicles (e.g., jeepneys, sedans) experience significant drag and risk of stalling; only high-clearance vehicles can safely traverse.
+High hazard (red): >1.5 meters flood depth. Water exceeds waist height. Roads are effectively impassable for most vehicles; emergency response may require boats or amphibious vehicles.
+These depth thresholds are grounded in hydraulic engineering standards and empirical observations of vehicle performance under flooding (Project NOAH, 2017; Dasallas et al. 2022). Research on flood-induced traffic disruption in Metro Manila confirms that flood depths exceeding 0.25 meters (25 cm) trigger lane closures and cause 40–70% reductions in vehicle flow per lane-kilometer. At 1.0–1.5 meters, most conventional vehicles lose traction and buoyancy becomes a concern (Mamuyac et al., 2024).
+NOAH landslide susceptibility maps, in contrast, classify terrain based on likelihood of slope failure given rainfall triggers, using factors such as slope angle, geology, soil type, and vegetation cover (Lagmay, 2023). The classification scheme is typically:
+Very Low susceptibility: Flat or gently sloping terrain with stable geology; landslides highly unlikely even under prolonged rain.
+Low susceptibility: Moderate slopes (15–30°) with mixed soil stability; landslides possible under heavy or prolonged rainfall.
+Moderate susceptibility: Steep slopes (>30°), weak rock formations, or areas with historical landslide scarring; high probability of failure under moderate to heavy rainfall.
+High susceptibility: Critical zones with active scarps, loose colluvium, or recent disturbance; landslides highly probable under any significant rainfall.
+Unlike flood maps which provide depth-specific thresholds, landslide maps represent conditional probability: the hazard activates only when rainfall exceeds a triggering threshold, which varies by location and antecedent soil moisture.
+B. Spatial Overlay and Edge Labeling
+Each road segment (edge) in the graph is assigned flood and landslide hazard scores through a spatial overlay procedure implemented using GeoPandas and Shapely (Jordahl et al., 2020; Gillies et al., 2025):
+Edge geometry to points: Each edge's polyline geometry is sampled at 10-meter intervals, generating a set of coordinate points  along the road. This dense sampling ensures that narrow hazard zones (e.g., a short bridge crossing a flood-prone stream) are not missed.
+Raster lookup: For each point , the corresponding flood hazard class  and landslide class  are extracted from the NOAH rasters using nearest-neighbor or bilinear interpolation. Nearest-neighbor is preferred for categorical hazard classes to avoid spurious intermediate values (Johnson and Clarke, 2021).
+Aggregation: The edge-level hazard score is computed as the maximum (worst-case) across all sampled points:
+
+This conservative approach ensures that a road passing through even a short high-risk segment (e.g., a low-lying bridge) is flagged accordingly, reflecting the principle that route safety is determined by the weakest link.
+Each hazard class is then mapped to a numeric risk score  for use in the RL state representation and reward function:
+Flood: Low (0–0.5m) → 0.2; Moderate (0.5–1.5m) → 0.6; High (>1.5m) → 1.0
+Landslide: Very Low → 0.1; Low → 0.5; Moderate → 0.8; High → 1.0
+This encoding is consistent with multi-criteria hazard scoring methods used in Philippine GIS-based disaster assessments, where categorical hazard classes are assigned normalized numerical values (e.g., 1, 3, 5 for low, moderate, high) to enable computational integration across multiple hazard types (UP Resilience Institute - NOAH Center, 2024), and enables the DQN to learn differentiated responses to varying hazard intensities.
+3.1.3 Rainfall Intensity and Hazard Activation Model
+Project NOAH hazard maps represent static susceptibility (the conditional probability or expected depth under a specified return-period storm) but actual road disruption depends on triggering conditions, particularly rainfall intensity. A road classified as "high flood hazard" may be fully passable during dry conditions or light rain, but becomes impassable under heavy rainfall that triggers river overflow or rapid surface runoff. Similarly, landslide-prone slopes may remain stable for years until a threshold rainfall intensity triggers failure. Modeling this dynamic activation is essential for realistic disaster routing simulation.
+A. Defining Rainfall Intensity Levels
+Drawing on the stochastic rainfall model developed and validated in the previous Monte Carlo framework, this study defines five rainfall intensity levels (RI₁–RI₅) ranging from light rain to torrential typhoon conditions. These levels are calibrated using a composite scale derived from Philippine meteorological data. RI₁ and RI₂ are based on the standard precipitation classifications for non-hazardous rainfall, while RI₃ through RI₅ correspond to the critical thresholds of the PAGASA Heavy Rainfall Warning System used for disaster risk management.
+RI₁ (Light Rain): < 2.5 mm/hr. Characterized by scattered drops or drizzle with minimal hazard activation, consistent with standard weather terminology.
+RI₂ (Moderate Rain): 2.5 – 7.5 mm/hr. Represents continuous rainfall typical of monsoons; while not immediately dangerous, it initiates soil saturation.
+RI₃ (Heavy Rain): 7.5 – 15 mm/hr. Corresponds to the Yellow Warning threshold. Indicates intense convective storms where flooding is possible in low-lying areas and landslide risk becomes elevated.
+RI₄ (Intense Rain): 15 – 30 mm/hr. Corresponds to the Orange Warning threshold. Represents tropical storm conditions with threatening floods and likely landslides.
+RI₅ (Torrential Rain): > 30 mm/hr. Corresponds to the Red Warning threshold. Represents typhoon core rainfall causing catastrophic flooding and widespread landslides.
+These thresholds align with PAGASA's operational warning protocols and the intensity classifications used in national disaster management (Lagmay et al., 2017).
+B. Hazard Activation Logic
+At the start of each simulation episode, a rainfall intensity  is sampled from a curriculum-stage-dependent probability distribution (Table 5, inspired from the Monte Carlo study). Given the rainfall intensity and the edge's baseline NOAH hazard scores  and , each edge transitions into one of three states:
+Passable with delay: The edge remains traversable, but travel time increases due to slower speeds and driver caution.
+Passable with high risk: The edge is technically passable but incurs a heavy penalty in the reward function to discourage use.
+Impassable (blocked): The edge is removed from the feasible action set, simulating complete road closure due to deep flooding, landslide debris, or emergency barricades.
+The activation thresholds and effects are formalized as follows. Define:
+: Flood depth threshold for impassability under rainfall intensity RI.
+: Landslide susceptibility threshold for impassability.
+: Speed reduction multiplier under rainfall RI.
+An edge  is blocked if:
+
+Otherwise, the edge remains passable but with adjusted travel characteristics:
+
+Where , with  calibrated from empirical flood-traffic and landslide-delay studies.
+C. Calibration of Parameters via Literature Grounding
+The original Monte Carlo study assigned rainfall-dependent speed multipliers stochastically from modeled probability distributions. To strengthen empirical grounding, this work now anchors those multipliers to observed traffic behavior from Philippine highway rainfall studies and urban flood-traffic observations, then extrapolates them to rural road conditions. Specifically, light–heavy rain effects on speed are informed by measured percentage slowdowns on North Luzon Expressway (Mejia & Sigua, 2018), while the severe reductions under deep flooding are treated as modeling assumptions that are qualitatively consistent with documented volume loss and lane closures on flooded Metro Manila roads (Mamuyac et al., 2024):
+Speed multipliers: Philippine expressway studies show that light rain reduces speeds by 5.34%, moderate rain by 6.3%, and heavy rain by 7.4% (Mejia and Sigua, 2018). Rural roads in La Trinidad, being narrower, less paved, and more vulnerable to surface runoff than urban expressways, are expected to experience equal or greater speed reductions under similar rainfall intensities. This study therefore adopts these values as conservative lower bounds for RI₁–RI₃. Meanwhile, Mamuyac et al. (2024) document that deeper flooding and lane closures on Metro Manila roads lead to substantial reductions in usable lanes and sharp drops in vehicle volumes, especially for low-clearance vehicles, this study therefore treats RI₄–RI₅ multipliers as explicit modeling assumptions, calibrated to be consistent with those observed collapses in throughput rather than claimed as directly measured values:
+RI₁:  (6% reduction)
+RI₂:  (10% reduction)
+RI₃:  (15% reduction)
+RI₄:  (60% reduction)
+RI₅:  (80% reduction, near-halt conditions)
+Flood blockage thresholds: Under RI₁–RI₂, even high NOAH hazard zones (>1.5m design depth) may not activate because the actual rainfall does not trigger river overflow. Activation probability increases with RI. Drawing on Metro Manila flood-traffic studies showing lane closures at ≥0.25m depth and complete impassability at ≥1.0m, and NOAH depth semantics, we define (Mamuyac et al., 2024):
+RI₁–RI₂: Only  (>1.5m design depth) has 10 and 30% block probability.
+RI₃:  (moderate zones) activate with 60% probability.
+RI₄–RI₅:  block with 90 and 100% probability.
+Landslide blockage thresholds: Landslides are rare under light rain (RI₁–RI₂) but escalate rapidly under prolonged heavy rainfall (RI₃+). Philippine landslide studies link failure to cumulative rainfall and slope angle. Using a cumulative-risk proxy scaled by RI:
+RI₁–RI₂: No landslide activation. 0 and 5% probability.
+RI₃:  (high/very high zones) activate with 15% probability.
+RI₄:  (moderate zones) activate with 30% probability.
+RI₅:  activate with near 100% probability.
+Table 4: Rainfall Intensity Activation Parameters
+
+This probabilistic activation logic reflects the stochastic nature of disaster triggering: two episodes with the same RI may produce different blocked-edge sets, forcing the DQN to learn robust policies rather than memorizing fixed hazard patterns. The approach is conceptually similar to Li et al.'s (2024) dynamic flood depth treatment and van Steenbergen et al.'s (2023) uncertainty factors per node.
+
+3.2 Environment Design and MDP Formulation
+Reinforcement learning requires formalizing the routing problem as a Markov Decision Process (MDP), defining what the agent observes (state), what actions it can take, how the environment responds (transition dynamics), and what objective it optimizes (reward function) (Anuar et al., 2022; Jiang & Chang, 2025).
+
+Figure 6 illustrates the general agent-environment interaction in an MDP framework in the context of this study. The agent observes state  (vehicle position, hazard conditions), executes action  (road selection), receives reward  (progress, safety, time penalties), and transitions to state . This cycle continues until the goal is reached or the episode terminates.
+
+Figure 6. General MDP Formulation
+This subsection specifies each component and justifies design choices with reference to both the disaster routing literature and established RL best practices.
+3.2.1 Markov Decision Process Definition
+The disaster routing problem is modeled as a discrete-time, finite-horizon MDP defined by the tuple , where:
+: State space (agent observations including current location, remaining unvisited nodes, hazard conditions)
+: Action space (feasible routing decisions to neighboring nodes)
+: Transition probability (stochastic hazard effects, deterministic movement)
+: Reward function (balancing delivery success, safety, and efficiency)
+: Discount factor (0.99)
+The agent's goal is to learn a policy  that maximizes the expected cumulative discounted reward:
+
+This formulation is standard in RL routing work and appears consistently in Mili & Argoubi (2025), Anuar et al. (2022), van Steenbergen et al. (2023), and other studies reviewed. The finite-horizon setting ( = maximum episode steps) reflects real-world operational constraints: disaster responders must reach destinations within bounded time, and episodes that exceed a certain maximum threshold are considered failures. This contrasts with infinite-horizon MDPs common in abstract RL problems and better captures the urgency inherent in disaster response.
+3.2.2 State Representation
+The state  encapsulates all information the agent requires to make a routing decision at time . Designing a compact, informative state is critical to avoid state-space explosion while retaining predictive power. The available literature emphasizes that excessive state dimensions slow learning and require exponentially more training data, while missing key features prevents the agent from learning effective policies (Wong et al., 2021). Drawing on similar practices from DRL navigation literature (Li et al., 2024; Koh et al.,2020; Bdeir et al., 2021), the state is represented as a fixed-length feature vector containing the following components:
+A. State Components
+Current node ID (): Integer index or one-hot embedding of the agent's current location.
+Delivery Set Representation: 
+Unvisited mask: A binary vector  where  if node  is an unvisited delivery target, 0 otherwise. This is the standard representation in VRP RL.
+Number of remaining deliveries: Scalar , providing a simple summary statistic.
+Spatial Features to Nearest Unvisited Target:
+To provide goal-directional signals, the state includes features relative to the nearest unvisited delivery node:
+Euclidean distance to destination (, meters): Straight-line distance from current node to the nearest unvisited delivery node, providing a directional signal.
+Shortest-path distance to destination (, meters): Precomputed using Dijkstra on the unobstructed graph, representing the "ideal" remaining distance to the nearest unvisited delivery node. This feature helps the agent gauge progress.
+Bearing to nearest unvisited node (, radians).
+The "nearest unvisited" heuristic is a natural intermediate target in greedy multi-stop routing and has been used successfully in VRP RL. The agent can learn more sophisticated non-greedy strategies (e.g., visiting a farther node first to avoid backtracking), but the nearest-target features provide a strong inductive bias.
+Spatial Features to Farthest Unvisited Target:
+Distance to farthest unvisited node (): Helps the agent gauge the "span" of remaining deliveries, useful for long-horizon planning.
+Neighbor-Level Hazard Features:
+For each neighboring node reachable from the current node (typically 2–4 neighbors at rural intersections):
+Edge flood hazard score (): Normalized NOAH flood risk for edge leading to .
+Edge landslide hazard score (): Normalized NOAH landslide risk.
+Edge length (, meters): Physical distance of the edge.
+Adjusted travel time (, minutes): Computed as , where  is the edge's speed limit and  is the rainfall-induced speed multiplier.
+Feasibility flag (): 1 if edge is passable given current hazard activation, 0 otherwise. This flag is used for action masking (Section 3.2.3), ensuring blocked edges are never selected.
+Global Context Features:
+These features provide episode-wide or cumulative information that shapes the agent's strategic behavior:
+Current rainfall intensity (): Episode-wide severity.
+Elapsed time (, minutes): Time since episode start.
+Deliveries completed so far: , indicating progress.
+
+The state vector balances informativeness enabling the agent to make intelligent multi-stop routing decisions with compactness to ensure efficient training with available computational resources. This design reflects principles established across the VRP and routing RL literature: Bdeir et al. (2021) employ task completion tracking within multi-objective navigation frameworks, Aslan & Yıldız (2025) integrate customer visit masks within deep reinforcement learning for electric VRP, and He et al. (2025) encode delivery progress states in their PPO-based routing approach The unvisited mask serves as the critical component, explicitly tracking which delivery nodes remain to be visited, enabling the agent to learn task-completion logic essential to multi-stop scenarios. By encoding delivery progress directly in the state, the agent learns to prioritize incomplete deliveries over arbitrary exploration, a capability that generalizes across diverse delivery set configurations.
+3.2.3 Action Space and Action Masking
+A. Action Space
+At each decision point, the agent selects which neighboring node to visit next. Actions are discrete indices .
+B. Action Masking
+ Two masking rules apply:
+Blocked edges: Neighbors connected by hazard-blocked edges are masked (infeasible due to floods/landslides).
+Already-visited nodes: If a neighbor is already a visited delivery node, it can be masked to prevent trivial revisits, though this is not strictly necessary. The baseline allows revisits but provides no reward, letting the agent learn to avoid them naturally.
+Masked actions receive  during selection.
+The maximum action space size is constrained by the maximum node degree in the graph (typically ~4 for rural networks), making the problem tractable for DQN. This design is standard in graph-based RL routing and enables efficient Q-value computation (Li et al., 2024; Mili & Argoubi, 2025; Koh et al. 2020).
+3.2.4 Transition Dynamics
+The environment transitions from state  to  when the agent executes action . The transition has both deterministic and stochastic components, reflecting the blend of predictable movement mechanics and unpredictable disaster effects.
+A. Deterministic Components
+These components are fully determined by the current state and action, with no randomness:
+Agent position update: The agent moves from the current node to the selected neighbor node.
+Time accumulation: , where  is the adjusted travel time of the selected edge.
+Delivery completion: If the selected neighbor is an unvisited delivery node, mark it as visited and increment .
+Feature recomputation: Distances, bearings, and neighbor sets are updated based on the new position. Hazard features of new neighbors are retrieved from the (fixed-per-episode) hazard activation state.
+Episode termination: The episode ends under one of three conditions:
+Success: All nodes in  have been visited ().
+Timeout: Elapsed time exceeds a maximum threshold (). This simulates operational time limits and prevents infinite wandering.
+Blockage failure: No feasible actions remain from the current node (all neighbors are blocked and unvisited nodes remain). This represents getting trapped in an inaccessible area, a realistic failure mode in disaster scenarios.
+B. Stochastic Components
+These components involve randomness and reflect the inherent unpredictability of disasters:
+Hazard realization: At , the rainfall intensity RI is sampled from the stage-specific distribution (Section 3.4.2). This matches the approach in Li et al. (2024) and van Steenbergen et al. (2023), where disaster states are sampled at episode start and remain fixed. The stochasticity across episodes (different RI samples, different blockage realizations) provides possible variability to train a robust policy.
+Stochastic edge blockage activation: At episode start (t=0), after sampling the rainfall intensity RI, each edge's activation state is determined stochastically according to the blockage thresholds specified in Table 4. For an edge  with flood hazard score  and landslide score , the edge is blocked with a probability dependent on both the hazard score and the current rainfall intensity.
+This hybrid deterministic-stochastic structure is in line withvan Steenbergen et al.'s (2023) stochastic dynamic programming model (stochastic travel times, deterministic movement) and Anuar et al.'s (2022) post-decision state transitions under uncertain road capacity. The key design choice, which is fixing hazards per episode rather than evolving them, simplifies the MDP and ensures the Markov property holds (future states depend only on current state and action, not on hidden time-varying processes), which is essential for Q-learning convergence (Sutton & Barto 2018).
+3.2.5 Reward Function Design
+The reward function  is the primary mechanism through which the agent learns desirable routing behavior. The function must balance multiple, sometimes conflicting, objectives: completing all deliveries (mission success), minimizing travel time (efficiency), and avoiding hazardous roads (safety). Drawing on multi-objective reward design in humanitarian logistics RL (Mili & Argoubi 2025), the reward is structured as a weighted sum of six components, each carefully justified:
+A. Delivery Completion Reward ()
+Each delivery provides a large positive reward, ensuring the agent prioritizes completing tasks. The magnitude (50) is high enough to dominate per-step penalties and incentivize task completion.
+B. All-Deliveries-Complete Bonus ()
+A large terminal bonus for completing the full mission encourages the agent to finish rather than abandoning hard-to-reach nodes.
+C. Progress Reward ()
+Where  is a positive scaling factor (e.g., 0.1–0.5),  is the shortest-path distance from current node to nearest unvisited delivery node before taking the action, and  is the shortest-path distance from new node to nearest unvisited delivery node after taking the action,  This dense reward incentivizes moves that reduce the remaining shortest-path to the nearest unvisited target, providing continuous feedback even before reaching the goal. It is analogous to the distance-based intrinsic rewards in Levy et al. (2019) and the goal-oriented reward shaping in He et al. (2025).
+
+D. Hazard Penalty ()
+Where:
+: Flood and landslide hazard scores of the chosen edge.
+: Relative importance weights (e.g.,  if floods are more common).
+: Scaling factor controlling the trade-off between safety and efficiency (e.g.,  =5−20, tuned empirically).
+This term penalizes traversing high-risk roads, encouraging the agent to prefer safer alternatives when available. The design directly mirrors approaches used in related disaster and humanitarian routing contexts: Mili & Argoubi (2025) employ explicit security risk penalties for routing in conflict zones, while Li et al. (2024) implement implicit safety incentives through increased travel time penalties on flooded road segments, both demonstrating that hazard-aware reward shaping leads to safer route selection.
+E. Time Penalty ()
+
+Where  is the travel time (in minutes) for the chosen edge, and  is a small weight (e.g., 0.1–0.5). This encourages time efficiency, penalizing slow or long edges.
+F. Combined Reward
+
+G. Failure Penalties
+Timeout:  (stronger than single-destination because failing multi-stop is more severe).
+Blockage: .
+Incomplete deliveries at timeout: If episode times out with  deliveries completed, additional penalty , penalizing unfinished tasks.
+These negative terminal rewards discourage policies that wander aimlessly (timeout), drive into dead ends (blockage), or incomplete deliveries, consistent with constraint-violation penalties in He et al. (2025) and van Steenbergen et al. (2023).
+3.2.6 Reward Weight Tuning and Multi-Profile Routing
+The relative weights  are initially set based on domain priorities (safety > efficiency, floods > landslides in frequency) and then tuned via grid search or practitioner consultation, following the methodology of Mili & Argoubi (2025) who calibrated weights with humanitarian experts. However, a key extension of this paper is training multiple routing profiles with different weight configurations:
+Safe profile: High  (20), low  (0.1)
+Balanced profile: Moderate  (10), moderate  (0.3)
+Fast profile: Low  (5), high  (0.8)
+Each profile is trained as a separate DQN. At visualization, users select the profile based on preference (e.g., fast profile for time-critical medical evacuations, safe profile for routine logistics). This mirrors the multi-objective optimization approach in Long et al. (2021) and He et al. (2025) and addresses the inherent multi-stakeholder nature of disaster routing (speed vs. safety trade-offs depend on context). 
+To implement this, the curriculum-trained DQN is first trained on the balanced profile, then fine-tuned (transfer learning) on safe and fast profiles for 2,000–5,000 additional episodes each, leveraging the shared routing knowledge while specializing to different objectives.
+
+3.2.7 Reward Shaping Considerations
+The proposed framework employs fixed-weight reward shaping to guide the learning process toward hazard-aware routing behavior. The reward function combines multiple components, including delivery completion, travel efficiency, and hazard exposure penalties, which collectively influence the agent’s decision-making. Different routing profiles (Safe, Balanced, Fast) are implemented by adjusting the relative weights of these reward components, enabling the agent to learn distinct behavioral preferences without modifying the underlying policy architecture.
+While this study adopts fixed reward weights for stability and interpretability, dynamic reward shaping, where penalty weights adapt in response to changing hazard severity or rainfall intensity, represents a potential extension. Such an approach could further encourage specialized behaviors under extreme conditions but is not explored in this work to maintain methodological clarity and controlled evaluation.
+3.3 Deep Q-Learning Architecture and Implementation
+This subsection describes the neural network architecture, DQN algorithm variant, training mechanics, and implementation details that enable the agent to learn a hazard-aware routing policy from experience.
+3.3.1 Deep Q-Network Architecture
+The DQN is a feedforward neural network that approximates the action-value function , where  represents the network's learnable parameters (weights and biases). Given a state , the network outputs Q-values for all possible actions, and the agent selects the action with the highest Q-value (during exploitation) or a random action (during exploration) (Sutton & Barto, 2018).
+
+A. Network Structure
+The architecture follows a simple multi-layer perceptron (MLP) design, validated as effective for graph-based routing in moderate-scale networks (hundreds to low thousands of nodes):
+Input layer: Dimensionality matches the state feature vector size ( detailed in Section 3.2.2).
+Hidden layer 1: Fully connected (dense), 128 neurons, ReLU activation.
+Hidden layer 2: Fully connected, 128 neurons, ReLU activation.
+Optional hidden layer 3: Fully connected, 64 neurons, ReLU activation (included only if initial experiments show underfitting on complex scenarios).
+Output layer: Linear (no activation), dimensionality equal to the maximum number of neighbors in the graph (e.g., 4 for up to 4-way intersections). Each output neuron corresponds to one possible action (neighbor choice).
+Deeper networks (4+ hidden layers) offer greater representational capacity but risk overfitting on small-to-medium datasets and slow inference. The 2–3 hidden layer design balances expressiveness with generalization, following the principle of "smallest network that solves the task". This choice aligns with prior routing and navigation studies that successfully employ relatively shallow multilayer perceptrons, such as Koh et al. (2020) 3-layer MLP for real-time vehicle routing and navigation and Jiang & Chang (2025) 3-layer network  for logistics-oriented DQN architectures. Moreover, shallow networks train faster (fewer parameters to update per gradient step) and are more interpretable via gradient visualization and ablation, critical for building trust in disaster-response systems (Arrieta et al., 2020).
+B. Activation and Normalization
+ReLU activations: is the standard choice for hidden layers, enabling gradient flow (mitigating vanishing gradients) and introducing non-linearity to model complex Q-function landscapes (Glorot et al., 2011).
+Batch normalization (optional): Applied after each hidden layer to normalize activations across mini-batches, stabilizing training when state features have widely different scales (e.g., distances vs. hazard scores) (Ioffe & Szegedy, 2015) However, batch normalization can interact poorly with small batch sizes (<32) and non-i.i.d. replay data, so it is tested empirically; if training is stable without it, it is omitted to reduce complexity.
+No activation on output layer: Q-values are unbounded (can be negative or positive, large or small), so the output layer uses a linear activation (identity function). This is universal in Q-learning (Mnih et al., 2015).
+C. Feature Normalization (Input Preprocessing)
+Before feeding the state into the network, continuous features are normalized:
+Distances:  Divided by the maximum graph diameter (longest shortest-path distance between any two nodes, precomputed once). This maps all distances to approximately, ensuring that distance features contribute proportionally to network activations regardless of absolute scale.
+Time: Divided by a typical episode duration (e.g., 120 minutes for medium-distance trips). This maps elapsed time to approximately for most episodes.
+Hazard scores: Already in  from Section 3.1.2; no further normalization.
+Categorical features (e.g., rainfall intensity RI): One-hot encoded (5-dimensional binary vector) or integer-encoded.
+This ensures that all input features contribute roughly equally to early-layer activations, improving convergence (Ioffe & Szegedy, 2015).
+3.3.2 DQN Algorithm Variant: Double DQN with Experience Replay
+The base DQN algorithm suffers from overestimation bias, where the max operation in the Bellman target  systematically overestimates future values, leading to unstable training and suboptimal policies (Mnih et al., 2015). To address this, the study employs Double DQN (DDQN), which decouples action selection from action evaluation using two networks: an online network (being trained) and a target network (periodically updated copy).
+A. Double DQN Update Rule
+The Q-learning update minimizes the temporal difference (TD) error, formalized by the below equation (Hasselt et al., 2015):
+
+Where:
+: Parameters of the online network (being trained via gradient descent).
+: Parameters of the target network (fixed during gradient updates, periodically copied from ).
+: Replay buffer (explained in succeeding section).
+: Action selection using the online network (finds the best action according to current knowledge).
+: Action evaluation using the target network (estimates the value of that action using slightly outdated but stable parameters).
+This decoupling reduces overestimation because selection and evaluation are no longer performed by the same (potentially overconfident) network, and the target network's slower update rate prevents "chasing a moving target" that destabilizes training (Hasselt et al., 2015).
+B. Experience Replay
+To break temporal correlations between consecutive experiences, which violate the i.i.d. (independent and identically distributed) assumption underlying stochastic gradient descent, the agent stores experiences  in a replay buffer  of fixed size (e.g., 50,000–100,000 transitions). During training, mini-batches of size 32 or 64 are sampled uniformly at random from  to compute the loss and update the network (Mnih et al., 2015).
+Without replay, consecutive states  are highly correlated, causing the network to overfit to recent experiences and "forget" earlier ones (catastrophic forgetting). Replay decorrelates training data by randomly mixing experiences from many episodes, stabilizing learning and improving sample efficiency by enabling each experience to contribute to multiple gradient updates (Mnih et al., 2015). This is universal in modern DQN and appears in all reviewed DRL routing papers.
+C. Target Network Updates
+The target network  is updated by copying  every  training steps (e.g., ). Between updates,  remains fixed, stabilizing the Bellman target and preventing the "moving target" problem that causes oscillations and divergence in vanilla Q-learning (Mnih et al., 2015).
+If the target were updated every step (i.e.,  always), then every gradient update would shift both sides of the Bellman equation simultaneously, creating a feedback loop where the network chases its own errors. By "freezing" the target for  steps, we compute gradients against a temporarily stable reference, allowing  to converge toward  before  is updated again (Mnih et al., 2015).
+3.3.3 Exploration Strategy
+Effective exploration is essential for the agent to discover safe routes and avoid getting stuck in local optima (e.g., always choosing the shortest but hazardous path because it was randomly tried first). The study uses -greedy exploration with exponential decay:
+
+Where  is the set of non-masked actions (passable roads).  starts at 1.0 (100% random exploration in early episodes) and decays to  (5% residual exploration to maintain robustness) over a schedule:
+
+Where  is the decay constant (e.g.,  episodes). This schedule enables a progressive transition from broad exploration to focused exploitation: during early training (episodes 1–5000), the agent samples diverse routes, discovers goal-bearing regions, and populates the replay buffer with varied experiences across different hazard conditions and delivery configurations. As training progresses into late stages (episodes 10,000–15,000), the agent increasingly exploits the learned policy, focusing on high-value routes and refining route quality, while maintaining a small exploration rate (5%) to enable adaptation to novel situations and prevent premature convergence to suboptimal policies (Sutton & Barto, 2018).
+3.3.4 Optimization and Hyperparameters
+The DQN is trained using the Adam optimizer. Adam adaptively adjusts learning rates per-parameter based on first- and second-moment estimates of gradients, providing faster and more stable convergence than plain SGD in most deep learning tasks (Kingma & Ba, 2017).
+A. Key Hyperparameters:
+Discount factor (): 0.99 (values near 1 because routing involves long-horizon planning).
+Replay buffer size: 100,000 transitions.
+Batch size: 64.
+Target network update frequency (): Every 1,000 training steps.
+Training episodes: 15,000 (until convergence).
+Exploration decay:  decays from 1.0 to 0.05 over the episodes.
+These values are informed by Koh et al. (2020), van Steenbergen et al. (2023), and He et al. (2025).
+
+3.4 Training Procedure and Curriculum Design
+Training a Deep Q-Network to handle diverse delivery sets, variable hazard patterns, and multiple rainfall intensities simultaneously is challenging and can result in slow convergence, poor generalization, and unstable learning dynamics if attempted end-to-end without structure. To manage this complexity and improve sample efficiency and policy robustness, this study employs curriculum learning, a pedagogical training strategy in which the agent first learns on simple scenarios and progressively encounters harder ones. This approach is grounded in cognitive science and has proven highly effective in deep reinforcement learning, particularly for complex navigation and routing tasks (Bengio et al., 2009; Narvekar et al., 2020).
+3.4.1 Curriculum Learning Rationale
+Curriculum learning addresses three critical challenges in disaster-aware multi-stop routing RL:
+Sparse Reward Problem: In large, complex road networks with many dead ends, hazardous zones, and long paths to distant delivery clusters, random exploration rarely stumbles upon completing all  deliveries early in training. The agent might take thousands of episodes before successfully visiting all targets, leaving the Q-network with almost no learning signal. Curriculum learning mitigates this by starting with small  (2–5 nodes) where random exploration frequently discovers all targets (within 10–30 steps), providing regular reward signals that bootstrap policy learning.
+Multi-Hazard Generalization: Training on all five rainfall intensities simultaneously requires the agent to simultaneously learn five different routing problems with different optimal solutions. Curriculum learning, which begins with benign conditions (RI₁–RI₂) where hazards rarely activate, then progresses to moderate disruptions (RI₃), and finally extreme conditions (RI₄–RI₅), helps the agent build a foundational policy that works under any weather before specializing for harder scenarios.
+Policy Brittleness in Constrained Environments: Early-trained policies often exploit narrow, hazard-prone paths if they happen to be slightly faster, creating a locally optimal but globally fragile policy. Curriculum learning develops broad, exploratory behavior early, discovering and generalizing across diverse routing strategies before settling into specialized high-performance policies, promoting robustness (Narvekar et al. 2020).
+Multiple studies support the use of curriculum learning for disaster-affected routing and related vehicle routing tasks. He et al. (2025) stage PPO-ALNS training from simple instances with 5 customers to large problems with over 100 customers, reporting approximately 25% improvements in solution quality and faster convergence compared to end-to-end training. Dastpak & Errico (2021) train DecQN on instances with varying duration limits and show that policies learned under a curriculum generalize well across task variants with minimal performance loss. Tsai et al. (2021) evaluate RL-based evacuation models on neighborhoods of increasing size and complexity, finding that the performance advantage of RL over traditional methods emerges primarily on harder instances, but only after the agent has been sufficiently trained on simpler scenarios.
+3.4.2 Three-Stage Training Curriculum
+The training curriculum is divided into three distinct stages, each with specific graph sizes, number of delivery nodes, hazard distributions, and learning objectives.
+Stage 1: Few Deliveries, Low Hazard, Small Graph (Episodes 1–5000)
+Graph size: Small subgraph of La Trinidad (30-50), focusing on the town center.
+Number of delivery nodes:  per episode.
+Rainfall intensity: Fixed at RI₁ or RI₂ (light to moderate rain).
+Delivery node sampling: Randomly sampled but constrained to within 1–2 km.
+Objective: Learn basic multi-stop mechanics, avoid trivial loops, understand state-action-reward structure.
+Stage 2: Moderate Deliveries, Moderate Hazard, Medium Graph (Episodes 5,001–10,000)
+Graph size: Expand the subgraph of the La Trinidad network (50–80 nodes).
+Number of delivery nodes:  per episode.
+Rainfall intensity: Sampled from RI₂–RI₃ (moderate to heavy rain).
+Delivery node sampling:Randomly sampled but constrained to distances ranging 2–8 km.
+Objective: Learn to balance efficiency with safety, identify hazardous roads, reroute when blocked.
+Stage 3: Full Deliveries, High Hazard, Full Graph (Episodes 10,001–15,000)
+Graph size: Expanded subgraph of the La Trinidad network (80-100 nodes).
+Number of delivery nodes:  per episode, with 30% of episodes using exactly .
+Rainfall intensity: Sampled from all five severity levels, with emphasis on RI₄–RI₅ (50% combined share).
+Delivery node sampling: Fully randomized, including long-distance trips (up to 15 km) and adversarial pairs.
+Objective: Master adaptive routing under extreme conditions, to exploit narrow safe corridors, recognize when no path exists.
+
+Table 5: Stage-Specific Curriculum Parameters for Multi-Stop Routing
+
+The n-scaling curriculum mirrors pedagogical principles: humans learn to route 2 stops, then 5, then 8. Each stage significantly increases complexity. The 15,000-episode budget (could be longer due to multi-stop complexity) reflects the increased problem difficulty. At each episode, success is recorded as a binary event (1 = reached destination without timeout/blockage, 0 = failed). A 100-episode rolling average is maintained. Transition criteria use this rolling average to detect convergence robustly, avoiding early transition due to random noise. The shift in rain intensity is designed to gradually expose the agent to harder conditions without overwhelming it. The progression for light rain reflects the principle of annealing, which involves slowly removing training wheels. Simultaneously, RI₄–RI₅ share grows up to 50%, ensuring the agent sees extreme conditions frequently enough to learn robust emergency responses in Stage 3.
+
+3.5 Comparison of Baseline Algorithms under a Monte Carlo Simulation environment
+To quantitatively evaluate the DQN's performance, the study compares it against baseline methods representing the spectrum of routing approaches: simple greedy heuristics, and deterministic optimal algorithms. This section specifies each baseline, explains its implementation, and justifies why it serves as a meaningful benchmark.
+3.5.1 Prior Monte Carlo Framework as Baseline Metric
+The previous study developed a parallelized Monte Carlo simulation framework for evaluating last-mile delivery feasibility under flood and landslide risks in rural areas. The prior work focused on evaluating existing nearest-neighbor routing under stochastic disaster conditions, providing an insightful baseline to measure DQN improvements.
+A. Overview of the Monte Carlo Simulation Framework
+The baseline framework models the La Trinidad road network by extracting topology from OpenStreetMap via OSMnx.
+Within this existing map, a defined number of nodes were randomly selected and label the first selected node as the starting point or the depot.
+After delivery nodes selection, a baseline Nearest Neighbor Algorithm (NNA) is applied to find a delivery path where there are still no disasters or assumes perfect conditions. The time it took to traverse this entire path was considered the baseline of the previous study.
+
+Figure 7. Delivery route generated by the Nearest Neighbor Algorithm.
+As mentioned, among the limitations of this approach is that it does not contain scientifically validated data of which roads are disaster prone. However, it addresses this by implementing a random selection of edges and marking them disaster prone while associating numerical values that represents how likely will those nodes become problematic or activated. Figure 8 shows that orange edges are landslide prone while light blue edges are flood prone.
+
+Figure 8. Route with disaster-prone edges visualized on the network.
+To simulate conditions of when these disaster prone roads become problematic and hinder navigation, the previous study applied a Monte Carlo Simulation that samples rainfall intensity from empirical distributions; for each intensity level, it stochastically activates edge blockages and speed reductions. This empirical distribution is shown in table 6.
+Table 6: Rainfall Intensity Probability Distributions
+After using python’s multiprocessing to simulate multiple distributions all at the same time, achieving 3.36x speedup, the simulation measures delivery success rates; defined by successfully delivering to all delivery nodes without disruptions, completion times, and time distributions across these scenarios. 
+B. Key Findings
+The prior framework established clear performance ceilings for heuristic routing under uncertainty. Under light rain, the NNA baseline achieved a 99.7% success rate with an average travel time of approximately 131 minutes. However, performance degraded significantly as severity increased: moderate conditions yielded 92.7% success with 180 - 200 minute travel times, while heavy rain dropped success rates to 72% with delays extending to 300 minutes. In extreme scenarios, the baseline struggled, with success rates falling to 34.7% - 12% due to two primary failure modes: immobility caused by intense precipitation blocking personnel departure, and infrastructure disruption where specific edges became flooded or blocked.
+
+Figure 9. Delivery Outcomes
+C. Integration into Current Study
+The framework from the previous study establishes a clear foundation for building the environment. Utilizing NOAH's hazard maps eliminates the need for both random sampling of disaster-prone roads and random assignment of activation values.
+These activation values previously drove the Monte Carlo simulation. However, this current study couples the probabilistic attributes of activation directly with the hazard values through the stochastic road blockage defined in Section 3.1.3.
+Consequently, these incorporations redefine the mechanics of the previous simulation while maintaining its core architecture. A defined number of simulation runs across different rain intensities will evaluate the study's proposed model based on its defined evaluation metrics.
+3.5.2 Baseline Algorithms
+To establish the range of algorithmic performance, the study tests variants of the Nearest Neighbor Algorithm configured with different underlying shortest-path computations. Specifically, Dijkstra’s Algorithm and A Search are implemented not merely as illustrative examples, but as the primary deterministic baselines against which the DRL agent's performance is quantitatively benchmarked. All baselines are evaluated within the same Monte Carlo environment as the DQN, using the same OSMnx-extracted road network and NetworkX graph representation.
+The key distinction between baselines lies in how the nearest node is determined at each step of the NNA construction. All variants use NetworkX's built-in shortest-path utilities, which differ in their pathfinding strategy:
+Nearest Neighbor + Dijkstra (NNA-Dijkstra)
+The standard configuration from the prior study. At each step, NNA queries NetworkX's shortest_path_length() function with Dijkstra's algorithm as the backend to find the unvisited node closest (in terms of minimum path cost) to the current location. This variant operates on the full road graph without hazard information, treating all edges as equally traversable. NNA-Dijkstra serves as a hazard-blind greedy baseline that mirrors the routing method used in the prior Monte Carlo study, enabling direct comparison.
+Nearest Neighbor + A* (NNA-A*)
+A variant where NetworkX's astar_path_length() function replaces Dijkstra. A* uses Euclidean distance to the target node as an admissible heuristic to guide its search, potentially improving computational efficiency for spatial graphs. Like NNA-Dijkstra, this variant also operates on the hazard-unaware graph; the difference is purely in the optimized pathfinding strategy. NNA-A* allows the study to isolate whether heuristic-guided pathfinding (A*) provides meaningful improvement over uninformed pathfinding (Dijkstra) when both ignore hazard information.
+Nearest Neighbor + Dijkstra (Hazard-Aware, NNA-Dijkstra-HA)
+A third variant where the underlying graph is modified to incorporate hazard activation before path computation. Rather than querying the full graph, this variant operates on a version where edge weights have been adjusted to reflect stochastically activated blockages and speed reductions (as defined in Section 3.1.3). This variant assumes that all hazard information is known at the time of route planning, an unrealistic but informative upper bound that shows whether a deterministic approach with perfect hazard foresight can outperform the DQN's learned policy. Like all NNA variants, NNA-Dijkstra-HA cannot replan mid-route if conditions change.
+These three configurations collectively bracket the design space: NNA-Dijkstra and NNA-A* represent hazard-blind greedy construction with different pathfinding efficiencies, while NNA-Dijkstra-HA provides an oracular upper bound assuming perfect hazard knowledge. Together, they establish a comprehensive reference frame within which to quantify the value of learned, adaptive routing via the DQN. The comparison is methodologically clean because all variants share the same NNA framework and graph representation, differing only in the shortest-path backend or the degree of hazard information available at planning time.
+
+3.6 Evaluation Metrics
+This section defines how the DQN and baseline algorithms are compared and specifies what constitutes success in hazard-aware routing. Metrics are organized into mission-critical performance indicators, safety-efficiency trade-offs, computational feasibility, and robustness across disaster severity levels.
+3.6.1 Performance Metrics
+A. Success Rate (%)
+
+Success rate is the percentage of test episodes in which the agent completes all  deliveries without timeout or blockage. This is the primary mission-critical metric in disaster response: an algorithm achieving 100% success but with slow speeds is preferable to 95% success with faster average times. Related studies such as van Steenbergen et al. (2023) also measured delivery completion rates for humanitarian relief under stochastic travel times, and Tsai et al. (2021) evaluated evacuation routing success under compound disaster scenarios.
+
+B. Average Travel Time for Successful Episodes (minutes)
+
+Average travel time is the mean elapsed time (in minutes) from initial departure to final delivery, calculated only for successfully completed episodes and excluding timeouts and blockages. Koh et al. (2020) evaluated mean travel time for DQN-based real-time vehicle navigation in dynamic traffic.
+ Conditional on success, shorter times indicate operational efficiency. In disaster contexts, faster delivery enables quicker aid distribution and medical transport. However, this metric remains secondary to success rate (Long et al., 2021): a 10% slower completion time with 95% success is operationally preferable to a 20% faster time with 85% success.
+
+C. Hazard Exposure Score
+
+Where  is the normalized hazard score or weighted combination of flood and landslide components, for edge  and  is the edge length. The score accumulates across the entire route, weighting distance traveled in hazardous zones by their respective hazard intensities.
+Hazard Exposure captures the cumulative hazard-weighted distance, measuring total exposure to flood and landslide risk. A route that is longer but mostly safe is operationally preferable to a shorter but highly hazardous route. This metric uniquely captures the safety-efficiency trade-off inherent in disaster routing and has no analog in standard Vehicle Routing Problem metrics. It is essential for validating that the DQN is genuinely prioritizing hazard avoidance rather than simply optimizing distance.
+The hazard exposure metric is adapted from Mili & Argoubi (2025), who quantified security risk exposure in conflict-affected humanitarian routing as the cumulative product of risk intensity and distance traveled through dangerous zones. Their reward function explicitly penalizes routes traversing high-security-risk areas. Similarly, Li et al. (2024) implicitly weighted flood exposure by imposing increased evacuation time proportional to flood depth on affected road segments in their RL-based flood evacuation model. Our formulation extends these approaches by combining flood and landslide hazards with Project NOAH data, representing the first integration of dual-hazard geospatial risk into a learned routing framework for rural Philippine disaster contexts.
+
+D. Computational Efficiency
+Training Time: Total wall-clock time (in hours) required to train the DQN through all three curriculum stages (Section 3.4.2) on a standard workstation. This is a one-time development cost incurred before deployment. Since baseline algorithms (NNA, Dijkstra, A*) require no training, training time is not used for comparative evaluation. Instead, it is reported to validate deployment feasibility. Training times of 8–25 hours are acceptable for operational use (train once, deploy indefinitely), whereas training requiring weeks would be impractical for resource-constrained disaster response agencies. Dastpak & Errico (2021) reported training times of 24–36 hours for their DecQN (Deep Q-Network) approach to stochastic vehicle routing demonstrating that Q-learning-based routing policies can be trained within practical timeframes for daily operational deployment in repetitive logistics contexts.
+
+Running time: Total wall-clock time (in seconds) to evaluate the trained DQN policy across the full test set of episodes. Following Mamond et al. (2025) who measured running time between DQN and FLDQN for multi agent routing.
+
+Both metrics are logged and reported to validate that the DQN is not merely more accurate but also practical for deployment in resource-constrained rural environments.
+
+E. Robustness Across Severity Levels
+
+Where  is the standard deviation of a performance metric (success rate, travel time, or hazard exposure) and  is the mean (average) of that same metric. The ratio  is called the coefficient of variation (CV).
+The robustness score quantifies consistency of performance across rainfall intensity levels (RI₁ through RI₅). A robustness score near 1.0 means consistent performance across severity levels; a low score means performance degrades sharply under extreme conditions. A brittle policy that works great under RI₁ but fails under RI₅ is less useful than a slightly less optimal policy that performs consistently. Curriculum learning should promote robustness; this metric validates that claim. 
+Dastpak & Errico (2021) evaluated their DecQN routing model across instances with varying duration limits and demand patterns, demonstrating that curriculum-trained policies maintain performance across unseen task variants with only 5% degradation. They use coefficient of variation (CV) as a robustness metric, with lower CV indicating more consistent performance.
+3.6.2 Generalization Testing and Transferability Assessment
+To evaluate whether the learned routing policy can generalize beyond the specific routes encountered during training, the trained DQN agent is tested on multiple unseen sub-areas drawn from neighboring road networks. These evaluation zones consist of graphs that were spatially excluded from the training data but remain connected to the overall regional network, ensuring consistent feature representations and hazard encoding.
+For each evaluation sub-area, the following protocol is applied:
+Road network extraction: OpenStreetMap data for the target subgraphs are processed using the same pipeline as La Trinidad (Section 3.1.1).
+Hazard integration: Flood and landslide hazard layers from Project NOAH are overlaid using identical encoding rules (Section 3.1.2).
+Zero-shot evaluation: The La Trinidad–trained DQN agent is deployed without retraining or fine-tuning, and multiple episodes are simulated under varying rainfall intensities.
+Comparative analysis: Performance is compared against baseline heuristics using the same evaluation metrics applied in the primary study area.
+This evaluation assesses whether the learned policy captures generalizable hazard-aware routing behavior across connected but previously unseen portions of the road network, rather than memorizing routes encountered during training.
+
+
+3.7 Interactive Visualization Tool
+This section describes the design and implementation of an interactive visualization tool that demonstrates the trained DQN routing agents, enabling model interpretability, comparison with baseline methods, and sensitivity analysis.
+3.7.1 Rationale and Objectives
+While quantitative metrics (success rate, travel time, hazard exposure) provide rigorous performance assessment, they offer limited insight into how and why the DQN makes specific routing decisions under diverse disaster conditions. To address this gap, the study develops an interactive visualization tool that serves three critical purposes:
+Model Interpretability: Demonstrates the learned policy by showing route selections, hazard avoidance patterns, and decision trade-offs, making the black-box neural network decisions transparent and understandable.
+Comparative Visualization: Side-by-side routes (DQN vs. NNA) under the same rainfall scenario visually demonstrate DQN's navigational differences. This visual comparison is more compelling and interpretable than tables of aggregate statistics, enabling rapid identification of specific scenarios where learned routing outperforms greedy heuristics.
+Ablation and Sensitivity Analysis: Interactive control over rainfall intensity (RI₁–RI₅) and routing profiles (Safe, Balanced, Fast) enables rapid testing of key research questions such as "How does route quality degrade under RI₅?" or "Does the Safe profile produce overly conservative/long routes?" This supports hyperparameter tuning, profile calibration, and understanding of policy behavior across the severity spectrum. In addition, controlled mid-episode hazard updates are used to visually demonstrate how the learned policy adapts routing decisions when hazard conditions change, supporting qualitative assessment of adaptive behavior.
+This aligns with best practices in RL for critical applications, where interpretability and transparency are essential for understanding agent behavior and validating learned policies. The tool is designed for research demonstration and validation purposes, not operational deployment. While the framework could eventually support integration into operational systems, this study focuses on developing and validating the core decision-making agent through simulation, rather than implementing user-facing applications or conducting real-world field testing.
+3.7.2 Tool Features and Functionality
+The tool is a web-based interactive dashboard implemented using open-source Python libraries, designed for research demonstration on a standard workstation.
+A. Core Features
+1. Interactive Map Display
+The core visualization component displays an interactive map of the La Trinidad road network overlaid with NOAH hazard layers. Road segments are color-coded by hazard severity (green = passable, yellow = caution, red = blocked), and the map shows the start node, delivery nodes, and status of completed and remaining deliveries. This provides the spatial context necessary for understanding routing decisions in the hazard-affected environment.
+2. Dynamic Hazard and Profile Selection
+To support ablation and sensitivity analysis, the tool includes dynamic selectors for rainfall intensity and routing profile. A dropdown menu allows users to select rainfall intensity (RI₁–RI₅), which updates hazard activation states in real-time according to Table 4 (Section 3.1.3) thresholds. A second dropdown enables selection of routing profiles (Safe, Balanced, Fast), switching between pre-trained DQN models. Together, these selectors enable instant visualization of how route quality and algorithm behavior change across the severity spectrum and policy profiles.
+3. Comparative Route Visualization
+The tool displays comparative routes side-by-side, showing DQN-computed routes alongside Nearest Neighbor (NNA) baseline routes under the same rainfall scenario. Routes are color-coded by algorithm (e.g., DQN = blue, NNA = orange) and include individual metrics for each: total distance (km), travel time (min), hazard exposure score, and success/failure status.
+4. Dynamic Replanning Feature
+To visualize the adaptive behavior of the learned routing policy, the tool includes a controlled dynamic replanning feature. This allows a sudden shift in rainfall intensity (e.g., varying from RI1 to RI5) at a specific time step during the agent's route, triggering an update of hazard-related edge costs while keeping the agent’s policy fixed. This feature serves to validate whether the fixed policy can successfully identify and navigate to alternative paths when previously safe edges become hazardous mid-operation. The setup does not aim to model realistic rainfall accumulation or hazard propagation over time. Instead, it provides a controlled test of whether the learned policy can adjust routing decisions when hazard conditions are updated mid-episode.
+5. Animated Route Playback
+Finally, the tool supports animated route playback, where a "Play" button animates the agent's step-by-step progression through the route. The animation shows decision points where alternative neighbors were available, the final outcome (success, timeout, or blockage failure), and enables visual inspection of how DQN prioritizes hazard avoidance versus efficiency at each decision step.
+
+3.7.3 Implementation Overview
+1. Technical Stack:
+Frontend: Folium (interactive mapping), Plotly (metrics visualization)
+Backend: Flask (lightweight Python web server)
+Data: Same La Trinidad network and NOAH hazard layers used in training/testing
+Models: Pre-trained DQN weights for Safe, Balanced, and Fast profiles
+2. Workflow:
+User selects rainfall intensity, routing profile, and scenario (start node + delivery nodes)
+System loads corresponding pre-trained DQN model and simulates hazard activation
+DQN inference computes route through network; baselines (NNA) also compute comparison routes
+Map displays activated hazards, all three routes side-by-side, and individual route metrics
+User can animate routes and adjust RI/profile parameters
+3.7.4 Scope and Limitations
+The tool is designed as a research demonstration and validation instrument to showcase the trained DQN agent's behavior under varied hazard scenarios and to support comparative analysis with baseline algorithms. It enables visual inspection of routing decisions for interpretability, comparative validation, and sensitivity analysis purposes.
+The tool operates on simulated hazard activations (NOAH data + stochastic blockage model from Table 4). Not designed for operational deployment or real-time field use. Integration into user-facing mobile applications or fleet management dashboards is reserved for future development. Outputs should be interpreted as demonstrations of agent behavior in simulation, not operational predictions.
+4.0 Calendar of Activities
+Table 7: Gantt chart of activities
+
+
+Appendix A. Bibliography
+Agoot, L. (2022, August 23). Benguet LGUs urged to use hazard maps in planning. Philippine News Agency. https://www.pna.gov.ph/articles/1181997
+Unson, J., & Cariaso, B. (2024, July 15). 20 flood, landslide-prone areas identified. The Philippine Star. https://www.philstar.com/nation/2024/07/15/2370302/20-flood landslide-prone-areas-identified
+Amit, A. M. L., Pepito, V. C. F., De los Reyes, S. J., Tang, C. S., Aliazas, N. A. K., & Sumpaico-Tanchanco, L. (2022). Prevalence and determinants of home delivery in urban and rural Philippines: Evidence from the 2017 National Demographic and Health Survey. Women's Health (London), 18. 1–11. https://doi.org/10.1177/17455057221117957
+Collado, Z. C. (2019). Challenges in public health facilities and services: evidence from a geographically isolated and disadvantaged area in the Philippines. Journal of Global Health Reports, 3, e2019059. https://doi.org/10.29392/joghr.3.e2019059
+Allen, E., Costello, S. B., & Henning, T. (2024). Contribution of network redundancy to reducing criticality of road links. Transportation Research Record: Journal of the Transportation Research Board, 2678(8). https://doi.org/10.1177/03611981241252767
+Archetti, C., Coelho, L. C., Speranza, M. G., & Vansteenwegen, P. (2025). Beyond fifty years of vehicle routing: Insights into the history and the future. European Journal of Operational Research. https://doi.org/10.1016/j.ejor.2025.06.014
+Ammouriova, M., Herrera, E. M., Neroni, M., Juan, A. A., & Faulin, J. (2022). Solving Vehicle Routing Problems under Uncertainty and in Dynamic Scenarios: From Simheuristics to Agile Optimization. Applied Sciences, 13(1), 101. https://doi.org/10.3390/app13010101
+Assunção, L., & Santos, A. C. (2025). The Robust Steiner Team Orienteering Problem with Decreasing Priorities under budgeted uncertainty. Operations Research Perspectives, 15, 100344. https://doi.org/10.1016/j.orp.2025.100344
+Du, J., Ji, Y., Qu, D., Wu, X., & Yang, D. (2020). Three-Stage Mixed Integer Robust Optimization Model Applied to Humanitarian Emergency Logistics by Considering Secondary Disasters. IEEE Access, 8, 223255–223270. https://doi.org/10.1109/ACCESS.2020.3042980
+Hajar, G., Fauzi, M. D., Harnaningrum, R. N., & Islami, M. C. P. A. (2025). Development of an Application Model for Solving the Vehicle Routing Problem (VRP) Using the Nearest Neighbour Approach. Tekmapro : Journal of Industrial Engineering and Management, 20(2), 90–99. https://tekmapro.upnjatim.ac.id/index.php/tekmapro/article/view/924
+Su, Y., Zhang, S., & Zhang, C. (2024). A Lightweight Genetic Algorithm with Variable Neighborhood Search for Multi-Depot Vehicle Routing Problem with Time Windows. SSRN Electronic Journal. Available at SSRN: https://ssrn.com/abstract=4685925
+Comert, S. E., & Yazgan, H. R. (2024). Genetic algorithm approach to asymmetric capacitated vehicle routing problem. Decision Science Letters, 13(4), 675-694. https://doi.org/10.5267/j.dsl.2024.4.003
+Stadler, T., Schrader, J., & Dunnweber, J. (2023). A Hybrid Genetic Algorithm for Solving the VRP with Pickup and Delivery in Rural Areas. In Proceedings of the 56th Hawaii International Conference on System Sciences (pp. 5039–5047). HICSS. https://doi.org/10.24251/HICSS.2023.617 
+Joshi, V. D., Agarwal, P., Čepová, L., Alsaud, H., Kumar, A., Swarna, B., & Kumar, A. (2025). Incorporating Fully Fuzzy Logic in Multi-Objective Transshipment Problems: A Study of Alternative Path Selection Using LR Flat Fuzzy Numbers. Computer Modeling in Engineering & Sciences, 144(1), 969–1011. https://doi.org/10.32604/cmes.2025.063996
+Liu, F., Lu, C., Gui, L., Zhang, Q., Tong, X., & Yuan, M. (2023). Heuristics for Vehicle Routing Problem: A Survey and Recent Advances (No. arXiv:2303.04147). arXiv. https://doi.org/10.48550/arXiv.2303.04147
+Long, S., Zhang, D., Liang, Y., Li, S., & Chen, W. (2021). Robust Optimization of the Multi-Objective Multi-Period Location-Routing Problem for Epidemic Logistics System With Uncertain Demand. IEEE Access, 9, 151912–151930. https://doi.org/10.1109/ACCESS.2021.3125746
+Mzili, T., Mzili, I., Riffi, M. E., Kurdi, M., Ali, A. H., Pamucar, D., & Abualigah, L. (2024). Enhancing COVID-19 vaccination and medication distribution routing strategies in rural regions of Morocco: A comparative metaheuristics analysis. Informatics in Medicine Unlocked, 46, 101467. https://doi.org/10.1016/j.imu.2024.101467
+Osorio-Mora, A., Saldanha-da-Gama, F., & Toth, P. (2025). A risk-averse latency location-routing problem with stochastic travel times. European Journal of Operational Research, 321(3), 837–850. https://doi.org/10.1016/j.ejor.2024.10.041
+Pérez-Carabaza, S., Besada-Portas, E., & López-Orozco, J. A. (2024). Minimizing the searching time of multiple targets in uncertain environments with multiple UAVs. Applied Soft Computing, 155, 111471. https://doi.org/10.1016/j.asoc.2024.111471
+Tarhan, İ., Zografos, K. G., Sutanto, J., & Kheiri, A. (2024). A quadrant shrinking heuristic for solving the dynamic multi-objective disaster response personnel routing and scheduling problem. European Journal of Operational Research, 314(2), 776–791. https://doi.org/10.1016/j.ejor.2023.09.002
+Tureci-Isik, H., Çelik, M., & Sanci, E. (2025). The stochastic location-routing problem with parallel truck–drone operations for humanitarian aid delivery. European Journal of Operational Research, S0377221725006940. https://doi.org/10.1016/j.ejor.2025.08.057
+Wang, F., Pei, Z., Dong, L., & Ma, J. (2020). Emergency Resource Allocation for Multi-Period Post-Disaster Using Multi-Objective Cellular Genetic Algorithm. IEEE Access, 8, 82255–82265. https://doi.org/10.1109/ACCESS.2020.2991865
+Wu, J., Wang, X.-Y., Tian, A.-Q., Du, Z.-G., & Yang, Z.-J. (2024). A Hybrid Meta-Heuristic Approach for Emergency Logistics Distribution Under Uncertain Demand. IEEE Access, 12, 135701–135729. https://doi.org/10.1109/ACCESS.2024.3463197
+ACAPS. (2024, February 16). Philippines: Floods and landslides in Mindanao Island – Briefing note. ACAPS. https://reliefweb.int/report/philippines/acaps-briefing-note-philippines-floods-and-landslides-mindanao-island-16-february-2024
+AHA Centre. (2024, February 2). Flash update no. 01 – Flooding and landslides in Regions X, XI, and CARAGA, Philippines. ASEAN Coordinating Centre for Humanitarian Assistance.https://ahacentre.org/flash-update/flash-update-no-01-flooding-and-landslides-in-regions-x-xi-and-caraga-philippines-2-february-2024
+Caritas Philippines. (2024, February 14). SitRep 3: Flooding in Mindanao. Caritas Philippines. https://caritas.org.ph/sitrep-3-flooding-in-mindanao/
+Péter Zsolt, P. (2020). Development of rural areas and improving their resilience with smart solutions. Club of Economics in Miskolc TMP, 16(1), 31–40. https://doi.org/10.18096/TMP.2020.01.04
+Red Cross Red Crescent Climate Centre. (2024). Philippines country climate and disaster risk profile. Red Cross Red Crescent Climate Centre. https://www.climatecentre.org/wp-content/uploads/RCCC-Country-profiles-Philippines_2024_final.pdf
+World Bank. (2020). Philippines—Climate change knowledge portal: Country profile. World Bank.https://climateknowledgeportal.worldbank.org/sites/default/files/country-profiles/15852-WB_Philippines%20Country%20Profile-WEB.pdf
+World Bank. (2021). Disaster risk management in the Philippines (World Bank Country Report). World Bank. https://openknowledge.worldbank.org/handle/10986/35293
+World Bank. (2022, December 14). Project information document – Mindanao transport connectivity improvement project (Report No. PIDISDSA32628). World Bank. https://documents1.worldbank.org/curated/en/099245003212214320/pdf/P177017022e7060a0989509dca5c60704e.pdf
+Anuar, W. K., Lee, L. S., Seow, H.-V., & Pickl, S. (2022). A Multi-Depot Dynamic Vehicle Routing Problem with Stochastic Road Capacity: An MDP Model and Dynamic Policy for Post-Decision State Rollout Algorithm in Reinforcement Learning. Mathematics, 10(15), 2699.https://doi.org/10.3390/math10152699
+Aslan Yıldız, Ö., Sarıçiçek, İ., & Yazıcı, A. (2025). A Reinforcement Learning-Based Solution for the Capacitated Electric Vehicle Routing Problem from the Last-Mile Delivery Perspective. Applied Sciences, 15(3), 1068.https://doi.org/10.3390/app15031068
+Bdeir, A., Boeder, S., Dernedde, T., Tkachuk, K., Falkner, J. K., & Schmidt-Thieme, L. (2021). RP-DQN: An Application of Q-Learning to Vehicle Routing Problems. In Lecture notes in computer science (pp. 3–16). Springer Science+Business Media.https://doi.org/10.1007/978-3-030-87626-5_1
+Dastpak, M., & Errico, F. (2021). Off-line approximate dynamic programming for the vehicle routing problem with stochastic customers and demands via decentralized decision-making. In arXiv (Cornell University) (pp. 1–36). Cornell University.
+He, H., Zhang, X., Fan, Q., Yang, J., Zhou, X., & Yu, B. (2025). Emergency Relief Material Distribution Path Optimization Under Multiple Constraints. Applied Sciences, 15(21), 11499.https://doi.org/10.3390/app152111499
+Jiang, T.-H., & Chang, Y.-C. (2025). Machine Learning-Enhanced Last-Mile Delivery Optimization: Integrating Deep Reinforcement Learning with Queueing Theory for Dynamic Vehicle Routing. Applied Sciences, 15(21), 11320.https://doi.org/10.3390/app152111320
+Kim, W.-J., Jeong, J., Kim, T., & Lee, K. (2025). AlphaRouter: Bridging the Gap Between Reinforcement Learning and Optimization for Vehicle Routing with Monte Carlo Tree Searches. Entropy, 27(3), 251.https://doi.org/10.3390/e27030251
+Koh, S., Zhou, B., Fang, H., Yang, P., Yang, Z., Yang, Q., Guan, L., & Ji, Z. (2020). Real-time deep reinforcement learning based vehicle navigation. Applied Soft Computing, 96, 106694.https://doi.org/10.1016/j.asoc.2020.106694
+Kool, W., Hoof, H. van, & Welling, M. (2019). Attention, Learn to Solve Routing Problems! (No. arXiv:1803.08475). arXiv.https://doi.org/10.48550/arXiv.1803.08475
+Li, D., Zhang, Z., Alizadeh, B., Zhang, Z., Duffield, N., Meyer, M. A., Thompson, C. M., Gao, H., & Behzadan, A. H. (2024). A reinforcement learning-based routing algorithm for large street networks. International Journal of Geographical Information Science, 38(2), 183–215.https://doi.org/10.1080/13658816.2023.2279975
+Mili, K., & Argoubi, M. (2025). Adaptive vehicle routing for humanitarian aid in conflict-affected regions: A practitioner-informed deep reinforcement learning approach. Frontiers in Future Transportation, 6.https://doi.org/10.3389/ffutr.2025.1603726
+Tsai, Y.-L., Rastogi, C., Kitanidis, P. K., & Field, C. B. (2021). Routing algorithms as tools for integrating social distancing with emergency evacuation. Scientific Reports, 11(1), 19623.https://doi.org/10.1038/s41598-021-98643-z
+van Steenbergen, R., Mes, M., & van Heeswijk, W. (2023). Reinforcement learning for humanitarian relief distribution with trucks and UAVs under travel time uncertainty. Transportation Research Part C: Emerging Technologies, 157, 104401.https://doi.org/10.1016/j.trc.2023.104401
+Barredo Arrieta, A., Díaz-Rodríguez, N., Del Ser, J., Bennetot, A., Tabik, S., Barbado, A., Garcia, S., Gil-Lopez, S., Molina, D., Benjamins, R., Chatila, R., & Herrera, F. (2020). Explainable Artificial Intelligence (XAI): Concepts, taxonomies, opportunities and challenges toward responsible AI. Information Fusion, 58, 82–115.https://doi.org/10.1016/j.inffus.2019.12.012
+Bengio, Y., Louradour, J., Collobert, R., & Weston, J. (2009). Curriculum learning. Proceedings of the 26th Annual International Conference on Machine Learning, 41–48.https://doi.org/10.1145/1553374.1553380
+Glorot, X., Bordes, A., & Bengio, Y. (2011). Deep Sparse Rectifier Neural Networks. Proceedings of the Fourteenth International Conference on Artificial Intelligence and Statistics, 315–323.https://proceedings.mlr.press/v15/glorot11a.html
+Hasselt, H. van, Guez, A., & Silver, D. (2015). Deep Reinforcement Learning with Double Q-learning (No. arXiv:1509.06461). arXiv.https://doi.org/10.48550/arXiv.1509.06461
+Ioffe, S., & Szegedy, C. (2015). Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift (No. arXiv:1502.03167). arXiv.https://doi.org/10.48550/arXiv.1502.03167
+Kingma, D. P., & Ba, J. (2017). Adam: A Method for Stochastic Optimization (No. arXiv:1412.6980). arXiv.https://doi.org/10.48550/arXiv.1412.6980
+Kool, W., Hoof, H. van, & Welling, M. (2019). Attention, Learn to Solve Routing Problems! (No. arXiv:1803.08475). arXiv.https://doi.org/10.48550/arXiv.1803.08475
+Levy, A., Konidaris, G., Platt, R., & Saenko, K. (2019). Learning Multi-Level Hierarchies with Hindsight (No. arXiv:1712.00948). arXiv.https://doi.org/10.48550/arXiv.1712.00948
+Long, S., Zhang, D., Liang, Y., Li, S., & Chen, W. (2021). Robust Optimization of the Multi-Objective Multi-Period Location-Routing Problem for Epidemic Logistics System With Uncertain Demand. IEEE Access, 9, 151912–151930.https://doi.org/10.1109/ACCESS.2021.3125746
+Mnih, V., Kavukcuoglu, K., Silver, D., Rusu, A. A., Veness, J., Bellemare, M. G., Graves, A., Riedmiller, M., Fidjeland, A. K., Ostrovski, G., Petersen, S., Beattie, C., Sadik, A., Antonoglou, I., King, H., Kumaran, D., Wierstra, D., Legg, S., & Hassabis, D. (2015). Human-level control through deep reinforcement learning. Nature, 518(7540), 529–533.https://doi.org/10.1038/nature14236
+Narvekar, S., Peng, B., Leonetti, M., Sinapov, J., Taylor, M. E., & Stone, P. (2020). Curriculum Learning for Reinforcement Learning Domains: A Framework and Survey (No. arXiv:2003.04960). arXiv.https://doi.org/10.48550/arXiv.2003.04960
+Sutton, R. S., & Barto, A. G. (2018). Reinforcement learning: An introduction (Vol. 1.) Cambridge: MIT press.
+Wong, E., Leung, K., & Field, T. (2021). State-space decomposition for reinforcement learning. Dept. Comput., Imperial College London, London, UK, Rep.
+Abedin, S. J. H., & MacVicar, B. J. (2025). Framework for stochastic urban flood hazard mapping using coupled and industry-standard hydrologic and hydraulic models. Environmental Modelling & Software, 193, 106632.https://doi.org/10.1016/j.envsoft.2025.106632
+Ahmed, I., Das (Pan), N., Debnath, J., Bhowmik, M., & Bhattacharjee, S. (2024). Flood hazard zonation using GIS-based multi-parametric Analytical Hierarchy Process. Geosystems and Geoenvironment, 3(2), 100250.https://doi.org/10.1016/j.geogeo.2023.100250
+Almouctar, M. A. S., Wu, Y., An, S., Yin, X., Qin, C., Zhao, F., & Qiu, L. (2024). Flood risk assessment in arid and semi-arid regions using Multi-criteria approaches and remote sensing in a data-scarce region. Journal of Hydrology: Regional Studies, 54, 101862.https://doi.org/10.1016/j.ejrh.2024.101862
+Ayenew, W. A., & Kebede, H. A. (2023). GIS and remote sensing based flood risk assessment and mapping: The case of Dikala Watershed in Kobo Woreda Amhara Region, Ethiopia. Environmental and Sustainability Indicators, 18, 100243.https://doi.org/10.1016/j.indic.2023.100243
+Bacero, R. S., & Fillone, A. M. (2023). Impact of flooding on truck movement in Metro Manila, Philippines. Asian Transport Studies, 9, 100113.https://doi.org/10.1016/j.eastsj.2023.100113
+Bahrami, Y., Hassani, H., & Maghsoudi, A. (2021). Landslide susceptibility mapping using AHP and fuzzy methods in the Gilan province, Iran. GeoJournal, 86(4), 1797–1816.
+Dasallas, L., An, H., & Lee, S. (2022). Developing an integrated multiscale rainfall-runoff and inundation model: Application to an extreme rainfall event in Marikina-Pasig River Basin, Philippines. Journal of Hydrology: Regional Studies, 39, 100995.https://doi.org/10.1016/j.ejrh.2022.100995
+Dulawan, J. M. T., Imamura, Y., Konishi, T., Amaguchi, H., & Ohara, M. (2024). A systematic framework for assessing social vulnerability to flood for integrated flood risk management: A case study in Metro Manila, Philippines. International Journal of Disaster Risk Reduction, 112, 104778.https://doi.org/10.1016/j.ijdrr.2024.104778
+Gao, X., Wang, B., Dai, W., & Liu, Y. (2025). Bayesian Network-Based Landslide Susceptibility Safe Route Assessment in the Face of Uncertain Knowledge and Various Information. IEEE Access, 13, 46190–46209.https://doi.org/10.1109/ACCESS.2025.3550572
+Habibi, A., Delavar, M. R., Nazari, B., Pirasteh, S., & Sadeghian, M. S. (2023). A novel approach for flood hazard assessment using hybridized ensemble models and feature selection algorithms. International Journal of Applied Earth Observation and Geoinformation, 122, 103443.https://doi.org/10.1016/j.jag.2023.103443
+Legass, A. M., Alamirew, T., Gebrehiwot, S. G., & Bernhofen, M. V. (2025). Comprehensive flood vulnerability analysis and mapping for the Awash River Basin, Ethiopia. Natural Hazards Research, 5(3), 596–608.https://doi.org/10.1016/j.nhres.2025.01.012
+Lu, Y., Zhai, G., & Zhou, S. (2024). An integrated Bayesian networks and Geographic information system (BNs-GIS) approach for flood disaster risk assessment: A case study of Yinchuan, China. Ecological Indicators, 166, 112322.https://doi.org/10.1016/j.ecolind.2024.112322
+Mahmood, R., Hassan, M. F., Reza, Md. M., Tabassum, N., Kona, N., & Akter, U. (2025). A GIS based Multi Criteria Decision Analysis for Community Risk Mapping based on IPCC AR6 Framework: The Case of Coastal Bangladesh. Human Settlements and Sustainability.https://doi.org/10.1016/j.hssust.2025.07.001
+Mandal, K. K., Dharanirajan, K., Meena, M. L., Jaman, T., & Rana, S. (2024). Application of geospatial tools in the assessment of Flood hazard impact on social vulnerability of Malda district, West Bengal, India. Natural Hazards Research, 4(3), 470–485.https://doi.org/10.1016/j.nhres.2023.11.008
+Nanda, A. M., Hassan, Z. ul, Ahmed, P., & Kanth, T. A. (2021). Landslide susceptibility assessment of national highway 1D from Sonamarg to Kargil, Jammu and Kashmir, India using frequency ratio method. GeoJournal, 86(6), 2945–2956.
+Osei, J. D., Reed-Jones, Q., Twumasi, Y. A., & Ning, Z. H. (2025). A GIS-based flood hazard mapping in the Alsen St./Irma Lee Community Village in the Louisiana state of USA. Natural Hazards Research.https://doi.org/10.1016/j.nhres.2025.03.006
+Osman, S. A., & Das, J. (2024). A robust ensemble of hybrid and bivariate statistical models for flood prediction mapping in Lower Damodar River Basin of India. Geosystems and Geoenvironment, 3(4), 100312.https://doi.org/10.1016/j.geogeo.2024.100312
+Rangari, V. A., Bhatt, C. M., & Umamahesh, N. V. (2021). Rapid assessment of the October 2020 Hyderabad urban flood and risk analysis using geospatial. Current Science, 120(12), 1840–1847.
+Vanama, V. S. K., Musthafa, M., Khati, U., Gowtham, R., Singh, G., & Rao, Y. S. (2021). Inundation mapping of Kerala flood event in 2018 using ALOS-2 and temporal Sentinel-1 SAR images. Current Science, 120(5), 915–925.
+Vanolya, N. M., & Jelokhani-Niaraki, M. (2021). The use of subjective–objective weights in GIS-based multi-criteria decision analysis for flood hazard assessment: A case study in Mazandaran, Iran. GeoJournal, 86(1), 379–398.
+Evangelista, D. (2024, June 21). UP RI – NOAH Center furthers research and development of data on the compounding effects of multiple hazards. https://resilience.up.edu.ph/up-ri-noah-center-furthers-research-and-development-of-data-on-the-compounding-effects-of-multiple-hazards/
+Johnson, J. M., & Clarke, K. C. (2021). An area preserving method for improved categorical raster resampling. Cartography and Geographic Information Science, 48(4), 292–304. https://doi.org/10.1080/15230406.2021.1892531
+Mamuyac, L. K. D., Lumanglas, S. L., Rebotiaco, E. L. C., & Fillone, A. M. (n.d.). Characterizing Traffic Behavior on Flooded Roads of Metro Manila.
+Mamuyac, L. K., Reyes, J., Lumanglas, L., Rebotiaco, E. L., Fukuda, A., & Fillone, A. (2025). Flood-induced effects on vehicular traffic in Metro Manila, Philippines. Natural Hazards, 121, 14907–14933. https://doi.org/10.1007/s11069-025-07382-1
+Mejia, H. N., & Sigua, R. G. (n.d.). Impacts of Different Rainfall Intensities on Key Traffic Flow Parameters at North Luzon Expressway Using Underwood’s Exponential Model.
+PAGASA. (n.d.). Retrieved December 10, 2025, from https://www.pagasa.dost.gov.ph/information/weather-terminologies
+University of the Philippines Resilience Institute and NOAH Center, Lagmay, A. M., & National Institute of Geological Sciences, University of the Philippines. (2023). The Probabilistic Risk Assessment Imperative in Philippine Climate Change Adaptation-Disaster Risk Reduction (CCA-DRR) Efforts. Transactions of the National Academy of Science and Technology, 45(2023), 1–18. https://doi.org/10.57043/transnastphl.2023.3324
+Jordahl, K., Bossche, J. V. D., Fleischmann, M., Wasserman, J., McBride, J., Gerard, J., Tratner, J., Perry, M., Badaracco, A. G., Farmer, C., Hjelle, G. A., Snow, A. D., Cochran, M., Gillies, S., Culbertson, L., Bartos, M., Eubank, N., Maxalbert, Bilogur, A., … Leblanc, F. (2020). geopandas/geopandas: V0.8.1 (Version v0.8.1) [Computer software]. Zenodo. https://doi.org/10.5281/ZENODO.3946761
+Gillies, S., van der Wel, C., Van den Bossche, J., Taves, M. W., Arnott, J., Ward, B. C., & others. (2025, May 19). Shapely (Version 2.1.1) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.5597138
+A. Lagmay, A. M. F., Racoma, B. A., Aracan, K. A., Alconis-Ayco, J., & Saddi, I. L. (2017). Disseminating near-real-time hazards information and flood maps in the Philippines through Web-GIS. Journal of Environmental Sciences, 59, 13–23. https://doi.org/10.1016/j.jes.2017.03.014
+Cruz, M. N., Medina, K. C., Cabriga, A. S., Mendoza, F., & Blanco, A. C. (2019). GIS-ASSISTED RAIN-INDUCED LANDSLIDE SUSCEPTIBILITY MAPPING OF BENGUET USING A LOGISTIC REGRESSION MODEL. The International Archives of the Photogrammetry, Remote Sensing and Spatial Information Sciences, XLII-4-W19, 157–164. ISPRS TC IV<br>PhilGEOS x GeoAdvances 2019 “Geomatics and Data Science: Towards Adaptive Management in a Changing World” (Volume XLII-4/W19) - 14&ndash;15 November 2019, Manila, Philippines. https://doi.org/10.5194/isprs-archives-XLII-4-W19-157-2019
+Manliguez, C., Diche, Z. J., Jimenez, M. J., Agrazamendez, M., & Acosta, J. (2017). GIS-based Evacuation Routing using Capacity Aware Shortest Path Evacuation Routing Algorithm and Analytic Hierarchy Process for Flood Prone Communities: Proceedings of the 3rd International Conference on Geographical Information Systems Theory, Applications and Management, 237–243. https://doi.org/10.5220/0006327402370243
+Pourghasemi, H. R., Amiri, M., Edalat, M., Ahrari, A. H., Panahi, M., Sadhasivam, N., & Lee, S. (2021). Assessment of Urban Infrastructures Exposed to Flood Using Susceptibility Map and Google Earth Engine. IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, 14, 1923–1937. https://doi.org/10.1109/JSTARS.2020.3045278
+Aguirre-Ayerbe, I., Merino, M., Aye, S. L., Dissanayake, R., Shadiya, F., & Lopez, C. M. (2020). An evaluation of availability and adequacy of Multi-Hazard Early Warning Systems in Asian countries: A baseline study. International Journal of Disaster Risk Reduction, 49, 101749. https://doi.org/10.1016/j.ijdrr.2020.101749
+University of the Philippines Resilience Institute and NOAH Center, Lagmay, A. M., & National Institute of Geological Sciences, University of the Philippines. (2023). The Probabilistic Risk Assessment Imperative in Philippine Climate Change Adaptation-Disaster Risk Reduction (CCA-DRR) Efforts. Transactions of the National Academy of Science and Technology, 45(2023), 1–18. https://doi.org/10.57043/transnastphl.2023.3324
+Hagberg, A. A., Schult, D. A., & Swart, P. J. (2008). Exploring Network Structure, Dynamics, and Function using NetworkX. 11–15. https://doi.org/10.25080/TCWV9851
+Paulmino, I. G. D., & Llantos, O. E. (n.d.). Parallelized Monte Carlo Simulation for Disaster-Adaptive Last-Mile Logistics Amidst Flood and Landslide Risks.
+UP NOAH Center (n.d.). NOAH Studio. accessed https:// noah.up.edu.ph/noah-studio; accessed December 01, 2025
+Modeling and Analyzing Urban Networks and Amenities With OSMnx—Boeing—2025—Geographical Analysis—Wiley Online Library. (n.d.). Retrieved December 10, 2025, from https://onlinelibrary.wiley.com/doi/10.1111/gean.70009
+Department of Transportation, Department of the Interior and Local Government, & Department of Public Works and Highways. (2018). Joint memorandum circular no. 2018-001: Guidelines and standards for the classifications of roads, setting of speed limits under Republic Act No. 4136, and collection of road crash data. Retrieved December 10, 2025, from https://web.archive.org/web/20210714031352/https://www.imaginelaw.ph/wpcontent/uploads/2018/02/JMC-2018-001-Guidelines-and-Standards-on-Speed-Limit-Setting-and-Enforcement.pdf
+Adam, M. S., Nordin, R., Abdullah, N. F., Abu-Samah, A., Amodu, O. A., & Alsharif, M. H. (2024). Optimizing Disaster Response through Efficient Path Planning of Mobile Aerial Base Station with Genetic Algorithm. Drones, 8(6), 272. https://doi.org/10.3390/drones8060272
+
+
+
+Appendix B. Resource Persons
+Provide for each resource person: 
+Full Name and Title (e.g., Dr. Juan Dela Cruz) 
+Profession (e.g., Medical Doctor) 
+Affiliation (e.g., XYZ Hospital) 
+Email Address
+
+
+
+
+Appendix C. Personal Vitae
+
+Ian Gabriel Dalin Paulmino
+0966 628 3660
+Brgy. Bagong Silang, Iligan City , Lanao del Norte, Philippines
+iangabriel.paulmino@g.msuiit.edu.ph
+
+Christian Dave J. Janiola
+0946 125 0453
+Purok Sudlonon, Brgy. San Miguel, Iligan City, Lanao del Norte, Philippines
+christiandave.janiola@g.msuiit.edu.ph
+
+Josaih Raziel Sermon Lluch
+0905 377 1521
+Purok 5, Brgy. Pala-o, Iligan City, Lanao del Norte, Philippines
+josiahraziel.lluch@g.msuiit.edu.ph
+
+

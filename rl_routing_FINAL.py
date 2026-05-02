@@ -9,6 +9,7 @@ import json
 import math
 import random
 import argparse
+import time
 from collections import deque
 from copy import deepcopy
 from datetime import datetime
@@ -963,6 +964,22 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
         run_log_fp.write(f"{msg}\n")
         run_log_fp.flush()
 
+    def _wall_clock():
+        return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    def _fmt_minutes(seconds):
+        try:
+            return f"{float(seconds) / 60.0:.2f}m"
+        except (TypeError, ValueError):
+            return "n/a"
+
+    train_time_offset_seconds = 0.0
+    best_model_elapsed_seconds = 0.0
+    session_perf_start = time.perf_counter()
+
+    def current_elapsed_seconds():
+        return float(train_time_offset_seconds + (time.perf_counter() - session_perf_start))
+
     def _load_model_state_with_transfer(model, incoming_state, allow_partial_node_embedding=False):
         """
         Load a checkpoint state dict into `model` while tolerating selected shape changes.
@@ -1045,6 +1062,8 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
 
         if run_log_mode == "a":
             log("\n=== Resumed Training Session ===")
+
+        log(f"Session started | {_wall_clock()}")
 
         log(
             "Run config | "
@@ -1165,6 +1184,8 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
                 "best_eval_reward": float(best_eval_reward),
                 "eval_success_rate_primary": float(best_eval_success),
                 "eval_mean_reward_primary": float(best_eval_reward),
+                "cumulative_train_seconds": float(current_elapsed_seconds()),
+                "best_model_elapsed_seconds": float(best_model_elapsed_seconds),
                 "reward_history_tail": [float(x) for x in reward_history[-max(log_every, 1):]],
                 "success_history_tail": [float(x) for x in success_history[-max(log_every, 1):]],
                 "graph_num_nodes": env.num_nodes,
@@ -1222,6 +1243,15 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
             epsilon = _to_float(checkpoint.get("epsilon", epsilon_start), epsilon_start) if isinstance(checkpoint, dict) else epsilon_start
             epsilon_step = int(checkpoint.get("epsilon_step", start_episode)) if isinstance(checkpoint, dict) else start_episode
             train_steps = int(checkpoint.get("train_steps", 0)) if isinstance(checkpoint, dict) else 0
+            train_time_offset_seconds = _to_float(
+                checkpoint.get("cumulative_train_seconds", 0.0),
+                0.0,
+            ) if isinstance(checkpoint, dict) else 0.0
+            best_model_elapsed_seconds = _to_float(
+                checkpoint.get("best_model_elapsed_seconds", 0.0),
+                0.0,
+            ) if isinstance(checkpoint, dict) else 0.0
+            session_perf_start = time.perf_counter()
 
             best_eval_success = _to_float(
                 checkpoint.get("best_eval_success", checkpoint.get("eval_success_rate_primary", best_eval_success)),
@@ -1241,6 +1271,8 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
             log(
                 f"Resumed checkpoint: {ckpt_path} | start_episode={start_episode} | "
                 f"epsilon={epsilon:.4f} | train_steps={train_steps} | "
+                f"ElapsedSoFar={_fmt_minutes(train_time_offset_seconds)} | "
+                f"BestModelTime={_fmt_minutes(best_model_elapsed_seconds)} | "
                 f"MissingKeys: {len(missing_keys)}, UnexpectedKeys: {len(unexpected_keys)}"
             )
             if checkpoint_config_path:
@@ -1436,7 +1468,8 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
                     avg_reward = float(np.mean(reward_history[-log_every:]))
                     success_rate = float(np.mean(success_history[-log_every:]))
                     log(
-                        f"Episode {episode + 1}, "
+                        f"Episode {episode + 1} | "
+                        f"Elapsed: {_fmt_minutes(current_elapsed_seconds())} | "
                         f"LastReward: {total_reward:.2f}, "
                         f"AvgReward({log_every}): {avg_reward:.2f}, "
                         f"SuccessRate({log_every}): {success_rate:.2%}, "
@@ -1446,7 +1479,8 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
 
                 if (episode + 1) % eval_every == 0:
                     eval_count += 1
-                    eval_clock = datetime.now().strftime("%H:%M:%S")
+                    eval_clock = _wall_clock()
+                    elapsed_now = current_elapsed_seconds()
                     eval_reward_eps0, eval_success_eps0, eval_reasons_eps0, eval_metrics_eps0 = evaluate_policy(
                         online,
                         env,
@@ -1466,17 +1500,17 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
                         return_metrics=True,
                     )
                     log(
-                        f"[Eval @ Episode {episode + 1} | {eval_clock}] "
+                        f"[Eval @ Episode {episode + 1} | {eval_clock} | Elapsed: {_fmt_minutes(elapsed_now)}] "
                         f"eps={eval_eps0:.2f} -> MeanReward: {eval_reward_eps0:.2f}, SuccessRate: {eval_success_eps0:.2%} | "
                         f"eps={eval_eps_noise:.2f} -> MeanReward: {eval_reward_epsn:.2f}, SuccessRate: {eval_success_epsn:.2%}"
                     )
                     log(
-                        f"[EvalReasons @ Episode {episode + 1} | {eval_clock}] "
+                        f"[EvalReasons @ Episode {episode + 1} | {eval_clock} | Elapsed: {_fmt_minutes(elapsed_now)}] "
                         f"eps={eval_eps0:.2f} -> {format_reason_counts(eval_reasons_eps0, eval_episodes)} | "
                         f"eps={eval_eps_noise:.2f} -> {format_reason_counts(eval_reasons_epsn, eval_episodes)}"
                     )
                     log(
-                        f"[EvalStats @ Episode {episode + 1} | {eval_clock}] "
+                        f"[EvalStats @ Episode {episode + 1} | {eval_clock} | Elapsed: {_fmt_minutes(elapsed_now)}] "
                         f"eps={eval_eps0:.2f} -> {format_eval_metrics(eval_metrics_eps0)} | "
                         f"eps={eval_eps_noise:.2f} -> {format_eval_metrics(eval_metrics_epsn)}"
                     )
@@ -1488,11 +1522,13 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
                         best_eval_success = eval_success_eps0
                         best_eval_reward = eval_reward_eps0
                         best_episode = episode + 1
+                        best_model_elapsed_seconds = elapsed_now
                         evals_since_improvement = 0
                         torch.save(_make_checkpoint_payload(best_episode), best_model_path)
                         log(
                             f"Saved best checkpoint: {best_model_path} "
-                            f"(episode {best_episode}, success={best_eval_success:.2%}, reward={best_eval_reward:.2f})"
+                            f"(episode {best_episode}, success={best_eval_success:.2%}, reward={best_eval_reward:.2f}, "
+                            f"elapsed={_fmt_minutes(best_model_elapsed_seconds)})"
                         )
                     else:
                         evals_since_improvement += 1
@@ -1525,7 +1561,7 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
             torch.save(_make_checkpoint_payload(last_completed_episode), last_model_path)
             log(
                 f"Saved resumable checkpoint: {last_model_path} (episode {last_completed_episode}, "
-                f"epsilon={epsilon:.3f})."
+                f"epsilon={epsilon:.3f}, elapsed={_fmt_minutes(current_elapsed_seconds())})."
             )
             log("Resume by setting training.resume_training=true.")
             return
@@ -1541,7 +1577,7 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
 
         final_completed_episode = last_completed_episode if early_stopped else num_episodes
         torch.save(_make_checkpoint_payload(final_completed_episode), last_model_path)
-        log(f"Saved last checkpoint: {last_model_path}")
+        log(f"Saved last checkpoint: {last_model_path} | Elapsed: {_fmt_minutes(current_elapsed_seconds())}")
 
         final_reward_eps0, final_success_eps0, final_reasons_eps0, final_metrics_eps0 = evaluate_policy(
             online,
@@ -1561,9 +1597,10 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
             return_reason_counts=True,
             return_metrics=True,
         )
-        final_eval_clock = datetime.now().strftime("%H:%M:%S")
+        total_runtime_seconds = current_elapsed_seconds()
+        final_eval_clock = _wall_clock()
         log(
-            f"Evaluation over {eval_episodes} episodes | {final_eval_clock} | "
+            f"Evaluation over {eval_episodes} episodes | {final_eval_clock} | Elapsed: {_fmt_minutes(total_runtime_seconds)} | "
             f"eps={eval_eps0:.2f} MeanReward: {final_reward_eps0:.2f}, SuccessRate: {final_success_eps0:.2%} | "
             f"eps={eval_eps_noise:.2f} MeanReward: {final_reward_epsn:.2f}, SuccessRate: {final_success_epsn:.2%}"
         )
@@ -1580,6 +1617,11 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
         log(
             f"Best checkpoint summary | Episode: {best_episode}, "
             f"PrimaryEval MeanReward: {best_eval_reward:.2f}, SuccessRate: {best_eval_success:.2%}"
+        )
+        log(
+            f"Time summary | TotalRuntime: {_fmt_minutes(total_runtime_seconds)}, "
+            f"BestModelTime: {_fmt_minutes(best_model_elapsed_seconds)}, "
+            f"FinalEpisode: {final_completed_episode}, EvalCount: {eval_count}, EarlyStopped: {early_stopped}"
         )
         log(f"Run log saved to: {run_log_path}")
     finally:
