@@ -89,7 +89,7 @@
     "capacity": 20000
   },
   "training": {
-    "num_episodes": 30000,
+    "num_episodes": 35000,
     "gamma": 0.99,
     "lr": 0.0002,
     "batch_size": 128,
@@ -111,7 +111,7 @@
       "enabled": true,
       "patience_evals": 8,
       "min_evals": 8,
-      "min_episodes": 22000,
+      "min_episodes": 30000,
       "restore_best_weights_for_final_eval": true
     }
   },

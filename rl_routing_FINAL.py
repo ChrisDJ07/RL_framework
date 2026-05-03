@@ -924,10 +924,19 @@ def reset_episode_with_feasibility(
 # =========================
 # Training
 # =========================
-def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
+def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None, force_resume=False):
     cfg = load_config(config_path)
     if config_overrides:
         cfg = deep_update(cfg, config_overrides)
+    if force_resume:
+        cfg = deep_update(
+            cfg,
+            {
+                "training": {
+                    "resume_training": True,
+                }
+            },
+        )
 
     set_seed(cfg["seed"])
     apply_runtime_config(cfg)
@@ -1631,13 +1640,20 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train hazard-aware RL routing model.")
     parser.add_argument(
+        "mode",
+        nargs="?",
+        default="train",
+        choices=["train", "resume"],
+        help="Use 'resume' to continue from the run's resumable checkpoint without editing the config.",
+    )
+    parser.add_argument(
         "--config",
         type=str,
         default=CONFIG_PATH_DEFAULT,
         help="Path to config JSON (default: configs/experiment_config.json).",
     )
     args = parser.parse_args()
-    train(config_path=args.config)
+    train(config_path=args.config, force_resume=(args.mode == "resume"))
 
 # python rl_routing_wCUDA_wCheckP.py --config configs/no_hazard_training/no_hazard_config.json
 # python rl_routing_wCUDA_wCheckP.py --config configs/no_hazard_training/no_hazard_config_control.json
