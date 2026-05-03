@@ -1567,7 +1567,7 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None):
             return
 
         if early_stopped and early_stop_restore_best and best_episode > 0 and Path(best_model_path).exists():
-            best_payload = torch.load(best_model_path, map_location=device)
+            best_payload = torch.load(best_model_path, map_location=device, weights_only=False)
             online.load_state_dict(best_payload["model_state_dict"])
             target.load_state_dict(online.state_dict())
             log(
