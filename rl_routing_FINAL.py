@@ -705,7 +705,8 @@ class DQN(nn.Module):
 
 class ReplayBuffer:
     def __init__(self, capacity=10000):
-        self.buffer = deque(maxlen=int(capacity))
+        self.capacity = int(capacity)
+        self.buffer = deque(maxlen=self.capacity)
 
     def store(self, transition):
         self.buffer.append(transition)
@@ -743,6 +744,54 @@ class ReplayBuffer:
 
     def __len__(self):
         return len(self.buffer)
+
+    def state_dict(self):
+        return {
+            "capacity": int(self.capacity),
+            "items": list(self.buffer),
+        }
+
+    def load_state_dict(self, state):
+        if not isinstance(state, dict):
+            raise TypeError("ReplayBuffer state must be a dict.")
+        capacity = int(state.get("capacity", self.capacity))
+        items = list(state.get("items", []))
+        self.capacity = capacity
+        self.buffer = deque(items, maxlen=self.capacity)
+
+
+def _capture_rng_state():
+    state = {
+        "python_random_state": random.getstate(),
+        "numpy_random_state": np.random.get_state(),
+        "torch_random_state": torch.random.get_rng_state(),
+    }
+    if torch.cuda.is_available():
+        try:
+            state["torch_cuda_random_state_all"] = torch.cuda.get_rng_state_all()
+        except Exception:
+            pass
+    return state
+
+
+def _restore_rng_state(state):
+    if not isinstance(state, dict):
+        return
+    py_state = state.get("python_random_state")
+    if py_state is not None:
+        random.setstate(py_state)
+    np_state = state.get("numpy_random_state")
+    if np_state is not None:
+        np.random.set_state(np_state)
+    torch_state = state.get("torch_random_state")
+    if torch_state is not None:
+        torch.random.set_rng_state(torch_state)
+    cuda_state_all = state.get("torch_cuda_random_state_all")
+    if cuda_state_all is not None and torch.cuda.is_available():
+        try:
+            torch.cuda.set_rng_state_all(cuda_state_all)
+        except Exception:
+            pass
 
 
 def select_action(model, state, mask, epsilon):
@@ -1185,6 +1234,8 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None, force_resume=F
                 "model_state_dict": online.state_dict(),
                 "target_state_dict": target.state_dict(),
                 "optimizer_state_dict": optimizer.state_dict(),
+                "replay_buffer_state": buffer.state_dict(),
+                "rng_state": _capture_rng_state(),
                 "epsilon": float(epsilon),
                 "epsilon_step": int(epsilon_step),
                 "train_steps": int(train_steps),
@@ -1246,6 +1297,20 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None, force_resume=F
             if isinstance(checkpoint, dict) and "optimizer_state_dict" in checkpoint:
                 optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
 
+            replay_state = checkpoint.get("replay_buffer_state") if isinstance(checkpoint, dict) else None
+            if replay_state is not None:
+                try:
+                    buffer.load_state_dict(replay_state)
+                except Exception as exc:
+                    log(f"WARNING: failed to restore replay buffer state on resume: {exc}")
+
+            rng_state = checkpoint.get("rng_state") if isinstance(checkpoint, dict) else None
+            if rng_state is not None:
+                try:
+                    _restore_rng_state(rng_state)
+                except Exception as exc:
+                    log(f"WARNING: failed to restore RNG state on resume: {exc}")
+
             start_episode = max(0, int(checkpoint.get("episode", 0))) if isinstance(checkpoint, dict) else 0
             start_episode = min(start_episode, num_episodes)
             last_completed_episode = start_episode
@@ -1279,7 +1344,7 @@ def train(config_path=CONFIG_PATH_DEFAULT, config_overrides=None, force_resume=F
 
             log(
                 f"Resumed checkpoint: {ckpt_path} | start_episode={start_episode} | "
-                f"epsilon={epsilon:.4f} | train_steps={train_steps} | "
+                f"epsilon={epsilon:.4f} | train_steps={train_steps} | replay_size={len(buffer)} | "
                 f"ElapsedSoFar={_fmt_minutes(train_time_offset_seconds)} | "
                 f"BestModelTime={_fmt_minutes(best_model_elapsed_seconds)} | "
                 f"MissingKeys: {len(missing_keys)}, UnexpectedKeys: {len(unexpected_keys)}"
