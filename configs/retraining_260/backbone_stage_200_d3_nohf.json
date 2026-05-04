@@ -111,7 +111,7 @@
       "enabled": true,
       "patience_evals": 8,
       "min_evals": 8,
-      "min_episodes": 17000,
+      "min_episodes": 20000,
       "restore_best_weights_for_final_eval": true
     }
   },

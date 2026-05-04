@@ -99,8 +99,8 @@ DEFAULT_CONFIG = {
         "mission_success": 100.0,
         "k_progress": 0.1,
         "hazard_lambda": 10.0,
-        "w_flood": 0.6,
-        "w_landslide": 0.4,
+        "w_flood": 0.5,
+        "w_landslide": 0.5,
         "eta_time": 0.2,
         "step_cost": 0.2,
         "revisit_penalty": 0.0,
@@ -385,8 +385,8 @@ class HazardRoutingEnv:
         self.reward_mission_success = float(reward_cfg.get("mission_success", 100.0))
         self.k_progress = float(reward_cfg.get("k_progress", 0.1))
         self.hazard_lambda = float(reward_cfg.get("hazard_lambda", 10.0))
-        self.w_flood = float(reward_cfg.get("w_flood", 0.6))
-        self.w_landslide = float(reward_cfg.get("w_landslide", 0.4))
+        self.w_flood = float(reward_cfg.get("w_flood", 0.5))
+        self.w_landslide = float(reward_cfg.get("w_landslide", 0.5))
         self.eta_time = float(reward_cfg.get("eta_time", 0.2))
         self.step_cost = float(reward_cfg.get("step_cost", 0.2))
         self.revisit_penalty = float(reward_cfg.get("revisit_penalty", 0.0))
