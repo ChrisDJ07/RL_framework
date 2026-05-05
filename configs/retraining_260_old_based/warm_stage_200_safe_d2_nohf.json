@@ -69,7 +69,7 @@
     "delivery": 60.0,
     "mission_success": 120.0,
     "k_progress": 10.0,
-    "hazard_lambda": 20.0,
+    "hazard_lambda": 8.0,
     "w_flood": 0.5,
     "w_landslide": 0.5,
     "eta_time": 0.1,
